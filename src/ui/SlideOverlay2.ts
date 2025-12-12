@@ -99,9 +99,8 @@ export class SlideOverlay2 {
 
     // Render slide elements
     let currentY = -280;
-    const elementSpacing = 20;
+    const elementSpacing = 25; // Increased base spacing
     const leftMargin = -550;
-    const rightMargin = 550;
     const contentWidth = 1100;
     const maxContentY = 220; // Maximum Y before navigation buttons
     let previousElementType: string | null = null;
@@ -119,16 +118,13 @@ export class SlideOverlay2 {
         spacingToAdd = 0; // Spacers don't need extra spacing
       } else if (element.type === 'title') {
         const titleObj = rendered[0] as Phaser.GameObjects.Text;
-        // Use displayHeight which accounts for line spacing
-        heightToAdd = titleObj.displayHeight || titleObj.height;
+        heightToAdd = this.getTextHeight(titleObj);
       } else if (element.type === 'paragraph') {
         const textObj = rendered[0] as Phaser.GameObjects.Text;
-        // Use displayHeight and add a small buffer for line spacing
-        const textHeight = textObj.displayHeight || textObj.height;
-        heightToAdd = textHeight + 2; // Small buffer for line spacing
+        heightToAdd = this.getTextHeight(textObj);
         // Add extra spacing if paragraph comes after bold
         if (previousElementType === 'bold') {
-          spacingToAdd = elementSpacing + 10;
+          spacingToAdd = elementSpacing + 12;
         }
       } else if (element.type === 'bullet') {
         // Calculate actual height of all bullet items
@@ -138,7 +134,7 @@ export class SlideOverlay2 {
         for (let i = 1; i < rendered.length; i += 2) {
           const textObj = rendered[i];
           if (textObj instanceof Phaser.GameObjects.Text) {
-            const itemHeight = textObj.displayHeight || textObj.height;
+            const itemHeight = this.getTextHeight(textObj);
             bulletHeight += Math.max(itemHeight, 25) + bulletItemSpacing;
           }
         }
@@ -149,14 +145,13 @@ export class SlideOverlay2 {
         heightToAdd = bulletHeight;
       } else if (element.type === 'bold') {
         const textObj = rendered[0] as Phaser.GameObjects.Text;
-        const textHeight = textObj.displayHeight || textObj.height;
-        heightToAdd = textHeight + 2; // Small buffer
+        heightToAdd = this.getTextHeight(textObj);
         // Add extra spacing if bold is followed by paragraph
         const nextElement = slide.elements[index + 1];
         if (nextElement && nextElement.type === 'paragraph') {
-          spacingToAdd = elementSpacing + 10;
+          spacingToAdd = elementSpacing + 12;
         } else {
-          spacingToAdd = elementSpacing + 5; // Extra spacing after bold in general
+          spacingToAdd = elementSpacing + 8; // Extra spacing after bold in general
         }
       } else if (element.type === 'diagram' || element.type === 'graph') {
         const diagramEl = element as any;
@@ -192,12 +187,14 @@ export class SlideOverlay2 {
   }
 
   private getTextHeight(textObj: Phaser.GameObjects.Text): number {
-    // Ensure text is updated and get accurate height
-    // Phaser text height should account for word wrap, but add a small buffer
+    // Get the actual text height
+    // Phaser text height accounts for word wrap, but we need to ensure we get the full height
     const height = textObj.height;
-    // Add buffer for line spacing (approximately 20% of font size)
-    const lineSpacing = textObj.style.fontSize ? parseInt(textObj.style.fontSize) * 0.2 : 4;
-    return height + lineSpacing;
+    // For multi-line text, Phaser includes line spacing in height, but add a small safety buffer
+    // Check if text likely wraps (rough estimate: if text is long)
+    const estimatedLines = Math.ceil(textObj.text.length / 50); // Rough estimate
+    const buffer = estimatedLines > 1 ? 4 : 2; // More buffer for multi-line
+    return height + buffer;
   }
 
   private renderElement(element: SlideElement, x: number, y: number, width: number): Phaser.GameObjects.GameObject[] {
@@ -278,14 +275,29 @@ export class SlideOverlay2 {
 
       case 'bold':
         const boldEl = element as any;
-        const boldText = this.scene.add.text(x + width / 2, y, boldEl.text, {
+        const boldAlign = boldEl.align || 'center';
+        // Position based on alignment
+        let boldX: number;
+        let boldOriginX: number;
+        if (boldAlign === 'center') {
+          boldX = x + width / 2;
+          boldOriginX = 0.5;
+        } else if (boldAlign === 'right') {
+          boldX = x + width - 50;
+          boldOriginX = 1;
+        } else {
+          // left alignment
+          boldX = x + 50;
+          boldOriginX = 0;
+        }
+        const boldText = this.scene.add.text(boldX, y, boldEl.text, {
           fontSize: '20px',
           color: '#' + COLORS.SECONDARY.toString(16).padStart(6, '0'),
           fontFamily: 'Arial',
           fontStyle: 'bold',
-          align: 'center'
+          align: boldAlign
         });
-        boldText.setOrigin(0.5, 0);
+        boldText.setOrigin(boldOriginX, 0);
         objects.push(boldText);
         break;
 
@@ -476,11 +488,15 @@ export class SlideOverlay2 {
   }
 
   private clearCurrentElements(): void {
-    this.currentElements.forEach(element => {
-      if (element && !element.destroyed) {
-        element.destroy();
-      }
-    });
+        this.currentElements.forEach(element => {
+          if (element) {
+            try {
+              element.destroy();
+            } catch (e) {
+              // Element might already be destroyed
+            }
+          }
+        });
     this.currentElements = [];
     if (this.container) {
       this.container.removeAll(true);

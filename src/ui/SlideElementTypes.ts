@@ -41,6 +41,7 @@ export interface BoldElement extends BaseSlideElement {
   type: 'bold';
   text: string;
   inline?: boolean;
+  align?: 'left' | 'center' | 'right';
 }
 
 export interface IconElement extends BaseSlideElement {

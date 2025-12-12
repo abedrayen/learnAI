@@ -50,19 +50,27 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
     title: 'Types of AI Creatures',
     elements: [
       { type: 'title', text: 'Types of AI Creatures' },
-      { type: 'spacer', height: 15 },
-      { type: 'diagram', diagramType: 'ai-hierarchy', width: 600, height: 280 },
-      { type: 'spacer', height: 25 },
+      { type: 'spacer', height: 30 },
+      { type: 'diagram', diagramType: 'ai-hierarchy', width: 600, height: 400 },
+      { type: 'spacer', height: 30 },
+      { type: 'paragraph', text: 'AI can be categorized into three main types:', align: 'center' }
+    ]
+  },
+  {
+    title: 'Types of AI Creatures Explained',
+    elements: [
+      { type: 'title', text: 'Types of AI Creatures Explained' },
+      { type: 'spacer', height: 20 },
       { type: 'bold', text: 'Rule-Based AI (The Lizard)' },
-      { type: 'spacer', height: 5 },
+      { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'Follows strict instructions: "If this happens → do that." No learning, just rules.' },
-      { type: 'spacer', height: 12 },
+      { type: 'spacer', height: 20 },
       { type: 'bold', text: 'Machine Learning (The Tiger)' },
-      { type: 'spacer', height: 5 },
+      { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'Learns from data and improves over time. Recognizes patterns.' },
-      { type: 'spacer', height: 12 },
+      { type: 'spacer', height: 20 },
       { type: 'bold', text: 'Deep Learning (The Dragon)' },
-      { type: 'spacer', height: 5 },
+      { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'A powerful form of ML that uses neural networks. Great for images, sound, language.' }
     ]
   },
