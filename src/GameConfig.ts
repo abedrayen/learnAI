@@ -1,11 +1,23 @@
 import Phaser from 'phaser';
 
+// Base game dimensions (16:9 aspect ratio)
+const BASE_WIDTH = 1280;
+const BASE_HEIGHT = 720;
+
 export const GameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 1280,
-  height: 720,
+  width: BASE_WIDTH,
+  height: BASE_HEIGHT,
   parent: 'game-container',
   backgroundColor: '#1a1a2e',
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: BASE_WIDTH,
+    height: BASE_HEIGHT,
+    fullscreenTarget: 'game-container',
+    expandParent: true
+  },
   physics: {
     default: 'arcade',
     arcade: {

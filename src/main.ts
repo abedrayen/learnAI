@@ -25,5 +25,37 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 // Start the game
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// Handle window resize for responsive scaling
+window.addEventListener('resize', () => {
+  if (game.scale) {
+    game.scale.refresh();
+  }
+});
+
+// Handle fullscreen changes
+document.addEventListener('fullscreenchange', () => {
+  if (game.scale) {
+    game.scale.refresh();
+  }
+});
+
+document.addEventListener('webkitfullscreenchange', () => {
+  if (game.scale) {
+    game.scale.refresh();
+  }
+});
+
+document.addEventListener('mozfullscreenchange', () => {
+  if (game.scale) {
+    game.scale.refresh();
+  }
+});
+
+document.addEventListener('MSFullscreenChange', () => {
+  if (game.scale) {
+    game.scale.refresh();
+  }
+});
 

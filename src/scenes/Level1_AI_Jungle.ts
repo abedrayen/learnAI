@@ -3,29 +3,40 @@ import { COLORS } from '../GameConfig';
 import { InputManager } from '../systems/InputManager';
 import { ProgressManager } from '../systems/ProgressManager';
 import { DialogBox } from '../ui/DialogBox';
-import { QuizOverlay, QuizQuestion } from '../ui/QuizOverlay';
 import { LabLinkOverlay, LabLinkInfo } from '../ui/LabLinkOverlay';
 import { RecapScreen, RecapData } from '../ui/RecapScreen';
 import { SlideOverlay2 } from '../ui/SlideOverlay2';
 import { LEVEL_1_SLIDES_ENHANCED } from '../data/learningSlides2';
 import { SceneHelpers } from '../utils/SceneHelpers';
 
-interface AIExample {
-  x: number;
-  y: number;
-  type: string;
-  description: string;
-  collected: boolean;
-  sprite?: Phaser.GameObjects.Rectangle;
-  icon?: Phaser.GameObjects.Text;
+interface DraggableIcon {
+  sprite: Phaser.GameObjects.Container;
+  type: 'rule-based' | 'ml' | 'dl';
+  name: string;
+  icon: string;
+  originalX: number;
+  originalY: number;
+  isDragging: boolean;
+  isPlaced: boolean;
+  correctZone: 'rule-based' | 'ml' | 'dl';
 }
 
-interface CategoryPlatform {
+interface AIZone {
+  container: Phaser.GameObjects.Container;
+  type: 'rule-based' | 'ml' | 'dl';
+  label: string;
+  color: number;
   x: number;
   y: number;
-  category: 'rule-based' | 'ml' | 'dl';
+  width: number;
+  height: number;
+}
+
+interface BrainChoice {
+  container: Phaser.GameObjects.Container;
+  type: 'rule' | 'ml' | 'dl';
   label: string;
-  sprite?: Phaser.GameObjects.Rectangle;
+  reaction: string;
 }
 
 export default class Level1_AI_Jungle extends Phaser.Scene {
@@ -33,30 +44,35 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
   private platforms?: Phaser.Physics.Arcade.StaticGroup;
   private inputManager?: InputManager;
   private dialogBox?: DialogBox;
-  private quizOverlay?: QuizOverlay;
   private labLinkOverlay?: LabLinkOverlay;
   private recapScreen?: RecapScreen;
   private slideOverlay?: SlideOverlay2;
   
-  private aiExamples: AIExample[] = [];
-  private collectedCount: number = 0;
-  private categoryPlatforms: CategoryPlatform[] = [];
-  private categorizationActive: boolean = false;
-  private currentExample?: { type: string; description: string; correct: string };
-  private categorizationExamples: Array<{ type: string; description: string; correct: string }> = [];
-  private completedCategorizations: number = 0;
-  private floatingLabel?: Phaser.GameObjects.Text;
+  // Activity 1: AI Ecosystem Drag & Drop
+  private ecosystemActive: boolean = false;
+  private ecosystemContainer?: Phaser.GameObjects.Container;
+  private draggableIcons: DraggableIcon[] = [];
+  private aiZones: AIZone[] = [];
+  private placedCount: number = 0;
+  
+  // Activity 2: AI Guess-the-Brain
+  private brainGameActive: boolean = false;
+  private brainGameContainer?: Phaser.GameObjects.Container;
+  private currentScenario?: { description: string; animation: string; correct: 'rule' | 'ml' | 'dl' };
+  private brainChoices: BrainChoice[] = [];
+  private scenarioIndex: number = 0;
+  private scenarios: Array<{ description: string; animation: string; correct: 'rule' | 'ml' | 'dl' }> = [];
+  
   private labTerminal?: Phaser.GameObjects.Rectangle;
   private exitZone?: Phaser.GameObjects.Zone;
+  private activityCompleted: { ecosystem: boolean; brainGame: boolean } = { ecosystem: false, brainGame: false };
 
   constructor() {
     super({ key: 'Level1_AI_Jungle' });
   }
 
   create(): void {
-    // Initialize UI components
     this.dialogBox = new DialogBox(this);
-    this.quizOverlay = new QuizOverlay(this);
     this.labLinkOverlay = new LabLinkOverlay(this);
     this.recapScreen = new RecapScreen(this);
     this.slideOverlay = new SlideOverlay2(this);
@@ -72,12 +88,6 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     // Create player
     this.createPlayer();
 
-    // Create AI example collectibles
-    this.createAIExamples();
-
-    // Create categorization platforms
-    this.createCategoryPlatforms();
-
     // Create Lab Terminal
     this.createLabTerminal();
 
@@ -86,247 +96,44 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
 
     // Show learning slides first, then enable gameplay
     this.slideOverlay.show(LEVEL_1_SLIDES_ENHANCED, () => {
-      // Slides completed - enable gameplay
       this.time.delayedCall(500, () => {
         this.dialogBox!.show(
-          'Welcome to the AI Jungle! Your mission: Learn about AI by collecting examples and categorizing them. ' +
-          'Collect the AI icons scattered around, then test your knowledge by categorizing examples!',
-          () => {}
+          'Welcome to the AI Jungle! Complete two interactive activities:\n\n' +
+          '1. AI Ecosystem Map - Drag AI examples to the correct zones\n' +
+          '2. AI Guess-the-Brain - Choose the right AI type for each scenario',
+          () => {
+            // Ensure dialog is hidden and input is unblocked
+            this.dialogBox!.hide();
+            if (this.inputManager) {
+              this.inputManager.setBlocked(false);
+            }
+            this.time.delayedCall(100, () => {
+              this.startEcosystemActivity();
+            });
+          }
         );
       });
     }, this.inputManager);
 
-    // Physics collisions
     this.physics.add.collider(this.player!, this.platforms!);
-    
-    // Create a group for AI examples for overlap detection
-    const aiExampleGroup = this.physics.add.staticGroup();
-    this.aiExamples.forEach(example => {
-      if (example.sprite) {
-        aiExampleGroup.add(example.sprite);
-      }
-    });
-    this.physics.add.overlap(this.player!, aiExampleGroup, this.collectAIExample, undefined, this);
-    
-    // Category platforms overlap - create a group for them
-    const categoryPlatformGroup = this.physics.add.staticGroup();
-    this.categoryPlatforms.forEach(platform => {
-      if (platform.sprite) {
-        categoryPlatformGroup.add(platform.sprite);
-      }
-    });
-    this.physics.add.overlap(this.player!, categoryPlatformGroup, this.landOnCategoryPlatform, undefined, this);
   }
 
   private createPlatforms(): void {
-    // Ground
     SceneHelpers.createPlatform(this, this.platforms!, 640, 700, 1280, 40, COLORS.BG_MEDIUM);
-    
-    // Additional platforms
-    SceneHelpers.createPlatform(this, this.platforms!, 200, 550, 300, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 500, 450, 300, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 800, 550, 300, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 1100, 450, 300, 20, COLORS.BG_LIGHT);
-    
-    // Categorization area platforms (at the end)
-    SceneHelpers.createPlatform(this, this.platforms!, 300, 300, 200, 20, COLORS.SUCCESS);
-    SceneHelpers.createPlatform(this, this.platforms!, 640, 300, 200, 20, COLORS.PRIMARY);
-    SceneHelpers.createPlatform(this, this.platforms!, 980, 300, 200, 20, COLORS.SECONDARY);
+    SceneHelpers.createPlatform(this, this.platforms!, 200, 550, 200, 20, COLORS.BG_LIGHT);
+    SceneHelpers.createPlatform(this, this.platforms!, 500, 450, 200, 20, COLORS.BG_LIGHT);
+    SceneHelpers.createPlatform(this, this.platforms!, 800, 550, 200, 20, COLORS.BG_LIGHT);
+    SceneHelpers.createPlatform(this, this.platforms!, 1100, 450, 200, 20, COLORS.BG_LIGHT);
   }
 
   private createPlayer(): void {
     this.player = SceneHelpers.createPlayer(this, 100, 400);
   }
 
-  private createAIExamples(): void {
-    const examples: Array<{x: number; y: number; type: string; description: string}> = [
-      { x: 200, y: 500, type: 'search', description: 'Search engines use AI to find relevant results' },
-      { x: 500, y: 400, type: 'recommendation', description: 'Netflix uses AI to recommend movies' },
-      { x: 800, y: 500, type: 'face-recognition', description: 'Face recognition uses AI to identify people' },
-      { x: 1100, y: 400, type: 'chatbot', description: 'Chatbots use AI to have conversations' },
-      { x: 600, y: 200, type: 'self-driving', description: 'Self-driving cars use AI to navigate' }
-    ];
-
-    examples.forEach(example => {
-      const sprite = this.add.rectangle(example.x, example.y, 50, 50, COLORS.SECONDARY);
-      sprite.setStrokeStyle(3, COLORS.PRIMARY);
-      sprite.setOrigin(0.5, 0.5);
-      
-      // Make it a physics body so overlap detection works
-      this.physics.add.existing(sprite, true); // true = static body
-      const body = sprite.body as Phaser.Physics.Arcade.StaticBody;
-      if (body) {
-        body.setSize(50, 50);
-        // Static bodies are already immovable and don't have gravity
-      }
-      
-      const icon = this.add.text(example.x, example.y, '🤖', { fontSize: '30px' });
-      icon.setOrigin(0.5);
-      
-      this.aiExamples.push({
-        ...example,
-        collected: false,
-        sprite,
-        icon
-      });
-    });
-  }
-
-  private collectAIExample(player: Phaser.GameObjects.GameObject, exampleSprite: Phaser.GameObjects.GameObject): void {
-    const example = this.aiExamples.find(e => e.sprite === exampleSprite);
-    if (example && !example.collected) {
-      example.collected = true;
-      example.sprite!.setVisible(false);
-      if (example.icon) {
-        example.icon.setVisible(false);
-      }
-      this.collectedCount++;
-
-      // Show tooltip
-      this.dialogBox!.show(`Collected: ${example.description}`, () => {});
-
-      // Check if all collected
-      if (this.collectedCount >= this.aiExamples.length) {
-        this.time.delayedCall(1000, () => {
-          this.startCategorizationActivity();
-        });
-      }
-    }
-  }
-
-  private createCategoryPlatforms(): void {
-    this.categoryPlatforms = [
-      { x: 300, y: 280, category: 'rule-based', label: 'Rule-based AI' },
-      { x: 640, y: 280, category: 'ml', label: 'Machine Learning' },
-      { x: 980, y: 280, category: 'dl', label: 'Deep Learning' }
-    ];
-
-    this.categoryPlatforms.forEach((platform, index) => {
-      const sprite = this.add.rectangle(platform.x, platform.y, 200, 20, 
-        index === 0 ? COLORS.SUCCESS : index === 1 ? COLORS.PRIMARY : COLORS.SECONDARY);
-      sprite.setAlpha(0.5);
-      sprite.setOrigin(0.5, 0.5);
-      
-      // Make it a physics body for overlap detection
-      this.physics.add.existing(sprite, true); // true = static body
-      const body = sprite.body as Phaser.Physics.Arcade.StaticBody;
-      if (body) {
-        body.setSize(200, 20);
-      }
-      
-      const label = this.add.text(platform.x, platform.y - 30, platform.label, {
-        fontSize: '18px',
-        color: '#ffffff',
-        fontFamily: 'Arial',
-        fontStyle: 'bold'
-      });
-      label.setOrigin(0.5);
-      platform.sprite = sprite;
-    });
-  }
-
-  private startCategorizationActivity(): void {
-    this.categorizationActive = true;
-    this.completedCategorizations = 0;
-    
-    // Initialize the list of examples to categorize
-    this.categorizationExamples = [
-      { type: 'rule-based', description: 'Classic calculator', correct: 'rule-based' },
-      { type: 'ml', description: 'Netflix recommendations', correct: 'ml' },
-      { type: 'dl', description: 'Self-driving car vision', correct: 'dl' },
-      { type: 'ml', description: 'Email spam filter', correct: 'ml' },
-      { type: 'dl', description: 'Image recognition', correct: 'dl' }
-    ];
-    
-    this.dialogBox!.show(
-      'Great! Now categorize these examples. Jump onto the correct platform for each example that appears.',
-      () => {
-        this.showNextCategorizationExample();
-      }
-    );
-  }
-
-  private showNextCategorizationExample(): void {
-    // Check if all examples are done
-    if (this.completedCategorizations >= this.categorizationExamples.length) {
-      this.dialogBox!.show(
-        'Excellent! You\'ve completed all categorizations. You can now proceed to the exit!',
-        () => {}
-      );
-      this.categorizationActive = false;
-      return;
-    }
-
-    // Remove any existing floating label
-    if (this.floatingLabel) {
-      this.floatingLabel.destroy();
-      this.floatingLabel = undefined;
-    }
-
-    // Get a random example from the remaining ones
-    const availableExamples = this.categorizationExamples.filter((_, index) => 
-      !this.categorizationExamples.slice(0, this.completedCategorizations).some((ex, i) => 
-        i === index && ex.description === this.categorizationExamples[index].description
-      )
-    );
-    
-    // Actually, let's just go through them in order to avoid repeats
-    if (this.completedCategorizations < this.categorizationExamples.length) {
-      this.currentExample = this.categorizationExamples[this.completedCategorizations];
-      
-      this.floatingLabel = this.add.text(640, 150, this.currentExample.description, {
-        fontSize: '24px',
-        color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
-        fontFamily: 'Arial',
-        fontStyle: 'bold',
-        backgroundColor: '#' + COLORS.BG_MEDIUM.toString(16).padStart(6, '0'),
-        padding: { x: 20, y: 10 }
-      });
-      this.floatingLabel.setOrigin(0.5);
-      this.floatingLabel.setDepth(100);
-    }
-  }
-
-  private landOnCategoryPlatform(player: Phaser.GameObjects.GameObject, platformSprite: Phaser.GameObjects.GameObject): void {
-    if (!this.categorizationActive || !this.currentExample) return;
-
-    const platform = this.categoryPlatforms.find(p => p.sprite === platformSprite);
-    if (!platform) return;
-
-    const isCorrect = platform.category === this.currentExample.correct;
-    
-    if (isCorrect) {
-      const exampleDesc = this.currentExample.description;
-      this.completedCategorizations++;
-      
-      // Remove floating label
-      if (this.floatingLabel) {
-        this.floatingLabel.destroy();
-        this.floatingLabel = undefined;
-      }
-      
-      this.dialogBox!.show(
-        `Correct! ${exampleDesc} is an example of ${this.currentExample.correct === 'rule-based' ? 'Rule-based AI' : this.currentExample.correct === 'ml' ? 'Machine Learning' : 'Deep Learning'}.`,
-        () => {
-          this.currentExample = undefined;
-          // Continue with next or complete
-          this.time.delayedCall(500, () => {
-            this.showNextCategorizationExample();
-          });
-        }
-      );
-    } else {
-      this.dialogBox!.show(
-        `Not quite! Try again. ${this.currentExample.description} belongs to a different category.`,
-        () => {}
-      );
-    }
-  }
-
   private createLabTerminal(): void {
     this.labTerminal = this.add.rectangle(1200, 200, 100, 100, COLORS.SECONDARY);
     this.labTerminal.setStrokeStyle(4, COLORS.PRIMARY);
-    this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains);
     
     const terminalIcon = this.add.text(1200, 200, '💻', { fontSize: '40px' });
     terminalIcon.setOrigin(0.5);
@@ -349,30 +156,14 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
   }
 
   private createExitZone(): void {
-    // Create exit as a rectangle with physics for better detection
-    const exitRect = this.add.rectangle(1200, 650, 80, 50, COLORS.SUCCESS);
-    exitRect.setAlpha(0.3); // Make it semi-transparent so it's visible but not too prominent
-    exitRect.setOrigin(0.5, 0.5);
-    this.physics.add.existing(exitRect, true); // true = static body
-    const exitBody = exitRect.body as Phaser.Physics.Arcade.StaticBody;
-    if (exitBody) {
-      exitBody.setSize(80, 50);
-    }
-    
-    // Store as exitZone for reference
-    this.exitZone = exitRect as any;
-    
-    // Create a static group for the exit
-    const exitGroup = this.physics.add.staticGroup();
-    exitGroup.add(exitRect);
-    
-    this.physics.add.overlap(this.player!, exitGroup, () => {
-      // Only allow exit if categorization is complete or not required
-      if (!this.categorizationActive || this.completedCategorizations >= this.categorizationExamples.length) {
+    this.exitZone = this.add.zone(1200, 650, 80, 50);
+    this.physics.add.existing(this.exitZone, true);
+    this.physics.add.overlap(this.player!, this.exitZone, () => {
+      if (this.activityCompleted.ecosystem && this.activityCompleted.brainGame) {
         this.completeLevel();
       } else {
         this.dialogBox!.show(
-          'Complete the categorization activity first! Jump onto the platforms to categorize the examples.',
+          'Complete both activities first!',
           () => {}
         );
       }
@@ -385,16 +176,562 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
       fontStyle: 'bold'
     });
     exitSign.setOrigin(0.5);
-    exitSign.setDepth(10); // Make sure text is visible
+  }
+
+  // ========== ACTIVITY 1: AI ECOSYSTEM DRAG & DROP MAP ==========
+  private startEcosystemActivity(): void {
+    this.ecosystemActive = true;
+    this.placedCount = 0;
+    
+    // Ensure input is not blocked
+    if (this.inputManager) {
+      this.inputManager.setBlocked(false);
+    }
+    
+    // Create fullscreen overlay
+    this.ecosystemContainer = this.add.container(640, 360);
+    this.ecosystemContainer.setDepth(2000); // Higher than dialog box
+    
+    // Background overlay - don't make it interactive so it doesn't block child elements
+    const bg = this.add.rectangle(0, 0, 1280, 720, 0x000000, 0.8);
+    this.ecosystemContainer.add(bg);
+    
+    // Title
+    const title = this.add.text(0, -320, 'AI Ecosystem Map', {
+      fontSize: '32px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    this.ecosystemContainer.add(title);
+    
+    // Instructions
+    const instructions = this.add.text(0, -280, 'Drag each AI example to its correct zone', {
+      fontSize: '18px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    instructions.setOrigin(0.5);
+    this.ecosystemContainer.add(instructions);
+    
+    // Left side label for icons
+    const iconsLabel = this.add.text(-600, -150, 'AI Examples\n(Drag to zones)', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    iconsLabel.setOrigin(0.5);
+    this.ecosystemContainer.add(iconsLabel);
+    
+    // Create zones
+    this.createAIZones();
+    
+    // Create draggable icons
+    this.createDraggableIcons();
+    
+    // Close button
+    const closeBtn = this.add.rectangle(600, -300, 120, 40, COLORS.ERROR);
+    closeBtn.setInteractive({ useHandCursor: true });
+    const closeText = this.add.text(600, -300, 'Close', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    closeText.setOrigin(0.5);
+    closeBtn.on('pointerdown', () => {
+      if (this.placedCount >= this.draggableIcons.length) {
+        this.activityCompleted.ecosystem = true;
+        this.ecosystemActive = false;
+        this.ecosystemContainer!.destroy();
+        this.dialogBox!.show('Great! Now try the AI Guess-the-Brain game!', () => {
+          this.startBrainGame();
+        });
+      } else {
+        this.dialogBox!.show('Place all icons first!', () => {});
+      }
+    });
+    this.ecosystemContainer.add([closeBtn, closeText]);
+  }
+
+  private createAIZones(): void {
+    const zones = [
+      { type: 'rule-based' as const, label: 'Rule-Based Zone\n(Algorithmic Trees)', x: -350, y: 50, color: COLORS.BG_LIGHT },
+      { type: 'ml' as const, label: 'Machine Learning Valley', x: 0, y: 50, color: COLORS.PRIMARY },
+      { type: 'dl' as const, label: 'Deep Learning Caverns', x: 350, y: 50, color: COLORS.SECONDARY }
+    ];
+    
+    zones.forEach(zoneData => {
+      const container = this.add.container(zoneData.x, zoneData.y);
+      
+      // Zone background
+      const bg = this.add.rectangle(0, 0, 280, 350, zoneData.color, 0.3);
+      bg.setStrokeStyle(4, zoneData.color);
+      container.add(bg);
+      
+      // Zone label
+      const label = this.add.text(0, -140, zoneData.label, {
+        fontSize: '18px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        align: 'center',
+        wordWrap: { width: 250 }
+      });
+      label.setOrigin(0.5);
+      container.add(label);
+      
+      // Drop zone indicator
+      const dropZone = this.add.rectangle(0, 20, 250, 250, 0xffffff, 0.1);
+      dropZone.setStrokeStyle(2, 0xffffff, 0.5);
+      container.add(dropZone);
+      
+      this.aiZones.push({
+        container,
+        type: zoneData.type,
+        label: zoneData.label,
+        color: zoneData.color,
+        x: zoneData.x,
+        y: zoneData.y,
+        width: 280,
+        height: 350
+      });
+      
+      this.ecosystemContainer!.add(container);
+    });
+  }
+
+  private createDraggableIcons(): void {
+    const icons: Array<{ name: string; icon: string; correctZone: 'rule-based' | 'ml' | 'dl' }> = [
+      { name: 'Tesla Car', icon: '🚗', correctZone: 'dl' },
+      { name: 'Netflix', icon: '📺', correctZone: 'ml' },
+      { name: 'Google Lens', icon: '🔍', correctZone: 'dl' },
+      { name: 'Spam Filter', icon: '📧', correctZone: 'ml' },
+      { name: 'Anti-cheat Bot', icon: '🛡️', correctZone: 'ml' },
+      { name: 'Calculator', icon: '🔢', correctZone: 'rule-based' }
+    ];
+    
+    // Arrange icons in a grid on the left side, well separated from zones
+    const startX = -600;
+    const startY = -150;
+    const colSpacing = 110;
+    const rowSpacing = 130;
+    
+    icons.forEach((iconData, index) => {
+      const row = Math.floor(index / 2);
+      const col = index % 2;
+      const x = startX + col * colSpacing;
+      const y = startY + row * rowSpacing;
+      
+      const container = this.add.container(x, y);
+      
+      // Icon background - make this interactive
+      const bg = this.add.rectangle(0, 0, 90, 90, COLORS.WARNING, 0.8);
+      bg.setStrokeStyle(3, COLORS.WARNING);
+      container.add(bg);
+      
+      // Icon emoji
+      const iconText = this.add.text(0, -10, iconData.icon, { fontSize: '35px' });
+      iconText.setOrigin(0.5);
+      container.add(iconText);
+      
+      // Icon label
+      const label = this.add.text(0, 30, iconData.name, {
+        fontSize: '12px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        align: 'center',
+        wordWrap: { width: 80 }
+      });
+      label.setOrigin(0.5);
+      container.add(label);
+      
+      // Create draggable icon object first
+      const draggableIcon: DraggableIcon = {
+        sprite: container,
+        type: iconData.correctZone,
+        name: iconData.name,
+        icon: iconData.icon,
+        originalX: x,
+        originalY: y,
+        isDragging: false,
+        isPlaced: false,
+        correctZone: iconData.correctZone
+      };
+      
+      // Make container draggable - set up interactive area
+      container.setInteractive(
+        new Phaser.Geom.Rectangle(-45, -45, 90, 90),
+        Phaser.Geom.Rectangle.Contains
+      );
+      container.setData('isDragging', false);
+      container.setData('iconData', draggableIcon); // Store reference
+      
+      // Enable dragging
+      this.input.setDraggable(container);
+      
+      // Visual feedback on hover
+      container.on('pointerover', () => {
+        if (!draggableIcon.isPlaced) {
+          container.setScale(1.05);
+        }
+      });
+      
+      container.on('pointerout', () => {
+        if (!draggableIcon.isDragging && !draggableIcon.isPlaced) {
+          container.setScale(1);
+        }
+      });
+      
+      this.draggableIcons.push(draggableIcon);
+      this.ecosystemContainer!.add(container);
+      
+      // Drag events - store reference for event handlers
+      const iconRef = draggableIcon;
+      let dragOffsetX = 0;
+      let dragOffsetY = 0;
+      
+      // Use global input events but check for this specific container
+      this.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === container && !iconRef.isPlaced) {
+          iconRef.isDragging = true;
+          container.setScale(1.1);
+          container.setDepth(3000); // Higher depth when dragging
+          
+          // Calculate offset from pointer to container center
+          // Container's world position = ecosystemContainer world (640, 360) + container local (x, y)
+          const containerWorldX = 640 + container.x;
+          const containerWorldY = 360 + container.y;
+          dragOffsetX = pointer.worldX - containerWorldX;
+          dragOffsetY = pointer.worldY - containerWorldY;
+        }
+      });
+      
+      this.input.on('drag', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === container && iconRef.isDragging && !iconRef.isPlaced) {
+          // Convert world coordinates to container-relative coordinates
+          // ecosystemContainer is at world position (640, 360)
+          // Account for the drag offset to keep the cursor at the same relative position
+          container.x = pointer.worldX - 640 - dragOffsetX;
+          container.y = pointer.worldY - 360 - dragOffsetY;
+        }
+      });
+      
+      this.input.on('dragend', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === container && iconRef.isDragging) {
+          iconRef.isDragging = false;
+          container.setScale(1);
+          
+          // Check if dropped in correct zone
+          // Container coordinates are relative to ecosystemContainer (which is at 640, 360)
+          const containerX = container.x;
+          const containerY = container.y;
+          
+          let droppedInZone = false;
+          for (const zone of this.aiZones) {
+            const zoneX = zone.x; // Already relative to ecosystemContainer
+            const zoneY = zone.y;
+            // Check if dropped within zone bounds (zone is 280x350, centered at zoneX, zoneY)
+            if (Math.abs(containerX - zoneX) < 140 && Math.abs(containerY - zoneY) < 175) {
+              droppedInZone = true;
+              
+              if (zone.type === draggableIcon.correctZone) {
+                // Correct placement!
+                draggableIcon.isPlaced = true;
+                container.x = zoneX;
+                container.y = zoneY;
+                container.setAlpha(0.8);
+                this.placedCount++;
+                
+                // Particle effect
+                this.createParticleBurst(zoneX, zoneY, zone.color);
+                
+                // Sound feedback (visual)
+                const feedback = this.add.text(zoneX, zoneY - 100, '✓ Correct!', {
+                  fontSize: '24px',
+                  color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+                  fontFamily: 'Arial',
+                  fontStyle: 'bold'
+                });
+                feedback.setOrigin(0.5);
+                this.ecosystemContainer!.add(feedback);
+                this.tweens.add({
+                  targets: feedback,
+                  alpha: 0,
+                  y: feedback.y - 50,
+                  duration: 1000,
+                  onComplete: () => feedback.destroy()
+                });
+                
+                if (this.placedCount >= this.draggableIcons.length) {
+                  this.time.delayedCall(1000, () => {
+                    this.dialogBox!.show('Perfect! All icons placed correctly!', () => {});
+                  });
+                }
+              } else {
+                // Incorrect - shake and hint
+                this.tweens.add({
+                  targets: container,
+                  x: container.x - 10,
+                  duration: 50,
+                  yoyo: true,
+                  repeat: 5,
+                  onComplete: () => {
+                    container.x = draggableIcon.originalX;
+                    container.y = draggableIcon.originalY;
+                  }
+                });
+                
+                const hint = this.add.text(zoneX, zoneY - 100, 'Needs training data...', {
+                  fontSize: '18px',
+                  color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+                  fontFamily: 'Arial',
+                  fontStyle: 'italic'
+                });
+                hint.setOrigin(0.5);
+                this.ecosystemContainer!.add(hint);
+                this.tweens.add({
+                  targets: hint,
+                  alpha: 0,
+                  duration: 2000,
+                  onComplete: () => hint.destroy()
+                });
+              }
+              break;
+            }
+          }
+          
+          if (!droppedInZone && !draggableIcon.isPlaced) {
+            // Return to original position
+            container.x = draggableIcon.originalX;
+            container.y = draggableIcon.originalY;
+          }
+        }
+      });
+    });
+  }
+
+  private createParticleBurst(x: number, y: number, color: number): void {
+    // Create visual burst effect with circles
+    // Coordinates are relative to ecosystemContainer
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const distance = 30;
+      const particle = this.add.circle(0, 0, 5, color);
+      particle.setAlpha(0.8);
+      particle.x = x;
+      particle.y = y;
+      this.ecosystemContainer!.add(particle);
+      
+      this.tweens.add({
+        targets: particle,
+        x: x + Math.cos(angle) * distance,
+        y: y + Math.sin(angle) * distance,
+        alpha: 0,
+        scale: 0,
+        duration: 500,
+        onComplete: () => particle.destroy()
+      });
+    }
+  }
+
+  // ========== ACTIVITY 2: AI GUESS-THE-BRAIN ==========
+  private startBrainGame(): void {
+    this.brainGameActive = true;
+    this.scenarioIndex = 0;
+    
+    this.scenarios = [
+      { description: 'A robot sees a cat in an image', animation: '🤖👁️🐱', correct: 'dl' },
+      { description: 'A device transcribes speech to text', animation: '🎤→📝', correct: 'dl' },
+      { description: 'A system follows "if temperature > 30, turn on AC"', animation: '🌡️→❄️', correct: 'rule' },
+      { description: 'An app recommends movies based on your history', animation: '📊→🎬', correct: 'ml' },
+      { description: 'A chess engine evaluates board positions', animation: '♟️→🧠', correct: 'ml' }
+    ];
+    
+    this.showNextScenario();
+  }
+
+  private showNextScenario(): void {
+    if (this.scenarioIndex >= this.scenarios.length) {
+      this.activityCompleted.brainGame = true;
+      this.dialogBox!.show('Excellent! You completed the AI Guess-the-Brain game!', () => {
+        if (this.brainGameContainer) {
+          this.brainGameContainer.destroy();
+        }
+      });
+      return;
+    }
+    
+    this.currentScenario = this.scenarios[this.scenarioIndex];
+    
+    // Create fullscreen overlay
+    if (this.brainGameContainer) {
+      this.brainGameContainer.destroy();
+    }
+    this.brainGameContainer = this.add.container(640, 360);
+    this.brainGameContainer.setDepth(500);
+    
+    // Background
+    const bg = this.add.rectangle(0, 0, 1280, 720, 0x000000, 0.85);
+    this.brainGameContainer.add(bg);
+    
+    // Title
+    const title = this.add.text(0, -280, 'AI Guess-the-Brain', {
+      fontSize: '32px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    this.brainGameContainer.add(title);
+    
+    // Scenario animation
+    const animText = this.add.text(0, -180, this.currentScenario.animation, {
+      fontSize: '60px',
+      fontFamily: 'Arial'
+    });
+    animText.setOrigin(0.5);
+    this.brainGameContainer.add(animText);
+    
+    // Scenario description
+    const desc = this.add.text(0, -100, this.currentScenario.description, {
+      fontSize: '24px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      wordWrap: { width: 800 }
+    });
+    desc.setOrigin(0.5);
+    this.brainGameContainer.add(desc);
+    
+    const question = this.add.text(0, -50, 'Which AI type handles this?', {
+      fontSize: '20px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    question.setOrigin(0.5);
+    this.brainGameContainer.add(question);
+    
+    // Create brain choices
+    this.createBrainChoices();
+  }
+
+  private createBrainChoices(): void {
+    const choices = [
+      { type: 'rule' as const, label: 'Rule-Brain', reaction: 'I don\'t see images, give me rules! 😵', color: COLORS.BG_LIGHT },
+      { type: 'ml' as const, label: 'ML-Brain', reaction: 'Ah yes, I learned this pattern. 😎', color: COLORS.PRIMARY },
+      { type: 'dl' as const, label: 'DL-Brain', reaction: 'Give me pixels, I feast! 🧠🔥', color: COLORS.SECONDARY }
+    ];
+    
+    this.brainChoices = [];
+    const spacing = 400;
+    const startX = -400;
+    
+    choices.forEach((choiceData, index) => {
+      const x = startX + index * spacing;
+      const container = this.add.container(x, 100);
+      
+      // Brain box
+      const box = this.add.rectangle(0, 0, 300, 200, choiceData.color, 0.7);
+      box.setStrokeStyle(4, choiceData.color);
+      box.setInteractive({ useHandCursor: true });
+      container.add(box);
+      
+      // Brain label
+      const label = this.add.text(0, -50, choiceData.label, {
+        fontSize: '22px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      container.add(label);
+      
+      // Brain emoji
+      const emoji = this.add.text(0, 0, '🧠', { fontSize: '50px' });
+      emoji.setOrigin(0.5);
+      container.add(emoji);
+      
+      // Click handler
+      box.on('pointerdown', () => {
+        this.selectBrain(choiceData.type, choiceData.reaction);
+      });
+      
+      box.on('pointerover', () => {
+        box.setScale(1.05);
+      });
+      
+      box.on('pointerout', () => {
+        box.setScale(1);
+      });
+      
+      this.brainChoices.push({
+        container,
+        type: choiceData.type,
+        label: choiceData.label,
+        reaction: choiceData.reaction
+      });
+      
+      this.brainGameContainer!.add(container);
+    });
+  }
+
+  private selectBrain(selectedType: 'rule' | 'ml' | 'dl', reaction: string): void {
+    if (!this.currentScenario) return;
+    
+    const isCorrect = selectedType === this.currentScenario.correct;
+    
+    // Show reaction
+    const reactionText = this.add.text(0, 250, reaction, {
+      fontSize: '24px',
+      color: isCorrect ? '#' + COLORS.SUCCESS.toString(16).padStart(6, '0') : '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      wordWrap: { width: 1000 },
+      align: 'center'
+    });
+    reactionText.setOrigin(0.5);
+    this.brainGameContainer!.add(reactionText);
+    
+    if (isCorrect) {
+      const correctText = this.add.text(0, 320, '✓ Correct!', {
+        fontSize: '28px',
+        color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      correctText.setOrigin(0.5);
+      this.brainGameContainer!.add(correctText);
+      
+      this.time.delayedCall(2000, () => {
+        this.scenarioIndex++;
+        this.showNextScenario();
+      });
+    } else {
+      const tryAgain = this.add.text(0, 320, 'Try again!', {
+        fontSize: '24px',
+        color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial'
+      });
+      tryAgain.setOrigin(0.5);
+      this.brainGameContainer!.add(tryAgain);
+      
+      this.time.delayedCall(2000, () => {
+        reactionText.destroy();
+        tryAgain.destroy();
+      });
+    }
   }
 
   private completeLevel(): void {
     const recapData: RecapData = {
       levelName: 'AI Jungle',
       concepts: [
-        'AI is used in many everyday applications',
         'AI can be categorized into Rule-based, Machine Learning, and Deep Learning',
-        'Different AI systems work in different ways'
+        'Different AI systems work in different ways for different tasks',
+        'Real-world AI applications use various approaches'
       ],
       labLink: {
         title: 'AI Intro Lab',
@@ -406,15 +743,18 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.recapScreen!.show(recapData, () => {
       ProgressManager.completeLevel('Level1_AI_Jungle');
       this.scene.start('MenuScene');
-    }, () => {
-      // Go to Colab callback
     });
   }
 
   update(): void {
     if (!this.player || !this.inputManager) return;
 
-    // Horizontal movement
+    if (this.ecosystemActive || this.brainGameActive) {
+      // Disable player movement during activities
+      this.player.setVelocityX(0);
+      return;
+    }
+
     if (this.inputManager.isLeftPressed()) {
       this.player.setVelocityX(-200);
     } else if (this.inputManager.isRightPressed()) {
@@ -423,10 +763,8 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    // Jumping
     if (this.inputManager.isJumpJustPressed() && this.player.body!.touching.down) {
       this.player.setVelocityY(-500);
     }
   }
 }
-
