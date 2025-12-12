@@ -426,14 +426,16 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
         'It can then predict outputs for new, unseen inputs'
       ]},
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Real-World Applications:', align: 'center' },
-      { type: 'bullet', items: [
-        '🏥 Medical diagnosis — predicting diseases from symptoms and test results',
-        '📧 Email spam detection — learning which emails are spam vs. legitimate',
-        '💰 Price prediction — estimating house prices from features',
-        '🖼️ Image classification — recognizing objects in photos',
-        '📊 Sentiment analysis — determining if text is positive or negative'
-      ]},
+      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
+        title: 'Supervised Learning Applications',
+        items: [
+          '🏥 Medical diagnosis — predicting diseases from symptoms and test results',
+          '📧 Email spam detection — learning which emails are spam vs. legitimate',
+          '💰 Price prediction — estimating house prices from features',
+          '🖼️ Image classification — recognizing objects in photos',
+          '📊 Sentiment analysis — determining if text is positive or negative'
+        ]
+      }},
       { type: 'spacer', height: 15 },
       { type: 'paragraph', text: 'Use when: You have examples with known correct answers and want to predict or classify new examples.', align: 'center' }
     ]
@@ -454,14 +456,16 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
         'It reveals insights you might not have known existed'
       ]},
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Real-World Applications:', align: 'center' },
-      { type: 'bullet', items: [
-        '👥 Customer segmentation — grouping customers by behavior patterns (e.g., "frequent buyers," "bargain hunters," "luxury shoppers")',
-        '🔍 Anomaly detection — finding unusual patterns (fraud, system failures)',
-        '📚 Topic modeling — discovering themes in large text collections',
-        '🛒 Market basket analysis — finding products frequently bought together',
-        '🧬 Gene clustering — grouping similar genes in biology research'
-      ]},
+      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
+        title: 'Unsupervised Learning Applications',
+        items: [
+          '👥 Customer segmentation — grouping customers by behavior patterns (e.g., "frequent buyers," "bargain hunters," "luxury shoppers")',
+          '🔍 Anomaly detection — finding unusual patterns (fraud, system failures)',
+          '📚 Topic modeling — discovering themes in large text collections',
+          '🛒 Market basket analysis — finding products frequently bought together',
+          '🧬 Gene clustering — grouping similar genes in biology research'
+        ]
+      }},
       { type: 'spacer', height: 15 },
       { type: 'paragraph', text: 'Use when: You want to discover unknown patterns, group similar items, or explore data without predefined categories.', align: 'center' }
     ]
@@ -483,14 +487,16 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
         'Develops strategies through repeated interactions'
       ]},
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Real-World Applications:', align: 'center' },
-      { type: 'bullet', items: [
-        '🤖 Robot learning — robots learn to walk, grasp objects, or navigate by trying actions and receiving feedback',
-        '🎮 Game-playing AI — AlphaGo, chess engines learn optimal strategies through millions of games',
-        '🚗 Autonomous vehicles — learn to drive safely by experiencing different traffic scenarios',
-        '📊 Recommendation systems — learn to suggest content that keeps users engaged',
-        '🏭 Industrial control — optimizing energy usage, manufacturing processes'
-      ]},
+      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
+        title: 'Reinforcement Learning Applications',
+        items: [
+          '🤖 Robot learning — robots learn to walk, grasp objects, or navigate by trying actions and receiving feedback',
+          '🎮 Game-playing AI — AlphaGo, chess engines learn optimal strategies through millions of games',
+          '🚗 Autonomous vehicles — learn to drive safely by experiencing different traffic scenarios',
+          '📊 Recommendation systems — learn to suggest content that keeps users engaged',
+          '🏭 Industrial control — optimizing energy usage, manufacturing processes'
+        ]
+      }},
       { type: 'spacer', height: 15 },
       { type: 'paragraph', text: 'Use when: The model can interact with an environment, receive feedback, and learn through exploration. Perfect for sequential decision-making problems.', align: 'center' },
       { type: 'spacer', height: 20 },
@@ -632,15 +638,17 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
         '🔮 The model becomes a "predictor" — can estimate future values'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Real-World Applications:', align: 'center' },
-      { type: 'bullet', items: [
-        '💰 Predicting house prices from square footage',
-        '📊 Forecasting sales from advertising spend',
-        '🌡️ Estimating temperature from time of day',
-        '📈 Stock price predictions (with limitations)',
-        '🎓 Predicting student performance from study hours',
-        '💊 Estimating drug dosage based on patient weight'
-      ]}
+      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
+        title: 'Linear Regression Applications',
+        items: [
+          '💰 Predicting house prices from square footage',
+          '📊 Forecasting sales from advertising spend',
+          '🌡️ Estimating temperature from time of day',
+          '📈 Stock price predictions (with limitations)',
+          '🎓 Predicting student performance from study hours',
+          '💊 Estimating drug dosage based on patient weight'
+        ]
+      }}
     ]
   },
   {
