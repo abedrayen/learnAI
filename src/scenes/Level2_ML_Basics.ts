@@ -758,7 +758,7 @@ export default class Level2_ML_Basics extends Phaser.Scene {
       labLink: {
         title: 'ML Basics Lab',
         description: 'Try the ML workflow in Python',
-        url: 'https://colab.research.google.com/ml_basics_workflow'
+        url: 'https://colab.research.google.com/drive/11sKkvemiI3LbNcdpvspmUV1QsKgXRyU7?usp=sharing'
       },
       nextLevel: {
         key: 'Level3_First_Model',

@@ -109,10 +109,139 @@ export class RecapScreen {
         fontSize: '14px',
         color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
         fontFamily: 'monospace',
-        wordWrap: { width: 900 }
+        wordWrap: { width: 700 }
       });
       labUrl.setOrigin(0.5);
-      labSection = [labTitle, labDesc, labUrl];
+      
+      // Copy button
+      const copyBtn = this.scene.add.rectangle(400, 180, 100, 40, COLORS.PRIMARY);
+      copyBtn.setOrigin(0.5);
+      copyBtn.setInteractive({ useHandCursor: true });
+      const copyText = this.scene.add.text(400, 180, 'Copy', {
+        fontSize: '16px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      copyText.setOrigin(0.5);
+      
+      let copyFeedback: Phaser.GameObjects.Text | null = null;
+      copyBtn.on('pointerdown', () => {
+        // Copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(data.labLink.url).then(() => {
+            // Show feedback
+            if (copyFeedback) {
+              copyFeedback.destroy();
+            }
+            copyFeedback = this.scene.add.text(400, 220, '✓ Copied!', {
+              fontSize: '14px',
+              color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+              fontFamily: 'Arial',
+              fontStyle: 'bold'
+            });
+            copyFeedback.setOrigin(0.5);
+            this.container!.add(copyFeedback);
+            
+            // Remove feedback after 2 seconds
+            this.scene.time.delayedCall(2000, () => {
+              if (copyFeedback) {
+                copyFeedback.destroy();
+                copyFeedback = null;
+              }
+            });
+          }).catch((err) => {
+            console.error('Failed to copy:', err);
+            // Try fallback method
+            const textArea = document.createElement('textarea');
+            textArea.value = data.labLink.url;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              if (copyFeedback) {
+                copyFeedback.destroy();
+              }
+              copyFeedback = this.scene.add.text(400, 220, '✓ Copied!', {
+                fontSize: '14px',
+                color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+                fontFamily: 'Arial',
+                fontStyle: 'bold'
+              });
+              copyFeedback.setOrigin(0.5);
+              this.container!.add(copyFeedback);
+              this.scene.time.delayedCall(2000, () => {
+                if (copyFeedback) {
+                  copyFeedback.destroy();
+                  copyFeedback = null;
+                }
+              });
+            } catch (fallbackErr) {
+              console.error('Fallback copy failed:', fallbackErr);
+              if (copyFeedback) {
+                copyFeedback.destroy();
+              }
+              copyFeedback = this.scene.add.text(400, 220, 'Copy failed', {
+                fontSize: '14px',
+                color: '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+                fontFamily: 'Arial'
+              });
+              copyFeedback.setOrigin(0.5);
+              this.container!.add(copyFeedback);
+              this.scene.time.delayedCall(2000, () => {
+                if (copyFeedback) {
+                  copyFeedback.destroy();
+                  copyFeedback = null;
+                }
+              });
+            }
+            document.body.removeChild(textArea);
+          });
+        } else {
+          // Fallback for browsers without clipboard API
+          const textArea = document.createElement('textarea');
+          textArea.value = data.labLink.url;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            if (copyFeedback) {
+              copyFeedback.destroy();
+            }
+            copyFeedback = this.scene.add.text(400, 220, '✓ Copied!', {
+              fontSize: '14px',
+              color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+              fontFamily: 'Arial',
+              fontStyle: 'bold'
+            });
+            copyFeedback.setOrigin(0.5);
+            this.container!.add(copyFeedback);
+            this.scene.time.delayedCall(2000, () => {
+              if (copyFeedback) {
+                copyFeedback.destroy();
+                copyFeedback = null;
+              }
+            });
+          } catch (err) {
+            console.error('Fallback copy failed:', err);
+          }
+          document.body.removeChild(textArea);
+        }
+      });
+      
+      copyBtn.on('pointerover', () => {
+        copyBtn.setScale(1.05);
+      });
+      
+      copyBtn.on('pointerout', () => {
+        copyBtn.setScale(1);
+      });
+      
+      labSection = [labTitle, labDesc, labUrl, copyBtn, copyText];
     }
 
     // Buttons

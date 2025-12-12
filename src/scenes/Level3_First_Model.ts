@@ -644,11 +644,6 @@ export default class Level3_First_Model extends Phaser.Scene {
         'The ML pipeline: Load Data → Split → Train → Test → Predict',
         'Linear regression is a simple but powerful model'
       ],
-      labLink: {
-        title: 'First Model Lab',
-        description: 'Train your first model in Python',
-        url: 'https://colab.research.google.com/first_linear_model'
-      },
       nextLevel: {
         key: 'Level4_Neural_Temple',
         name: 'Level 4: Neural Temple'

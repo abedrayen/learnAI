@@ -664,12 +664,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
         'AI can be categorized into Rule-based, Machine Learning, and Deep Learning',
         'Different AI systems work in different ways for different tasks',
         'Real-world AI applications use various approaches'
-      ],
-      labLink: {
-        title: 'AI Intro Lab',
-        description: 'Try classifying AI examples in Python',
-        url: 'https://colab.research.google.com/ai_intro_examples'
-      }
+      ]
     };
 
     this.recapScreen!.show(recapData, () => {
