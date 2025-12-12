@@ -41,6 +41,17 @@ npm run build
 
 The built files will be in the `dist/` directory, ready for static hosting.
 
+### Deploying to GitHub Pages
+
+See [GITHUB_PAGES.md](./GITHUB_PAGES.md) for detailed instructions, or use the quick start:
+
+```bash
+# One-command deployment
+npm run deploy
+```
+
+Or set up automatic deployment with GitHub Actions (see `.github/workflows/deploy.yml`).
+
 ## 🎯 Learning Goals by Level
 
 ### Level 1: AI Jungle

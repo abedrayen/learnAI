@@ -5,16 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && vite build",
     "build:check": "tsc && vite build",
-    "preview": "vite preview"
+    "build:verify": "npm run build && node verify-build.js",
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist",
+    "deploy:verify": "npm run build:verify && gh-pages -d dist"
   },
   "dependencies": {
     "phaser": "^3.70.0"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.10"
   }
 }
-
