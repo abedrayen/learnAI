@@ -1,13 +1,11 @@
 import Phaser from 'phaser';
 import { COLORS } from '../GameConfig';
-import { InputManager } from '../systems/InputManager';
 import { ProgressManager } from '../systems/ProgressManager';
 import { DialogBox } from '../ui/DialogBox';
 import { QuizOverlay, QuizQuestion } from '../ui/QuizOverlay';
 import { RecapScreen, RecapData } from '../ui/RecapScreen';
 import { SlideOverlay2 } from '../ui/SlideOverlay2';
 import { LEVEL_6_SLIDES_ENHANCED } from '../data/learningSlides2';
-import { SceneHelpers } from '../utils/SceneHelpers';
 
 interface PipelineRoom {
   name: string;
@@ -26,24 +24,19 @@ interface DraggableConcept {
 }
 
 export default class Level6_Final_Artifact extends Phaser.Scene {
-  private player?: Phaser.Physics.Arcade.Sprite;
-  private platforms?: Phaser.Physics.Arcade.StaticGroup;
-  private inputManager?: InputManager;
   private dialogBox?: DialogBox;
   private quizOverlay?: QuizOverlay;
   private recapScreen?: RecapScreen;
   private slideOverlay?: SlideOverlay2;
-  private exitZone?: Phaser.GameObjects.Zone;
+  private exitButton?: Phaser.GameObjects.Rectangle;
   
   // Activity 1: Full ML Pipeline Puzzle (Room-based)
-  private pipelineActive: boolean = false;
   private pipelineContainer?: Phaser.GameObjects.Container;
   private currentRoomIndex: number = 0;
   private rooms: PipelineRoom[] = [];
   private roomsCompleted: number = 0;
   
   // Activity 2: Final Knowledge Challenge
-  private knowledgeActive: boolean = false;
   private knowledgeContainer?: Phaser.GameObjects.Container;
   private draggableConcepts: DraggableConcept[] = [];
   private matchingPairs: Array<{ concept: string; definition: string }> = [];
@@ -63,14 +56,10 @@ export default class Level6_Final_Artifact extends Phaser.Scene {
     this.quizOverlay = new QuizOverlay(this);
     this.recapScreen = new RecapScreen(this);
     this.slideOverlay = new SlideOverlay2(this);
-    this.inputManager = new InputManager(this);
 
     this.add.rectangle(640, 360, 1280, 720, 0x0a1929);
 
-    this.platforms = this.physics.add.staticGroup();
-    this.createPlatforms();
-    this.createPlayer();
-    this.createExitZone();
+    this.createExitButton();
 
     this.slideOverlay.show(LEVEL_6_SLIDES_ENHANCED, () => {
       this.time.delayedCall(500, () => {
@@ -83,45 +72,33 @@ export default class Level6_Final_Artifact extends Phaser.Scene {
           }
         );
       });
-    }, this.inputManager);
-
-    this.physics.add.collider(this.player!, this.platforms!);
+    });
   }
 
-  private createPlatforms(): void {
-    SceneHelpers.createPlatform(this, this.platforms!, 640, 700, 1280, 40, COLORS.BG_MEDIUM);
-    SceneHelpers.createPlatform(this, this.platforms!, 300, 550, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 640, 450, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 980, 550, 200, 20, COLORS.BG_LIGHT);
-  }
-
-  private createPlayer(): void {
-    this.player = SceneHelpers.createPlayer(this, 100, 400);
-  }
-
-  private createExitZone(): void {
-    this.exitZone = this.add.zone(1200, 650, 80, 50);
-    this.physics.add.existing(this.exitZone, true);
-    this.physics.add.overlap(this.player!, this.exitZone, () => {
+  private createExitButton(): void {
+    this.exitButton = this.add.rectangle(1200, 650, 120, 60, COLORS.SUCCESS);
+    this.exitButton.setInteractive({ useHandCursor: true });
+    this.exitButton.setDepth(3000);
+    this.exitButton.on('pointerdown', () => {
       if (this.activityCompleted.pipeline && this.activityCompleted.knowledge) {
         this.completeLevel();
       } else {
         this.dialogBox!.show('Complete both activities first!', () => {});
       }
-    }, undefined, this);
+    });
 
-    const exitSign = this.add.text(1200, 650, 'EXIT', {
-      fontSize: '20px',
-      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+    const exitText = this.add.text(1200, 650, 'EXIT', {
+      fontSize: '24px',
+      color: '#ffffff',
       fontFamily: 'Arial',
       fontStyle: 'bold'
     });
-    exitSign.setOrigin(0.5);
+    exitText.setOrigin(0.5);
+    exitText.setDepth(3001);
   }
 
   // ========== ACTIVITY 1: FULL ML PIPELINE PUZZLE ==========
   private startPipelinePuzzle(): void {
-    this.pipelineActive = true;
     this.currentRoomIndex = 0;
     this.roomsCompleted = 0;
     
@@ -505,7 +482,6 @@ export default class Level6_Final_Artifact extends Phaser.Scene {
 
   // ========== ACTIVITY 2: FINAL KNOWLEDGE CHALLENGE ==========
   private startKnowledgeChallenge(): void {
-    this.knowledgeActive = true;
     this.matchedPairs = 0;
     
     this.knowledgeContainer = this.add.container(640, 360);
@@ -560,7 +536,6 @@ export default class Level6_Final_Artifact extends Phaser.Scene {
     closeText.setOrigin(0.5);
     closeBtn.on('pointerdown', () => {
       if (this.activityCompleted.knowledge) {
-        this.knowledgeActive = false;
         this.knowledgeContainer!.destroy();
         this.dialogBox!.show('Perfect! All activities complete!', () => {});
       } else {
@@ -784,24 +759,4 @@ export default class Level6_Final_Artifact extends Phaser.Scene {
     });
   }
 
-  update(): void {
-    if (!this.player || !this.inputManager) return;
-
-    if (this.pipelineActive || this.knowledgeActive) {
-      this.player.setVelocityX(0);
-      return;
-    }
-
-    if (this.inputManager.isLeftPressed()) {
-      this.player.setVelocityX(-200);
-    } else if (this.inputManager.isRightPressed()) {
-      this.player.setVelocityX(200);
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    if (this.inputManager.isJumpJustPressed() && this.player.body!.touching.down) {
-      this.player.setVelocityY(-500);
-    }
-  }
 }

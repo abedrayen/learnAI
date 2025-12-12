@@ -102,15 +102,20 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.labTerminal = this.add.rectangle(1200, 200, 100, 100, COLORS.SECONDARY);
     this.labTerminal.setStrokeStyle(4, COLORS.PRIMARY);
     this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains);
+    this.labTerminal.input!.cursor = 'pointer';
+    this.labTerminal.setDepth(3000); // Above activity overlays (depth 2000)
     
     const terminalIcon = this.add.text(1200, 200, '💻', { fontSize: '40px' });
     terminalIcon.setOrigin(0.5);
+    terminalIcon.setDepth(3001); // Above the terminal rectangle
+    
     const terminalLabel = this.add.text(1200, 250, 'Lab Terminal', {
       fontSize: '16px',
       color: '#ffffff',
       fontFamily: 'Arial'
     });
     terminalLabel.setOrigin(0.5);
+    terminalLabel.setDepth(3001); // Above the terminal rectangle
 
     this.labTerminal.on('pointerdown', () => {
       const labInfo: LabLinkInfo = {

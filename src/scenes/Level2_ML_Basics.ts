@@ -1,13 +1,11 @@
 import Phaser from 'phaser';
 import { COLORS } from '../GameConfig';
-import { InputManager } from '../systems/InputManager';
 import { ProgressManager } from '../systems/ProgressManager';
 import { DialogBox } from '../ui/DialogBox';
 import { LabLinkOverlay, LabLinkInfo } from '../ui/LabLinkOverlay';
 import { RecapScreen, RecapData } from '../ui/RecapScreen';
 import { SlideOverlay2 } from '../ui/SlideOverlay2';
 import { LEVEL_2_SLIDES_ENHANCED } from '../data/learningSlides2';
-import { SceneHelpers } from '../utils/SceneHelpers';
 
 interface DataCard {
   container: Phaser.GameObjects.Container;
@@ -24,18 +22,14 @@ interface MLScenario {
 }
 
 export default class Level2_ML_Basics extends Phaser.Scene {
-  private player?: Phaser.Physics.Arcade.Sprite;
-  private platforms?: Phaser.Physics.Arcade.StaticGroup;
-  private inputManager?: InputManager;
   private dialogBox?: DialogBox;
   private labLinkOverlay?: LabLinkOverlay;
   private recapScreen?: RecapScreen;
   private slideOverlay?: SlideOverlay2;
   private labTerminal?: Phaser.GameObjects.Rectangle;
-  private exitZone?: Phaser.GameObjects.Zone;
+  private exitButton?: Phaser.GameObjects.Rectangle;
   
   // Activity 1: Dataset Builder
-  private datasetBuilderActive: boolean = false;
   private datasetContainer?: Phaser.GameObjects.Container;
   private dataCards: DataCard[] = [];
   private featureBucket?: Phaser.GameObjects.Container;
@@ -44,7 +38,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
   private cardsPlaced: number = 0;
   
   // Activity 2: ML Detective Mode
-  private detectiveActive: boolean = false;
   private detectiveContainer?: Phaser.GameObjects.Container;
   private currentScenario?: MLScenario;
   private mlDoors: Array<{ container: Phaser.GameObjects.Container; type: 'supervised' | 'unsupervised' | 'reinforcement' }> = [];
@@ -52,7 +45,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
   private scenarios: MLScenario[] = [];
   
   // Activity 3: Train/Test Split
-  private splitActive: boolean = false;
   private splitContainer?: Phaser.GameObjects.Container;
   private splitBar?: Phaser.GameObjects.Rectangle;
   private splitRatio: number = 0.7; // 70% train, 30% test
@@ -73,15 +65,11 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     this.labLinkOverlay = new LabLinkOverlay(this);
     this.recapScreen = new RecapScreen(this);
     this.slideOverlay = new SlideOverlay2(this);
-    this.inputManager = new InputManager(this);
 
     this.add.rectangle(640, 360, 1280, 720, 0x0a1929);
 
-    this.platforms = this.physics.add.staticGroup();
-    this.createPlatforms();
-    this.createPlayer();
     this.createLabTerminal();
-    this.createExitZone();
+    this.createExitButton();
 
     this.slideOverlay.show(LEVEL_2_SLIDES_ENHANCED, () => {
       this.time.delayedCall(500, () => {
@@ -95,36 +83,26 @@ export default class Level2_ML_Basics extends Phaser.Scene {
           }
         );
       });
-    }, this.inputManager);
-
-    this.physics.add.collider(this.player!, this.platforms!);
-  }
-
-  private createPlatforms(): void {
-    SceneHelpers.createPlatform(this, this.platforms!, 640, 700, 1280, 40, COLORS.BG_MEDIUM);
-    SceneHelpers.createPlatform(this, this.platforms!, 200, 550, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 500, 450, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 800, 550, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 1100, 450, 200, 20, COLORS.BG_LIGHT);
-  }
-
-  private createPlayer(): void {
-    this.player = SceneHelpers.createPlayer(this, 100, 400);
+    });
   }
 
   private createLabTerminal(): void {
     this.labTerminal = this.add.rectangle(1200, 200, 100, 100, COLORS.SECONDARY);
     this.labTerminal.setStrokeStyle(4, COLORS.PRIMARY);
-    this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains);
+    this.labTerminal.input!.cursor = 'pointer';
+    this.labTerminal.setDepth(3000);
     
     const terminalIcon = this.add.text(1200, 200, '💻', { fontSize: '40px' });
     terminalIcon.setOrigin(0.5);
+    terminalIcon.setDepth(3001);
     const terminalLabel = this.add.text(1200, 250, 'Lab Terminal', {
       fontSize: '16px',
       color: '#ffffff',
       fontFamily: 'Arial'
     });
     terminalLabel.setOrigin(0.5);
+    terminalLabel.setDepth(3001);
 
     this.labTerminal.on('pointerdown', () => {
       const labInfo: LabLinkInfo = {
@@ -137,29 +115,30 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     });
   }
 
-  private createExitZone(): void {
-    this.exitZone = this.add.zone(1200, 650, 80, 50);
-    this.physics.add.existing(this.exitZone, true);
-    this.physics.add.overlap(this.player!, this.exitZone, () => {
+  private createExitButton(): void {
+    this.exitButton = this.add.rectangle(1200, 650, 120, 60, COLORS.SUCCESS);
+    this.exitButton.setInteractive({ useHandCursor: true });
+    this.exitButton.setDepth(3000);
+    this.exitButton.on('pointerdown', () => {
       if (this.activityCompleted.dataset && this.activityCompleted.detective && this.activityCompleted.split) {
         this.completeLevel();
       } else {
         this.dialogBox!.show('Complete all three activities first!', () => {});
       }
-    }, undefined, this);
+    });
 
-    const exitSign = this.add.text(1200, 650, 'EXIT', {
-      fontSize: '20px',
-      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+    const exitText = this.add.text(1200, 650, 'EXIT', {
+      fontSize: '24px',
+      color: '#ffffff',
       fontFamily: 'Arial',
       fontStyle: 'bold'
     });
-    exitSign.setOrigin(0.5);
+    exitText.setOrigin(0.5);
+    exitText.setDepth(3001);
   }
 
   // ========== ACTIVITY 1: DATASET BUILDER ==========
   private startDatasetBuilder(): void {
-    this.datasetBuilderActive = true;
     this.cardsPlaced = 0;
     this.dataCards = [];
     this.datasetRows = [];
@@ -208,7 +187,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     closeBtn.on('pointerdown', () => {
       if (this.cardsPlaced >= this.dataCards.length) {
         this.activityCompleted.dataset = true;
-        this.datasetBuilderActive = false;
         this.datasetContainer!.destroy();
         this.dialogBox!.show('Great! Dataset built! Now try ML Detective Mode!', () => {
           this.startDetectiveMode();
@@ -457,7 +435,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
 
   // ========== ACTIVITY 2: ML DETECTIVE MODE ==========
   private startDetectiveMode(): void {
-    this.detectiveActive = true;
     this.scenarioIndex = 0;
     
     this.scenarios = [
@@ -656,7 +633,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
 
   // ========== ACTIVITY 3: TRAIN/TEST SPLIT ==========
   private startTrainTestSplit(): void {
-    this.splitActive = true;
     this.splitRatio = 0.7;
     
     this.splitContainer = this.add.container(640, 360);
@@ -767,7 +743,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
         this.splitContainer!.add(success);
         
         this.time.delayedCall(2000, () => {
-          this.splitActive = false;
           this.splitContainer!.destroy();
           this.dialogBox!.show('Perfect! All activities complete!', () => {});
         });
@@ -785,7 +760,6 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     closeText.setOrigin(0.5);
     closeBtn.on('pointerdown', () => {
       if (this.activityCompleted.split) {
-        this.splitActive = false;
         this.splitContainer!.destroy();
       } else {
         this.dialogBox!.show('Adjust the split bar to complete this activity!', () => {});
@@ -825,24 +799,4 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     });
   }
 
-  update(): void {
-    if (!this.player || !this.inputManager) return;
-
-    if (this.datasetBuilderActive || this.detectiveActive || this.splitActive) {
-      this.player.setVelocityX(0);
-      return;
-    }
-
-    if (this.inputManager.isLeftPressed()) {
-      this.player.setVelocityX(-200);
-    } else if (this.inputManager.isRightPressed()) {
-      this.player.setVelocityX(200);
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    if (this.inputManager.isJumpJustPressed() && this.player.body!.touching.down) {
-      this.player.setVelocityY(-500);
-    }
-  }
 }
