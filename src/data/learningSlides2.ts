@@ -83,13 +83,14 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
         'Fast, predictable, and transparent'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Real-World Examples:', align: 'center' },
-      { type: 'bullet', items: [
-        '🔢 Calculators — mathematical operations follow strict rules',
-        '🚦 Traffic lights — timed sequences based on fixed logic',
-        '🏦 ATM machines — predefined transaction rules',
-        '📋 Business rule engines — "If customer age > 18, allow purchase"'
-      ]}
+      { type: 'tooltip', triggerText: 'Real-World Examples (hover to see)', align: 'center', tooltipContent: {
+        title: 'Rule-Based AI Examples',
+        items: [
+          '🔢 Calculators — mathematical operations follow strict rules',
+          '🚦 Traffic lights — timed sequences based on fixed logic',
+          '🏦 ATM machines — predefined transaction rules',
+        ]
+      }}
     ]
   },
   {
@@ -130,14 +131,14 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
         'Improves performance as it sees more examples'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Real-World Examples:', align: 'center' },
-      { type: 'bullet', items: [
-        '📊 Netflix recommendations — learns from your viewing history',
-        '📧 Email spam filters — learns what spam looks like',
-        '💰 Credit scoring — learns patterns of good vs bad borrowers',
-        '🎯 Fraud detection — learns suspicious transaction patterns',
-        '🏥 Disease prediction — learns from medical records'
-      ]}
+      { type: 'tooltip', triggerText: 'Real-World Examples (hover to see)', align: 'center', tooltipContent: {
+        title: 'Machine Learning Examples',
+        items: [
+          '📊 Netflix recommendations — learns from your viewing history',
+          '💰 Credit scoring — learns patterns of good vs bad borrowers',
+          '🎯 Fraud detection — learns suspicious transaction patterns',
+        ]
+      }}
     ]
   },
   {
@@ -173,15 +174,14 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
         'Excels at unstructured data: images, audio, text, video'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Real-World Examples:', align: 'center' },
-      { type: 'bullet', items: [
-        '🚗 Self-driving cars — recognizing pedestrians, signs, obstacles',
-        '📱 Face unlock — identifying unique facial features',
-        '🎤 Voice assistants — understanding speech and context',
-        '🖼️ Medical imaging — detecting tumors in X-rays',
-        '🌐 Language translation — understanding meaning across languages',
-        '🎨 AI art generation — creating images from text descriptions'
-      ]}
+      { type: 'tooltip', triggerText: 'Real-World Examples (hover to see)', align: 'center', tooltipContent: {
+        title: 'Deep Learning Examples',
+        items: [
+          '📱 Face unlock — identifying unique facial features',
+          '🖼️ Medical imaging — detecting tumors in X-rays',
+          '🌐 Language translation — understanding meaning across languages',
+        ]
+      }}
     ]
   },
   {
@@ -207,14 +207,11 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'spacer', height: 20 },
       { type: 'paragraph', text: 'Understanding when to use each approach:', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Rule-Based AI 🦎' },
-      { type: 'paragraph', text: 'Best for: Well-defined problems with clear logic (calculators, business rules). Fast, predictable, explainable.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Machine Learning 🐅' },
-      { type: 'paragraph', text: 'Best for: Pattern recognition with structured data (recommendations, predictions, classification). Adapts to new data.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Deep Learning 🐉' },
-      { type: 'paragraph', text: 'Best for: Complex unstructured data (images, speech, language, video). Highest accuracy but requires more data and computing power.', align: 'center' },
+      { type: 'table', headers: ['AI Type', 'Best For'], rows: [
+        ['Rule-Based AI 🦎', 'Well-defined problems with clear logic'],
+        ['Machine Learning 🐅', 'Pattern recognition with structured data'],
+        ['Deep Learning 🐉', 'Complex unstructured data (images, speech, language, video)']
+      ]},
       { type: 'spacer', height: 20 },
       { type: 'paragraph', text: '💡 Insight: Most real-world AI systems combine multiple approaches. For example, a self-driving car uses rule-based logic for traffic laws, ML for route optimization, and Deep Learning for recognizing objects.', align: 'center' }
     ]

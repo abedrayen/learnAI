@@ -790,12 +790,19 @@ export default class Level2_ML_Basics extends Phaser.Scene {
         title: 'ML Basics Lab',
         description: 'Try the ML workflow in Python',
         url: 'https://colab.research.google.com/ml_basics_workflow'
+      },
+      nextLevel: {
+        key: 'Level3_First_Model',
+        name: 'Level 3: Data Scrolls'
       }
     };
 
     this.recapScreen!.show(recapData, () => {
       ProgressManager.completeLevel('Level2_ML_Basics');
       this.scene.start('MenuScene');
+    }, undefined, (levelKey: string) => {
+      ProgressManager.completeLevel('Level2_ML_Basics');
+      this.scene.start(levelKey);
     });
   }
 

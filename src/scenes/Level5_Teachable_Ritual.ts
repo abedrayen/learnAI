@@ -845,12 +845,19 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
         title: 'Teachable Machine',
         description: 'Train your own model with Teachable Machine',
         url: 'https://teachablemachine.withgoogle.com/'
+      },
+      nextLevel: {
+        key: 'Level6_Final_Artifact',
+        name: 'Level 6: Final Artifact'
       }
     };
 
     this.recapScreen!.show(recapData, () => {
       ProgressManager.completeLevel('Level5_Teachable_Ritual');
       this.scene.start('MenuScene');
+    }, undefined, (levelKey: string) => {
+      ProgressManager.completeLevel('Level5_Teachable_Ritual');
+      this.scene.start(levelKey);
     });
   }
 

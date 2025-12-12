@@ -709,6 +709,9 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.recapScreen!.show(recapData, () => {
       ProgressManager.completeLevel('Level1_AI_Jungle');
       this.scene.start('MenuScene');
+    }, undefined, (levelKey: string) => {
+      ProgressManager.completeLevel('Level1_AI_Jungle');
+      this.scene.start(levelKey);
     });
   }
 

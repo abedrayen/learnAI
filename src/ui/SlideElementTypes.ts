@@ -11,7 +11,9 @@ export type SlideElementType =
   | 'icon'
   | 'diagram'
   | 'graph'
-  | 'spacer';
+  | 'spacer'
+  | 'tooltip'
+  | 'table';
 
 export interface BaseSlideElement {
   type: SlideElementType;
@@ -77,6 +79,25 @@ export interface SpacerElement extends BaseSlideElement {
   height: number;
 }
 
+export interface TooltipElement extends BaseSlideElement {
+  type: 'tooltip';
+  triggerText: string;
+  tooltipContent: {
+    title?: string;
+    text?: string;
+    items?: string[];
+    image?: string;
+  };
+  align?: 'left' | 'center' | 'right';
+}
+
+export interface TableElement extends BaseSlideElement {
+  type: 'table';
+  headers: string[];
+  rows: string[][];
+  columnWidths?: number[];
+}
+
 export type SlideElement = 
   | TitleElement
   | ParagraphElement
@@ -85,7 +106,9 @@ export type SlideElement =
   | IconElement
   | DiagramElement
   | GraphElement
-  | SpacerElement;
+  | SpacerElement
+  | TooltipElement
+  | TableElement;
 
 export interface EnhancedSlide {
   title: string;

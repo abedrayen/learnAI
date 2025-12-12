@@ -20,6 +20,7 @@ export class SlideOverlay2 {
   private graphRenderer?: GraphRenderer;
   private currentElements: Phaser.GameObjects.GameObject[] = [];
   private transitionTween?: Phaser.Tweens.Tween;
+  private blurOverlay?: Phaser.GameObjects.Rectangle;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -97,6 +98,13 @@ export class SlideOverlay2 {
     bg.setStrokeStyle(4, COLORS.PRIMARY);
     this.currentElements.push(bg);
 
+    // Create blur overlay for tooltips (once per slide)
+    this.blurOverlay = this.scene.add.rectangle(0, 0, 1200, 680, 0x000000, 0.85);
+    this.blurOverlay.setDepth(2999);
+    this.blurOverlay.setVisible(false);
+    this.blurOverlay.setAlpha(0);
+    this.currentElements.push(this.blurOverlay);
+
     // Render slide elements
     let currentY = -280;
     const elementSpacing = 25; // Increased base spacing
@@ -159,6 +167,21 @@ export class SlideOverlay2 {
       } else if (element.type === 'icon') {
         const iconEl = element as any;
         heightToAdd = iconEl.size || 40;
+      } else if (element.type === 'tooltip') {
+        const tooltipEl = element as any;
+        const triggerText = this.scene.add.text(0, 0, tooltipEl.triggerText, {
+          fontSize: '20px',
+          wordWrap: { width: contentWidth - 100 }
+        });
+        heightToAdd = this.getTextHeight(triggerText);
+        triggerText.destroy();
+        // Add extra spacing for tooltip trigger
+        spacingToAdd = elementSpacing + 5;
+      } else if (element.type === 'table') {
+        const tableEl = element as any;
+        const headerHeight = 60;
+        const rowHeight = 55;
+        heightToAdd = headerHeight + (tableEl.rows.length * rowHeight);
       }
       
       currentY += heightToAdd + spacingToAdd;
@@ -357,6 +380,357 @@ export class SlideOverlay2 {
         objects.push(...graphObjects);
         break;
 
+      case 'tooltip':
+        const tooltipEl = element as any;
+        const tooltipAlign = tooltipEl.align || 'center';
+        let tooltipX: number;
+        let tooltipOriginX: number;
+        if (tooltipAlign === 'center') {
+          tooltipX = x + width / 2;
+          tooltipOriginX = 0.5;
+        } else if (tooltipAlign === 'right') {
+          tooltipX = x + width - 50;
+          tooltipOriginX = 1;
+        } else {
+          tooltipX = x + 50;
+          tooltipOriginX = 0;
+        }
+        
+        // Create trigger text with hover indicator
+        const triggerText = this.scene.add.text(tooltipX, y, tooltipEl.triggerText, {
+          fontSize: '20px',
+          color: '#' + COLORS.SECONDARY.toString(16).padStart(6, '0'),
+          fontFamily: 'Arial',
+          fontStyle: 'bold',
+          align: tooltipAlign
+        });
+        triggerText.setOrigin(tooltipOriginX, 0);
+        triggerText.setInteractive({ useHandCursor: true });
+        objects.push(triggerText);
+
+        // Create tooltip container (hidden by default) - centered on slide
+        const tooltipContainer = this.scene.add.container(x + width / 2, 0);
+        tooltipContainer.setVisible(false);
+        tooltipContainer.setDepth(3000);
+        tooltipContainer.setAlpha(0); // Start invisible for fade-in
+
+        // Calculate tooltip dimensions
+        const tooltipWidth = Math.min(600, width - 100);
+        const padding = 30;
+        const contentWidth = tooltipWidth - (padding * 2);
+
+        // First, calculate total content height to center it
+        const titleSpacing = 20;
+        const itemSpacing = 12;
+        let contentHeight = 0;
+        const topPadding = 50;
+        const bottomPadding = 50;
+
+        // Calculate title height
+        if (tooltipEl.tooltipContent.title) {
+          const tempTitle = this.scene.add.text(0, 0, tooltipEl.tooltipContent.title, {
+            fontSize: '22px',
+            fontFamily: 'Arial',
+            fontStyle: 'bold'
+          });
+          contentHeight += tempTitle.height + 15;
+          tempTitle.destroy();
+        }
+
+        // Calculate text height
+        if (tooltipEl.tooltipContent.text) {
+          const tempText = this.scene.add.text(0, 0, tooltipEl.tooltipContent.text, {
+            fontSize: '17px',
+            fontFamily: 'Arial',
+            wordWrap: { width: contentWidth },
+            lineSpacing: 4
+          });
+          contentHeight += tempText.height + titleSpacing;
+          tempText.destroy();
+        }
+
+        // Calculate items height
+        if (tooltipEl.tooltipContent.items) {
+          if (tooltipEl.tooltipContent.title || tooltipEl.tooltipContent.text) {
+            contentHeight += 8; // Separator spacing
+          }
+          tooltipEl.tooltipContent.items.forEach((item: string) => {
+            const emojiMatch = item.match(/^([^\s—]+)\s*—\s*(.+)$/);
+            const text = emojiMatch ? emojiMatch[2] : item;
+            const tempItem = this.scene.add.text(0, 0, text, {
+              fontSize: '16px',
+              fontFamily: 'Arial',
+              wordWrap: { width: contentWidth - 50 },
+              lineSpacing: 3
+            });
+            contentHeight += Math.max(25, tempItem.height) + itemSpacing;
+            tempItem.destroy();
+          });
+          contentHeight -= itemSpacing; // Remove last spacing
+        }
+
+        // Calculate centered starting position
+        const totalHeight = contentHeight + topPadding + bottomPadding;
+        const finalHeight = Math.max(200, totalHeight);
+        let tooltipY = -contentHeight / 2; // Center the content vertically
+
+        // Tooltip background with shadow effect
+        const tooltipBg = this.scene.add.rectangle(0, 0, tooltipWidth, finalHeight, COLORS.BG_DARK, 0.98);
+        tooltipBg.setStrokeStyle(4, COLORS.PRIMARY);
+        
+        // Add subtle inner glow
+        const innerGlow = this.scene.add.rectangle(0, 0, tooltipWidth - 8, finalHeight - 8, COLORS.BG_MEDIUM, 0.3);
+        tooltipContainer.add([tooltipBg, innerGlow]);
+
+        // Title section
+        if (tooltipEl.tooltipContent.title) {
+          const tooltipTitle = this.scene.add.text(0, tooltipY, tooltipEl.tooltipContent.title, {
+            fontSize: '22px',
+            color: '#' + COLORS.PRIMARY.toString(16).padStart(6, '0'),
+            fontFamily: 'Arial',
+            fontStyle: 'bold',
+            align: 'center'
+          });
+          tooltipTitle.setOrigin(0.5, 0);
+          tooltipContainer.add(tooltipTitle);
+          
+          tooltipY += tooltipTitle.height + 15;
+        }
+
+        // Description text
+        if (tooltipEl.tooltipContent.text) {
+          const tooltipText = this.scene.add.text(0, tooltipY, tooltipEl.tooltipContent.text, {
+            fontSize: '17px',
+            color: '#e0e0e0',
+            fontFamily: 'Arial',
+            wordWrap: { width: contentWidth },
+            align: 'center',
+            lineSpacing: 4
+          });
+          tooltipText.setOrigin(0.5, 0);
+          tooltipContainer.add(tooltipText);
+          tooltipY += tooltipText.height + titleSpacing;
+        }
+
+        // Items list with enhanced formatting
+        if (tooltipEl.tooltipContent.items) {
+          // Add a subtle separator before items
+          if (tooltipEl.tooltipContent.title || tooltipEl.tooltipContent.text) {
+            const separator = this.scene.add.rectangle(0, tooltipY - 8, tooltipWidth - 60, 1, COLORS.PRIMARY, 0.3);
+            separator.setOrigin(0.5, 0);
+            tooltipContainer.add(separator);
+            tooltipY += 8;
+          }
+
+          tooltipEl.tooltipContent.items.forEach((item: string) => {
+            // Extract emoji and text
+            const emojiMatch = item.match(/^([^\s—]+)\s*—\s*(.+)$/);
+            const emoji = emojiMatch ? emojiMatch[1] : '';
+            const text = emojiMatch ? emojiMatch[2] : item;
+            
+            // Bullet point with emoji
+            const bulletX = -contentWidth / 2 + 10;
+            const bulletY = tooltipY;
+            
+            // Emoji icon
+            if (emoji) {
+              const emojiText = this.scene.add.text(bulletX, bulletY, emoji, {
+                fontSize: '20px',
+                fontFamily: 'Arial'
+              });
+              emojiText.setOrigin(0, 0);
+              tooltipContainer.add(emojiText);
+            }
+            
+            // Item text with proper formatting
+            const itemTextX = bulletX + (emoji ? 35 : 20);
+            const itemText = this.scene.add.text(itemTextX, bulletY, text, {
+              fontSize: '16px',
+              color: '#ffffff',
+              fontFamily: 'Arial',
+              wordWrap: { width: contentWidth - (emoji ? 50 : 35) },
+              align: 'left',
+              lineSpacing: 3
+            });
+            itemText.setOrigin(0, 0);
+            tooltipContainer.add(itemText);
+            
+            // Calculate height for this item (accounting for wrapping)
+            const itemHeight = Math.max(25, itemText.height);
+            tooltipY += itemHeight + itemSpacing;
+          });
+        }
+
+        // Show/hide tooltip on hover with fade animation and background blur
+        triggerText.on('pointerover', () => {
+          // Show and fade in blur overlay
+          if (this.blurOverlay) {
+            this.blurOverlay.setVisible(true);
+            this.scene.tweens.add({
+              targets: this.blurOverlay,
+              alpha: 0.85,
+              duration: 200,
+              ease: 'Power2'
+            });
+          }
+          
+          // Blur slide content by reducing opacity of all elements except tooltip
+          this.currentElements.forEach(element => {
+            if (element !== tooltipContainer && element !== this.blurOverlay && element !== triggerText) {
+              this.scene.tweens.add({
+                targets: element,
+                alpha: 0.2,
+                duration: 200,
+                ease: 'Power2'
+              });
+            }
+          });
+          
+          // Show and fade in tooltip
+          tooltipContainer.setVisible(true);
+          this.scene.tweens.add({
+            targets: tooltipContainer,
+            alpha: 1,
+            duration: 200,
+            ease: 'Power2'
+          });
+        });
+        triggerText.on('pointerout', () => {
+          // Fade out tooltip
+          this.scene.tweens.add({
+            targets: tooltipContainer,
+            alpha: 0,
+            duration: 150,
+            ease: 'Power2',
+            onComplete: () => {
+              tooltipContainer.setVisible(false);
+            }
+          });
+          
+          // Restore slide content opacity
+          this.currentElements.forEach(element => {
+            if (element !== tooltipContainer && element !== this.blurOverlay && element !== triggerText) {
+              this.scene.tweens.add({
+                targets: element,
+                alpha: 1,
+                duration: 150,
+                ease: 'Power2'
+              });
+            }
+          });
+          
+          // Fade out blur overlay
+          if (this.blurOverlay) {
+            this.scene.tweens.add({
+              targets: this.blurOverlay,
+              alpha: 0,
+              duration: 150,
+              ease: 'Power2',
+              onComplete: () => {
+                this.blurOverlay!.setVisible(false);
+              }
+            });
+          }
+        });
+
+        objects.push(tooltipContainer);
+        break;
+
+      case 'table':
+        const tableEl = element as any;
+        const tableX = x + width / 2;
+        const tableY = y;
+        const tableWidth = Math.min(1100, width - 80);
+        const numCols = tableEl.headers.length;
+        const colWidth = tableWidth / numCols;
+        const rowHeight = 55;
+        const headerHeight = 60;
+        const cellPadding = 15;
+        const borderWidth = 3;
+
+        // Calculate total table height
+        const tableTotalHeight = headerHeight + (tableEl.rows.length * rowHeight);
+        const tableCenterY = tableY + tableTotalHeight / 2;
+
+        // Table outer background with shadow effect
+        const tableShadow = this.scene.add.rectangle(tableX + 4, tableCenterY + 4, tableWidth + 8, tableTotalHeight + 8, 0x000000, 0.3);
+        objects.push(tableShadow);
+        
+        // Table main background
+        const tableBg = this.scene.add.rectangle(tableX, tableCenterY, tableWidth, tableTotalHeight, COLORS.BG_DARK, 0.95);
+        tableBg.setStrokeStyle(borderWidth, COLORS.PRIMARY);
+        objects.push(tableBg);
+
+        // Header section with gradient effect
+        const headerBg = this.scene.add.rectangle(tableX, tableY + headerHeight / 2, tableWidth, headerHeight, COLORS.PRIMARY, 0.9);
+        headerBg.setStrokeStyle(2, COLORS.SECONDARY);
+        objects.push(headerBg);
+
+        // Header text with enhanced styling
+        tableEl.headers.forEach((header: string, colIndex: number) => {
+          const headerX = tableX - tableWidth / 2 + colWidth * (colIndex + 0.5);
+          const headerText = this.scene.add.text(headerX, tableY + headerHeight / 2, header, {
+            fontSize: '20px',
+            color: '#ffffff',
+            fontFamily: 'Arial',
+            fontStyle: 'bold',
+            align: 'center',
+            wordWrap: { width: colWidth - cellPadding * 2 },
+            lineSpacing: 4
+          });
+          headerText.setOrigin(0.5);
+          objects.push(headerText);
+        });
+
+        // Row separator line after header
+        const headerSeparator = this.scene.add.rectangle(tableX, tableY + headerHeight, tableWidth, 2, COLORS.SECONDARY, 0.8);
+        objects.push(headerSeparator);
+
+        // Rows with alternating colors and enhanced styling
+        tableEl.rows.forEach((row: string[], rowIndex: number) => {
+          const rowY = tableY + headerHeight + rowHeight * (rowIndex + 0.5);
+          const isEven = rowIndex % 2 === 0;
+          
+          // Row background with alternating colors
+          const rowBg = this.scene.add.rectangle(tableX, rowY, tableWidth - borderWidth * 2, rowHeight - 4, 
+            isEven ? COLORS.BG_MEDIUM : COLORS.BG_LIGHT, isEven ? 0.6 : 0.4);
+          objects.push(rowBg);
+
+          // Row border (subtle)
+          if (rowIndex < tableEl.rows.length - 1) {
+            const rowSeparator = this.scene.add.rectangle(tableX, rowY + rowHeight / 2, tableWidth - borderWidth * 2, 1, COLORS.PRIMARY, 0.2);
+            objects.push(rowSeparator);
+          }
+
+          // Cell content with better formatting
+          row.forEach((cell: string, colIndex: number) => {
+            const cellX = tableX - tableWidth / 2 + colWidth * (colIndex + 0.5);
+            
+            // Determine text color based on column (first column can be emphasized)
+            const cellColor = colIndex === 0 ? '#' + COLORS.SECONDARY.toString(16).padStart(6, '0') : '#ffffff';
+            const cellFontSize = colIndex === 0 ? '18px' : '16px';
+            const cellFontStyle = colIndex === 0 ? 'bold' : 'normal';
+            
+            const cellText = this.scene.add.text(cellX, rowY, cell, {
+              fontSize: cellFontSize,
+              color: cellColor,
+              fontFamily: 'Arial',
+              fontStyle: cellFontStyle,
+              align: 'center',
+              wordWrap: { width: colWidth - cellPadding * 2 },
+              lineSpacing: 3
+            });
+            cellText.setOrigin(0.5);
+            objects.push(cellText);
+          });
+        });
+
+        // Outer border enhancement
+        const outerBorder = this.scene.add.rectangle(tableX, tableCenterY, tableWidth, tableTotalHeight, 0x000000, 0);
+        outerBorder.setStrokeStyle(1, COLORS.SECONDARY, 0.5);
+        objects.push(outerBorder);
+        break;
+
       case 'spacer':
         // Spacer is handled in layout calculation
         break;
@@ -498,6 +872,13 @@ export class SlideOverlay2 {
           }
         });
     this.currentElements = [];
+    
+    // Clean up blur overlay
+    if (this.blurOverlay) {
+      this.blurOverlay.destroy();
+      this.blurOverlay = undefined;
+    }
+    
     if (this.container) {
       this.container.removeAll(true);
     }

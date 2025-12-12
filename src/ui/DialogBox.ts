@@ -15,9 +15,10 @@ export class DialogBox {
   }
 
   private createContainer(): void {
-    this.container = this.scene.add.container(640, 500);
+    // Centered on screen (both X and Y), on top of all elements
+    this.container = this.scene.add.container(640, 360);
     this.container.setVisible(false);
-    this.container.setDepth(1000);
+    this.container.setDepth(5000); // Highest depth to be on top of everything
   }
 
   show(text: string, onClose?: () => void): void {
@@ -28,11 +29,12 @@ export class DialogBox {
     this.isVisible = true;
     this.container!.setVisible(true);
 
-    // Background
+    // Background - centered
     const bg = this.scene.add.rectangle(0, 0, 1000, 150, COLORS.BG_MEDIUM, 0.95);
     bg.setStrokeStyle(4, COLORS.PRIMARY);
+    bg.setOrigin(0.5, 0.5);
 
-    // Text
+    // Text - centered
     const textObj = this.scene.add.text(0, 0, text, {
       fontSize: '20px',
       color: '#ffffff',
@@ -40,19 +42,21 @@ export class DialogBox {
       wordWrap: { width: 900 },
       align: 'center'
     });
-    textObj.setOrigin(0.5);
+    textObj.setOrigin(0.5, 0.5);
 
-    // Close button - create as a zone for better click detection
-    const closeBtn = this.scene.add.zone(450, -50, 100, 40);
+    // Close button - centered below text
+    const closeBtnY = 75; // Position below the dialog box
+    const closeBtn = this.scene.add.zone(0, closeBtnY, 100, 40);
     closeBtn.setOrigin(0.5, 0.5);
-    const closeBtnRect = this.scene.add.rectangle(450, -50, 100, 40, COLORS.PRIMARY);
+    const closeBtnRect = this.scene.add.rectangle(0, closeBtnY, 100, 40, COLORS.PRIMARY);
     closeBtnRect.setOrigin(0.5, 0.5);
-    const closeText = this.scene.add.text(450, -50, 'Close', {
+    const closeText = this.scene.add.text(0, closeBtnY, 'Close', {
       fontSize: '18px',
       color: '#ffffff',
-      fontFamily: 'Arial'
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
     });
-    closeText.setOrigin(0.5);
+    closeText.setOrigin(0.5, 0.5);
     // Make the zone interactive
     closeBtn.setInteractive({ useHandCursor: true });
     closeBtn.on('pointerdown', () => {
@@ -60,9 +64,8 @@ export class DialogBox {
       if (onClose) onClose();
     });
 
-    this.container!.add([bg, textObj, closeBtnRect, closeText, closeBtn]); // Zone last so it's on top for clicks
-
-    this.container!.add([bg, textObj, closeBtn, closeText]);
+    // Add all elements to container (zone last so it's on top for clicks)
+    this.container!.add([bg, textObj, closeBtnRect, closeText, closeBtn]);
   }
 
   hide(): void {

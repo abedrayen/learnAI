@@ -729,12 +729,19 @@ export default class Level4_Neural_Temple extends Phaser.Scene {
         title: 'Tiny Neural Net Lab',
         description: 'Build your first neural network',
         url: 'https://colab.research.google.com/tiny_neural_net_mnist'
+      },
+      nextLevel: {
+        key: 'Level5_Teachable_Ritual',
+        name: 'Level 5: Teachable Ritual'
       }
     };
 
     this.recapScreen!.show(recapData, () => {
       ProgressManager.completeLevel('Level4_Neural_Temple');
       this.scene.start('MenuScene');
+    }, undefined, (levelKey: string) => {
+      ProgressManager.completeLevel('Level4_Neural_Temple');
+      this.scene.start(levelKey);
     });
   }
 

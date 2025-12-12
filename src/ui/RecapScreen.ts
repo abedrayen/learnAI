@@ -6,6 +6,10 @@ export interface RecapData {
   levelName: string;
   concepts: string[];
   labLink?: LabLinkInfo;
+  nextLevel?: {
+    key: string;
+    name: string;
+  };
 }
 
 /**
@@ -17,6 +21,7 @@ export class RecapScreen {
   private isVisible: boolean = false;
   private onContinue?: () => void;
   private onGoToColab?: () => void;
+  private onNextLevel?: (levelKey: string) => void;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -29,7 +34,7 @@ export class RecapScreen {
     this.container.setDepth(1000);
   }
 
-  show(data: RecapData, onContinue: () => void, onGoToColab?: () => void): void {
+  show(data: RecapData, onContinue: () => void, onGoToColab?: () => void, onNextLevel?: (levelKey: string) => void): void {
     if (this.isVisible) {
       this.hide();
     }
@@ -37,6 +42,7 @@ export class RecapScreen {
     this.isVisible = true;
     this.onContinue = onContinue;
     this.onGoToColab = onGoToColab;
+    this.onNextLevel = onNextLevel;
     this.container!.setVisible(true);
 
     // Background
@@ -111,29 +117,55 @@ export class RecapScreen {
 
     // Buttons
     const buttonY = 250;
-    const continueBtn = this.scene.add.rectangle(-200, buttonY, 200, 60, COLORS.PRIMARY);
-    continueBtn.setOrigin(0.5, 0.5);
-    const continueText = this.scene.add.text(-200, buttonY, 'Continue', {
-      fontSize: '20px',
-      color: '#ffffff',
-      fontFamily: 'Arial',
-      fontStyle: 'bold'
-    });
-    continueText.setOrigin(0.5);
-    // Use zone for better click detection in containers
-    const continueZone = this.scene.add.zone(-200, buttonY, 200, 60);
-    continueZone.setOrigin(0.5, 0.5);
-    continueZone.setInteractive({ useHandCursor: true });
-    continueZone.on('pointerdown', () => {
-      this.hide();
-      if (this.onContinue) this.onContinue();
-    });
+    let continueBtn: Phaser.GameObjects.GameObject[] = [];
+    
+    // Show "Continue to Level N+1" if next level is available, otherwise show "Continue"
+    if (data.nextLevel && this.onNextLevel) {
+      const nextLevelBtn = this.scene.add.rectangle(0, buttonY, 300, 60, COLORS.SUCCESS);
+      nextLevelBtn.setOrigin(0.5, 0.5);
+      const nextLevelText = this.scene.add.text(0, buttonY, `Continue to ${data.nextLevel.name}`, {
+        fontSize: '20px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      nextLevelText.setOrigin(0.5);
+      const nextLevelZone = this.scene.add.zone(0, buttonY, 300, 60);
+      nextLevelZone.setOrigin(0.5, 0.5);
+      nextLevelZone.setInteractive({ useHandCursor: true });
+      nextLevelZone.on('pointerdown', () => {
+        this.hide();
+        if (this.onNextLevel) {
+          this.onNextLevel(data.nextLevel!.key);
+        }
+      });
+      continueBtn = [nextLevelBtn, nextLevelText, nextLevelZone];
+    } else {
+      const btn = this.scene.add.rectangle(0, buttonY, 200, 60, COLORS.PRIMARY);
+      btn.setOrigin(0.5, 0.5);
+      const btnText = this.scene.add.text(0, buttonY, 'Continue', {
+        fontSize: '20px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      btnText.setOrigin(0.5);
+      const btnZone = this.scene.add.zone(0, buttonY, 200, 60);
+      btnZone.setOrigin(0.5, 0.5);
+      btnZone.setInteractive({ useHandCursor: true });
+      btnZone.on('pointerdown', () => {
+        this.hide();
+        if (this.onContinue) this.onContinue();
+      });
+      continueBtn = [btn, btnText, btnZone];
+    }
 
     let colabBtn: Phaser.GameObjects.GameObject[] = [];
     if (data.labLink && this.onGoToColab) {
-      const btn = this.scene.add.rectangle(200, buttonY, 200, 60, COLORS.SECONDARY);
+      const colabX = data.nextLevel ? -150 : 200;
+      const btn = this.scene.add.rectangle(colabX, buttonY, 200, 60, COLORS.SECONDARY);
       btn.setOrigin(0.5, 0.5);
-      const btnText = this.scene.add.text(200, buttonY, 'Go to Colab', {
+      const btnText = this.scene.add.text(colabX, buttonY, 'Go to Colab', {
         fontSize: '20px',
         color: '#ffffff',
         fontFamily: 'Arial',
@@ -141,7 +173,7 @@ export class RecapScreen {
       });
       btnText.setOrigin(0.5);
       // Use zone for better click detection
-      const colabZone = this.scene.add.zone(200, buttonY, 200, 60);
+      const colabZone = this.scene.add.zone(colabX, buttonY, 200, 60);
       colabZone.setOrigin(0.5, 0.5);
       colabZone.setInteractive({ useHandCursor: true });
       colabZone.on('pointerdown', () => {
@@ -155,7 +187,7 @@ export class RecapScreen {
 
     this.container!.add([
       bg, title, conceptsTitle, ...conceptTexts,
-      ...labSection, continueBtn, continueText, continueZone, ...colabBtn
+      ...labSection, ...continueBtn, ...colabBtn
     ]);
   }
 
