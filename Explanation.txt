@@ -1,0 +1,363 @@
+🌴 Level 1 — AI Jungle
+🟦 Slide 1 — Welcome to the AI Jungle
+“Welcome, Explorer!
+ You’ve entered the AI Jungle, where different forms of intelligence roam — from simple rule-followers to powerful deep learners.”
+
+🟦 Slide 2 — What is Artificial Intelligence?
+Artificial Intelligence (AI) =
+ Machines doing tasks that normally require human intelligence, like recognizing faces or making decisions.
+AI doesn’t “think” like us — it finds patterns and uses them to act.
+
+🟦 Slide 3 — Where Do You Meet AI Daily?
+You interact with AI more than you think:
+Search engines
+
+
+Movie/music recommendations
+
+
+Face unlock
+
+
+Smart assistants
+
+
+Self-driving cars
+
+
+Spam filters
+
+
+AI is everywhere — but not all AI works the same way.
+
+🟦 Slide 4 — Types of AI Creatures
+Rule-Based AI (The Lizard)
+Follows strict instructions:
+ “If this happens → do that.”
+ No learning, just rules.
+Machine Learning (The Tiger)
+Learns from data and improves over time.
+ Recognizes patterns.
+Deep Learning (The Dragon)
+A powerful form of ML that uses neural networks.
+ Great for images, sound, language.
+
+🟦 Slide 5 — Why It Matters
+Understanding the types of AI helps us recognize strengths, weaknesses, and where to use which approach.
+
+🟦 Slide 6 — Prepare Your Mind
+Your goal in this jungle:
+Spot examples of AI
+
+
+Decide which kind they belong to
+
+
+Train your explorer brain!
+
+
+
+🟦 Slide 7 — Activity Reminder
+“In the next challenge, collect AI icons and classify them into Rule-based, ML, or DL platforms.”
+
+⚙️ Level 2 — Machine Whisperer
+🟦 Slide 1 — Welcome to the Machine Whisperer Zone
+Here, machines learn just like students — from examples, patterns, and trial and error.
+
+🟦 Slide 2 — What Is a Dataset?
+A dataset is a collection of examples.
+ Think of it like a table:
+Features → the inputs (color, size, speed…)
+
+
+Label → the correct answer (cat/dog, price, category)
+
+
+
+🟦 Slide 3 — Training vs Testing
+To teach a machine properly:
+Training Data: examples used to learn
+
+
+Testing Data: fresh examples used to measure how well the model learned
+
+
+Never use the same data for both — it would be cheating!
+
+🟦 Slide 4 — Types of Machine Learning
+Supervised Learning
+The model gets both inputs and correct outputs.
+Unsupervised Learning
+No labels — the model groups things on its own.
+Reinforcement Learning
+The model learns by trial, error, and rewards.
+
+🟦 Slide 5 — The ML Workflow
+The Machine Whisperer uses a simple cycle:
+Collect Data
+
+
+Split Data
+
+
+Train Model
+
+
+Evaluate Model
+
+
+Improve and Repeat
+
+
+This cycle powers almost every ML system today.
+
+🟦 Slide 6 — Why It Matters
+ML lets machines improve by themselves instead of following fixed rules.
+ This makes them flexible, adaptable, and smarter over time.
+
+🟦 Slide 7 — Activity Reminder
+Your mission:
+Sort data into features and labels
+
+
+Choose the correct ML type for each scenario
+
+
+
+📜 Level 3 — Data Scrolls & First Spell
+🟦 Slide 1 — Inside the Data Scroll Room
+You will learn your first ML spell: how to teach a machine a simple mathematical relationship.
+
+🟦 Slide 2 — Models Learn Patterns
+A model doesn’t memorize values — it learns the pattern behind them.
+Example:
+ If the pattern is “double the number”,
+ the model learns something like:
+ y = 2 × x
+
+🟦 Slide 3 — Linear Regression
+The simplest model type:
+Finds the best line through your data
+
+
+Learns a slope (how fast values grow)
+
+
+Learns an intercept (where the line starts)
+
+
+The model becomes a “predictor” of future values.
+
+🟦 Slide 4 — Data → Model → Prediction
+To cast your spell:
+Give the model data (X, y)
+
+
+Let it find the pattern
+
+
+Ask it to predict a new value
+
+
+If trained well, predictions will match reality.
+
+🟦 Slide 5 — Human vs Machine
+Sometimes humans guess patterns better…
+ But for large datasets, the machine wins.
+
+🟦 Slide 6 — Activity Reminder
+Your challenge:
+Complete the ML pipeline puzzle
+
+
+Compare your prediction vs the machine’s prediction
+
+
+
+🧠 Level 4 — Neural Temple
+🟦 Slide 1 — Enter the Neural Temple
+This temple holds the secrets of neurons — the building blocks of deep learning.
+
+🟦 Slide 2 — What Is a Neuron?
+A neuron:
+Takes inputs
+
+
+Combines them using weights
+
+
+Applies an activation function
+
+
+Produces an output
+
+
+It’s like a tiny decision-maker.
+
+🟦 Slide 3 — Layers
+Stack neurons together to make:
+Input Layer
+
+
+Hidden Layers
+
+
+Output Layer
+
+
+Each layer transforms the data into something more meaningful.
+
+🟦 Slide 4 — Why Deep Learning Works
+DL shines when data is complex:
+Images
+
+
+Speech
+
+
+Handwriting
+
+
+Language
+
+
+Each layer extracts deeper features—like edges → shapes → objects.
+
+🟦 Slide 5 — Data Transformations
+As data moves through layers:
+Raw pixels → edges → shapes → object identity
+ Each step refines the understanding.
+
+🟦 Slide 6 — Activity Reminder
+Your mission:
+Route a signal through the correct path of layers
+
+
+Solve the neuron switch puzzle
+
+
+
+🔮 Level 5 — Teachable Ritual
+🟦 Slide 1 — Welcome to the Ritual Chamber
+Here you will learn to create your own intelligent creature.
+
+🟦 Slide 2 — How Teachable Machine Works
+You provide examples:
+Images
+
+
+Sounds
+
+
+Poses
+
+
+The system learns patterns…
+ and becomes capable of recognizing new ones.
+
+🟦 Slide 3 — Why This Is Powerful
+You can train a model without coding —
+ using just your webcam or microphone.
+Perfect for experimentation and creativity.
+
+🟦 Slide 4 — How Training Works
+Collect samples
+
+
+Teach the model the difference between them
+
+
+Test the model on new examples
+
+
+Improve it by adding more data
+
+
+
+🟦 Slide 5 — Real Teachable Machine
+To build a real model, go to:
+https://teachablemachine.withgoogle.com/
+ Create your own project in minutes.
+
+🟦 Slide 6 — Activity Reminder
+Inside the game:
+Choose your shrine
+
+
+Collect example icons
+
+
+Train your simulated model
+
+
+Test its predictions
+
+
+
+🏛️ Level 6 — Final Artifact
+🟦 Slide 1 — The Final Chamber
+You have learned many skills, Explorer.
+ Now it’s time to combine them all.
+
+🟦 Slide 2 — The Complete ML Pipeline
+Data Collection
+
+
+Data Preparation
+
+
+Model Training
+
+
+Model Evaluation
+
+
+Improvement
+
+
+Deployment
+
+
+Every AI project follows this flow.
+
+🟦 Slide 3 — Why the Pipeline Matters
+A good pipeline makes models:
+More accurate
+
+
+More reliable
+
+
+Easier to debug
+
+
+Easier to improve
+
+
+Professionals use this pipeline every day.
+
+🟦 Slide 4 — Your Final Mission
+Activate the chambers:
+Data Chamber
+
+
+Model Forge
+
+
+Evaluation Lens
+
+
+Then answer final questions to prove mastery.
+
+🟦 Slide 5 — Graduation
+You will receive:
+Your AI Explorer Certificate
+
+
+Complete list of Colab links
+
+
+Link to Teachable Machine
+
+
+Encouragement to build your own AI project
