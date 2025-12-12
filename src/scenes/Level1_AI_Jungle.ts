@@ -1,13 +1,11 @@
 import Phaser from 'phaser';
 import { COLORS } from '../GameConfig';
-import { InputManager } from '../systems/InputManager';
 import { ProgressManager } from '../systems/ProgressManager';
 import { DialogBox } from '../ui/DialogBox';
 import { LabLinkOverlay, LabLinkInfo } from '../ui/LabLinkOverlay';
 import { RecapScreen, RecapData } from '../ui/RecapScreen';
 import { SlideOverlay2 } from '../ui/SlideOverlay2';
 import { LEVEL_1_SLIDES_ENHANCED } from '../data/learningSlides2';
-import { SceneHelpers } from '../utils/SceneHelpers';
 
 interface DraggableIcon {
   sprite: Phaser.GameObjects.Container;
@@ -40,23 +38,18 @@ interface BrainChoice {
 }
 
 export default class Level1_AI_Jungle extends Phaser.Scene {
-  private player?: Phaser.Physics.Arcade.Sprite;
-  private platforms?: Phaser.Physics.Arcade.StaticGroup;
-  private inputManager?: InputManager;
   private dialogBox?: DialogBox;
   private labLinkOverlay?: LabLinkOverlay;
   private recapScreen?: RecapScreen;
   private slideOverlay?: SlideOverlay2;
   
   // Activity 1: AI Ecosystem Drag & Drop
-  private ecosystemActive: boolean = false;
   private ecosystemContainer?: Phaser.GameObjects.Container;
   private draggableIcons: DraggableIcon[] = [];
   private aiZones: AIZone[] = [];
   private placedCount: number = 0;
   
   // Activity 2: AI Guess-the-Brain
-  private brainGameActive: boolean = false;
   private brainGameContainer?: Phaser.GameObjects.Container;
   private currentScenario?: { description: string; animation: string; correct: 'rule' | 'ml' | 'dl' };
   private brainChoices: BrainChoice[] = [];
@@ -64,7 +57,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
   private scenarios: Array<{ description: string; animation: string; correct: 'rule' | 'ml' | 'dl' }> = [];
   
   private labTerminal?: Phaser.GameObjects.Rectangle;
-  private exitZone?: Phaser.GameObjects.Zone;
+  private exitButton?: Phaser.GameObjects.Rectangle;
   private activityCompleted: { ecosystem: boolean; brainGame: boolean } = { ecosystem: false, brainGame: false };
 
   constructor() {
@@ -76,23 +69,15 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.labLinkOverlay = new LabLinkOverlay(this);
     this.recapScreen = new RecapScreen(this);
     this.slideOverlay = new SlideOverlay2(this);
-    this.inputManager = new InputManager(this);
 
     // Background
     this.add.rectangle(640, 360, 1280, 720, 0x0a1929);
 
-    // Create platforms
-    this.platforms = this.physics.add.staticGroup();
-    this.createPlatforms();
-
-    // Create player
-    this.createPlayer();
-
     // Create Lab Terminal
     this.createLabTerminal();
 
-    // Create exit zone
-    this.createExitZone();
+    // Create exit button
+    this.createExitButton();
 
     // Show learning slides first, then enable gameplay
     this.slideOverlay.show(LEVEL_1_SLIDES_ENHANCED, () => {
@@ -102,32 +87,15 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
           '1. AI Ecosystem Map - Drag AI examples to the correct zones\n' +
           '2. AI Guess-the-Brain - Choose the right AI type for each scenario',
           () => {
-            // Ensure dialog is hidden and input is unblocked
+            // Ensure dialog is hidden
             this.dialogBox!.hide();
-            if (this.inputManager) {
-              this.inputManager.setBlocked(false);
-            }
             this.time.delayedCall(100, () => {
               this.startEcosystemActivity();
             });
           }
         );
       });
-    }, this.inputManager);
-
-    this.physics.add.collider(this.player!, this.platforms!);
-  }
-
-  private createPlatforms(): void {
-    SceneHelpers.createPlatform(this, this.platforms!, 640, 700, 1280, 40, COLORS.BG_MEDIUM);
-    SceneHelpers.createPlatform(this, this.platforms!, 200, 550, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 500, 450, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 800, 550, 200, 20, COLORS.BG_LIGHT);
-    SceneHelpers.createPlatform(this, this.platforms!, 1100, 450, 200, 20, COLORS.BG_LIGHT);
-  }
-
-  private createPlayer(): void {
-    this.player = SceneHelpers.createPlayer(this, 100, 400);
+    });
   }
 
   private createLabTerminal(): void {
@@ -155,10 +123,10 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     });
   }
 
-  private createExitZone(): void {
-    this.exitZone = this.add.zone(1200, 650, 80, 50);
-    this.physics.add.existing(this.exitZone, true);
-    this.physics.add.overlap(this.player!, this.exitZone, () => {
+  private createExitButton(): void {
+    this.exitButton = this.add.rectangle(1200, 650, 120, 60, COLORS.SUCCESS);
+    this.exitButton.setInteractive({ useHandCursor: true });
+    this.exitButton.on('pointerdown', () => {
       if (this.activityCompleted.ecosystem && this.activityCompleted.brainGame) {
         this.completeLevel();
       } else {
@@ -167,26 +135,21 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
           () => {}
         );
       }
-    }, undefined, this);
+    });
 
-    const exitSign = this.add.text(1200, 650, 'EXIT', {
-      fontSize: '20px',
-      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+    const exitText = this.add.text(1200, 650, 'EXIT', {
+      fontSize: '24px',
+      color: '#ffffff',
       fontFamily: 'Arial',
       fontStyle: 'bold'
     });
-    exitSign.setOrigin(0.5);
+    exitText.setOrigin(0.5);
+    exitText.setDepth(10);
   }
 
   // ========== ACTIVITY 1: AI ECOSYSTEM DRAG & DROP MAP ==========
   private startEcosystemActivity(): void {
-    this.ecosystemActive = true;
     this.placedCount = 0;
-    
-    // Ensure input is not blocked
-    if (this.inputManager) {
-      this.inputManager.setBlocked(false);
-    }
     
     // Create fullscreen overlay
     this.ecosystemContainer = this.add.container(640, 360);
@@ -244,7 +207,6 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     closeBtn.on('pointerdown', () => {
       if (this.placedCount >= this.draggableIcons.length) {
         this.activityCompleted.ecosystem = true;
-        this.ecosystemActive = false;
         this.ecosystemContainer!.destroy();
         this.dialogBox!.show('Great! Now try the AI Guess-the-Brain game!', () => {
           this.startBrainGame();
@@ -539,7 +501,6 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
 
   // ========== ACTIVITY 2: AI GUESS-THE-BRAIN ==========
   private startBrainGame(): void {
-    this.brainGameActive = true;
     this.scenarioIndex = 0;
     
     this.scenarios = [
@@ -746,25 +707,4 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     });
   }
 
-  update(): void {
-    if (!this.player || !this.inputManager) return;
-
-    if (this.ecosystemActive || this.brainGameActive) {
-      // Disable player movement during activities
-      this.player.setVelocityX(0);
-      return;
-    }
-
-    if (this.inputManager.isLeftPressed()) {
-      this.player.setVelocityX(-200);
-    } else if (this.inputManager.isRightPressed()) {
-      this.player.setVelocityX(200);
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    if (this.inputManager.isJumpJustPressed() && this.player.body!.touching.down) {
-      this.player.setVelocityY(-500);
-    }
-  }
 }

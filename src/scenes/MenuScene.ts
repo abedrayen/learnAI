@@ -61,14 +61,6 @@ export default class MenuScene extends Phaser.Scene {
       fontStyle: 'bold'
     });
     levelSelectText.setOrigin(0.5);
-
-    // Instructions
-    const instructions = this.add.text(640, 550, 'Use Arrow Keys or WASD to move, Space to jump', {
-      fontSize: '18px',
-      color: '#aaaaaa',
-      fontFamily: 'Arial'
-    });
-    instructions.setOrigin(0.5);
   }
 
   private showLevelSelect(): void {
