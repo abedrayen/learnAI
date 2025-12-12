@@ -61,6 +61,15 @@ export default class MenuScene extends Phaser.Scene {
       fontStyle: 'bold'
     });
     levelSelectText.setOrigin(0.5);
+
+    // Footer credit
+    const creditText = this.add.text(640, 680, 'Created by Abed Rayen', {
+      fontSize: '16px',
+      color: '#888888',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    creditText.setOrigin(0.5);
   }
 
   private showLevelSelect(): void {
@@ -127,6 +136,15 @@ export default class MenuScene extends Phaser.Scene {
       fontFamily: 'Arial'
     });
     backText.setOrigin(0.5);
+
+    // Footer credit
+    const creditText = this.add.text(640, 680, 'Created by Abed Rayen', {
+      fontSize: '16px',
+      color: '#888888',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    creditText.setOrigin(0.5);
   }
 }
 
