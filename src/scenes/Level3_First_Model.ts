@@ -28,7 +28,6 @@ export default class Level3_First_Model extends Phaser.Scene {
   private labLinkOverlay?: LabLinkOverlay;
   private recapScreen?: RecapScreen;
   private slideOverlay?: SlideOverlay2;
-  private labTerminal?: Phaser.GameObjects.Rectangle;
   private exitButton?: Phaser.GameObjects.Rectangle;
   
   // Activity 1: Interactive Regression Plot
@@ -68,7 +67,6 @@ export default class Level3_First_Model extends Phaser.Scene {
 
     this.add.rectangle(640, 360, 1280, 720, 0x0a1929);
 
-    this.createLabTerminal();
     this.createExitButton();
 
     this.slideOverlay.show(LEVEL_3_SLIDES_ENHANCED, () => {
@@ -82,35 +80,6 @@ export default class Level3_First_Model extends Phaser.Scene {
           }
         );
       });
-    });
-  }
-
-  private createLabTerminal(): void {
-    this.labTerminal = this.add.rectangle(1200, 200, 100, 100, COLORS.SECONDARY);
-    this.labTerminal.setStrokeStyle(4, COLORS.PRIMARY);
-    this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains);
-    this.labTerminal.input!.cursor = 'pointer';
-    this.labTerminal.setDepth(3000);
-    
-    const terminalIcon = this.add.text(1200, 200, '💻', { fontSize: '40px' });
-    terminalIcon.setOrigin(0.5);
-    terminalIcon.setDepth(3001);
-    const terminalLabel = this.add.text(1200, 250, 'Lab Terminal', {
-      fontSize: '16px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    });
-    terminalLabel.setOrigin(0.5);
-    terminalLabel.setDepth(3001);
-
-    this.labTerminal.on('pointerdown', () => {
-      const labInfo: LabLinkInfo = {
-        title: 'First Model Lab',
-        description: 'Open this Colab to train your first linear regression model and see how it learns patterns from data.',
-        url: 'https://colab.research.google.com/first_linear_model',
-        shortCode: 'colab.link/first-model-1'
-      };
-      this.labLinkOverlay!.show(labInfo);
     });
   }
 

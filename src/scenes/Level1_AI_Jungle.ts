@@ -56,7 +56,6 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
   private scenarioIndex: number = 0;
   private scenarios: Array<{ description: string; animation: string; correct: 'rule' | 'ml' | 'dl' }> = [];
   
-  private labTerminal?: Phaser.GameObjects.Rectangle;
   private exitButton?: Phaser.GameObjects.Rectangle;
   private activityCompleted: { ecosystem: boolean; brainGame: boolean } = { ecosystem: false, brainGame: false };
 
@@ -72,9 +71,6 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
 
     // Background
     this.add.rectangle(640, 360, 1280, 720, 0x0a1929);
-
-    // Create Lab Terminal
-    this.createLabTerminal();
 
     // Create exit button
     this.createExitButton();
@@ -95,36 +91,6 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
           }
         );
       });
-    });
-  }
-
-  private createLabTerminal(): void {
-    this.labTerminal = this.add.rectangle(1200, 200, 100, 100, COLORS.SECONDARY);
-    this.labTerminal.setStrokeStyle(4, COLORS.PRIMARY);
-    this.labTerminal.setInteractive(new Phaser.Geom.Rectangle(-50, -50, 100, 100), Phaser.Geom.Rectangle.Contains);
-    this.labTerminal.input!.cursor = 'pointer';
-    this.labTerminal.setDepth(3000); // Above activity overlays (depth 2000)
-    
-    const terminalIcon = this.add.text(1200, 200, '💻', { fontSize: '40px' });
-    terminalIcon.setOrigin(0.5);
-    terminalIcon.setDepth(3001); // Above the terminal rectangle
-    
-    const terminalLabel = this.add.text(1200, 250, 'Lab Terminal', {
-      fontSize: '16px',
-      color: '#ffffff',
-      fontFamily: 'Arial'
-    });
-    terminalLabel.setOrigin(0.5);
-    terminalLabel.setDepth(3001); // Above the terminal rectangle
-
-    this.labTerminal.on('pointerdown', () => {
-      const labInfo: LabLinkInfo = {
-        title: 'AI Intro Lab',
-        description: 'Open this Colab to see a simple Python notebook that lists different AI applications and classifies them.',
-        url: 'https://colab.research.google.com/ai_intro_examples',
-        shortCode: 'colab.link/ai-intro-1'
-      };
-      this.labLinkOverlay!.show(labInfo);
     });
   }
 
