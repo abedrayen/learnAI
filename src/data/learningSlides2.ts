@@ -531,20 +531,6 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
   },
 
   {
-    title: 'Making Good Predictions',
-    elements: [
-      { type: 'title', text: 'Making Good Predictions' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Critical Point:', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'If trained well, predictions will match reality. If trained poorly (overfitting, bad data), predictions will fail on new examples.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'This pipeline — from data to prediction — is the foundation of all supervised machine learning. Linear regression teaches you the core principles that apply to all ML models.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🔮', size: 50 }
-    ]
-  },
-  {
     title: 'Activity Reminder',
     elements: [
       { type: 'title', text: 'Activity Reminder' },
@@ -571,35 +557,72 @@ export const LEVEL_4_SLIDES_ENHANCED: EnhancedSlide[] = [
     title: 'Enter the Neural Temple',
     elements: [
       { type: 'title', text: 'Enter the Neural Temple' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Welcome to the heart of Deep Learning — where artificial neurons work together to solve complex problems.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'This temple holds the secrets of neural networks: how simple units combine to create powerful intelligence. You\'ll discover how layers of neurons transform raw data into meaningful understanding.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'By understanding neurons and layers, you\'ll grasp how Deep Learning achieves its remarkable capabilities in vision, speech, and language.', align: 'center' },
-      { type: 'spacer', height: 30 },
-      { type: 'icon', icon: '🧠', size: 60 }
+      { type: 'spacer', height: 0 },
+      { type: 'diagram', diagramType: 'neural-temple-intro', width: 800, height: 450 },
+      { type: 'spacer', height: 5 },
+      { type: 'bullet', items: [
+        '🔗 Layers of neurons transform raw data → understanding',
+        '⚡ Simple units combine to solve complex problems',
+        '🎯 Powers vision, speech, and language AI'
+      ]}
+    ]
+  },
+  {
+    title: 'Deep Learning Architectures',
+    elements: [
+      { type: 'title', text: 'Deep Learning Architectures' },
+      { type: 'spacer', height: -90 },
+      { type: 'diagram', diagramType: 'deep-learning-fields', width: 900, height: 500 },
+      { type: 'spacer', height: -50 },
+      { type: 'bullet', items: [
+        '🧠 ANN: Multi-layer networks for complex unstructured data',
+        '👁️ CNN: Convolutional filters for image recognition',
+        '🔄 RNN: Recurrent connections for sequences & language'
+      ]}
     ]
   },
   {
     title: 'What Is a Neuron?',
     elements: [
       { type: 'title', text: 'What Is a Neuron?' },
-      { type: 'spacer', height: 20 },
-      { type: 'diagram', diagramType: 'neuron', width: 600, height: 300 },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Visual Metaphor: Think of a neuron as a tiny voting committee. It receives multiple inputs (opinions), weighs their importance (weights), combines them, and makes a decision (output).', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'How a Neuron Works:', align: 'center' },
+      { type: 'spacer', height: 0 },
+      { type: 'diagram', diagramType: 'neuron-detailed', width: 800, height: 400 },
+      { type: 'spacer', height: -50 },
       { type: 'bullet', items: [
-        '📥 Takes inputs — receives signals from other neurons or data',
-        '⚖️ Combines them using weights — multiplies each input by its importance',
-        '🔢 Applies an activation function — decides whether to "fire" (send signal)',
-        '📤 Produces an output — passes the result to the next layer',
-        '🧠 It\'s like a tiny decision-maker — simple but powerful when combined'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Key Insight: A single neuron is simple, but thousands working together can recognize faces, understand speech, and translate languages.', align: 'center' }
+        '📥 Inputs × Weights: Each input multiplied by importance',
+        '🔢 Sum: Add all weighted inputs',
+        '⚡ Activation: Decide if neuron "fires"'
+      ]}
+    ]
+  },
+  {
+    title: 'How Neurons Learn',
+    elements: [
+      { type: 'title', text: 'How Neurons Learn' },
+      { type: 'spacer', height: 0 },
+      { type: 'diagram', diagramType: 'neuron-learning', width: 800, height: 400 },
+      { type: 'spacer', height: -50 },
+      { type: 'bullet', items: [
+        '📊 Compare output to expected result',
+        '⚖️ Adjust weights to reduce error',
+        '🔄 Repeat: Learn through practice',
+        '✅ Lower error = Better predictions'
+      ]}
+    ]
+  },
+  {
+    title: 'From Neurons to Networks',
+    elements: [
+      { type: 'title', text: 'From Neurons to Networks' },
+      { type: 'spacer', height: 0 },
+      { type: 'diagram', diagramType: 'neurons-to-network', width: 900, height: 400 },
+      { type: 'spacer', height: -30 },
+      { type: 'bullet', items: [
+        '🔵 Single neuron: Simple linear patterns',
+        '🟢 Few neurons: Combine features',
+        '🟣 Deep network: Complex hierarchies',
+        '🚀 More layers = More capability'
+      ]}
     ]
   },
   {

@@ -79,6 +79,24 @@ export class DiagramRenderer {
       case 'error-metrics-combined':
         objects.push(...this.renderErrorMetricsCombined(x, y, width, height));
         break;
+      case 'prediction-quality':
+        objects.push(...this.renderPredictionQuality(x, y, width, height));
+        break;
+      case 'neural-temple-intro':
+        objects.push(...this.renderNeuralTempleIntro(x, y, width, height));
+        break;
+      case 'deep-learning-fields':
+        objects.push(...this.renderDeepLearningFields(x, y, width, height));
+        break;
+      case 'neuron-detailed':
+        objects.push(...this.renderNeuronDetailed(x, y, width, height));
+        break;
+      case 'neuron-learning':
+        objects.push(...this.renderNeuronLearning(x, y, width, height));
+        break;
+      case 'neurons-to-network':
+        objects.push(...this.renderNeuronsToNetwork(x, y, width, height));
+        break;
     }
 
     return objects;
@@ -2267,6 +2285,1108 @@ export class DiagramRenderer {
     title.setOrigin(0.5);
     objects.push(title);
 
+    return objects;
+  }
+
+  private renderPredictionQuality(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const padding = 50;
+    const graphX = x - width / 2 + padding;
+    const graphY = y + height / 2 - padding;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Split into two sections: Well-trained vs Poorly-trained
+    const leftX = graphX + graphWidth / 4;
+    const rightX = graphX + 3 * graphWidth / 4;
+    const centerY = graphY - graphHeight / 2 + 60;
+    const plotWidth = graphWidth / 2 - 40;
+    const plotHeight = graphHeight * 0.5;
+
+    // Helper function to render a prediction scenario
+    const renderScenario = (centerX: number, isGood: boolean, scenarioLabel: string) => {
+      const color = isGood ? COLORS.SUCCESS : COLORS.ERROR;
+      
+      // Training data points
+      const trainPoints = isGood 
+        ? [{ x: 1, y: 2.1 }, { x: 2, y: 4.0 }, { x: 3, y: 5.9 }, { x: 4, y: 7.8 }, { x: 5, y: 9.7 }]
+        : [{ x: 1, y: 2.5 }, { x: 2, y: 3.8 }, { x: 3, y: 6.2 }, { x: 4, y: 7.1 }, { x: 5, y: 9.5 }];
+      
+      // Test data points (new, unseen)
+      const testPoints = isGood
+        ? [{ x: 6, y: 11.6 }, { x: 7, y: 13.5 }]
+        : [{ x: 6, y: 10.2 }, { x: 7, y: 12.8 }];
+
+      const allPoints = [...trainPoints, ...testPoints];
+      const minX = Math.min(...allPoints.map(p => p.x));
+      const maxX = Math.max(...allPoints.map(p => p.x));
+      const minY = Math.min(...allPoints.map(p => p.y));
+      const maxY = Math.max(...allPoints.map(p => p.y));
+
+      // Best fit line (for well-trained, it generalizes; for poorly-trained, it overfits)
+      const slope = isGood ? 2 : 1.8;
+      const intercept = isGood ? 0.1 : 0.5;
+
+      // Draw axes
+      const axes = this.scene.add.graphics();
+      axes.lineStyle(2, COLORS.TEXT, 0.5);
+      axes.beginPath();
+      axes.moveTo(centerX - plotWidth / 2, centerY + plotHeight / 2);
+      axes.lineTo(centerX - plotWidth / 2, centerY - plotHeight / 2);
+      axes.moveTo(centerX - plotWidth / 2, centerY + plotHeight / 2);
+      axes.lineTo(centerX + plotWidth / 2, centerY + plotHeight / 2);
+      axes.strokePath();
+      objects.push(axes);
+
+      // Draw best-fit line
+      const line = this.scene.add.graphics();
+      line.lineStyle(3, color);
+      line.beginPath();
+      const startX = centerX - plotWidth / 2;
+      const startY = centerY + plotHeight / 2 - ((slope * minX + intercept - minY) / (maxY - minY)) * plotHeight;
+      const endX = centerX + plotWidth / 2;
+      const endY = centerY + plotHeight / 2 - ((slope * maxX + intercept - minY) / (maxY - minY)) * plotHeight;
+      line.moveTo(startX, startY);
+      line.lineTo(endX, endY);
+      line.strokePath();
+      objects.push(line);
+
+      // Draw training points (filled)
+      trainPoints.forEach(point => {
+        const plotX = centerX - plotWidth / 2 + ((point.x - minX) / (maxX - minX)) * plotWidth;
+        const plotY = centerY + plotHeight / 2 - ((point.y - minY) / (maxY - minY)) * plotHeight;
+        const pointCircle = this.scene.add.circle(plotX, plotY, 6, color);
+        pointCircle.setStrokeStyle(2, COLORS.TEXT);
+        objects.push(pointCircle);
+      });
+
+      // Draw test points (with error indicators if poor)
+      testPoints.forEach(point => {
+        const plotX = centerX - plotWidth / 2 + ((point.x - minX) / (maxX - minX)) * plotWidth;
+        const plotY = centerY + plotHeight / 2 - ((point.y - minY) / (maxY - minY)) * plotHeight;
+        const predictedY = slope * point.x + intercept;
+        const predictedPlotY = centerY + plotHeight / 2 - ((predictedY - minY) / (maxY - minY)) * plotHeight;
+        
+        // Test point
+        const pointCircle = this.scene.add.circle(plotX, plotY, 6, isGood ? COLORS.SUCCESS : COLORS.ERROR);
+        pointCircle.setStrokeStyle(2, COLORS.TEXT);
+        objects.push(pointCircle);
+        
+        // Error line for poor predictions
+        if (!isGood) {
+          const errorLine = this.scene.add.graphics();
+          errorLine.lineStyle(2, COLORS.ERROR, 0.6);
+          errorLine.lineBetween(plotX, plotY, plotX, predictedPlotY);
+          objects.push(errorLine);
+        }
+      });
+
+      // Label
+      const scenarioLabelText = this.scene.add.text(centerX, centerY + plotHeight / 2 + 30, scenarioLabel, {
+        fontSize: '14px',
+        color: '#' + color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      scenarioLabelText.setOrigin(0.5);
+      objects.push(scenarioLabelText);
+
+      // Status indicator
+      const status = this.scene.add.text(centerX, centerY + plotHeight / 2 + 55, isGood ? '✅ Generalizes well' : '❌ Fails on new data', {
+        fontSize: '12px',
+        color: isGood ? '#' + COLORS.SUCCESS.toString(16).padStart(6, '0') : '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial'
+      });
+      status.setOrigin(0.5);
+      objects.push(status);
+    };
+
+    // Render both scenarios
+    renderScenario(leftX, true, 'Well-Trained Model');
+    renderScenario(rightX, false, 'Poorly-Trained Model');
+
+    // Legend
+    const legendY = graphY + 20;
+    const legend1 = this.scene.add.text(graphX + 30, legendY, '● Training Data', {
+      fontSize: '11px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    legend1.setOrigin(0, 0.5);
+    objects.push(legend1);
+
+    const legend2 = this.scene.add.text(graphX + 150, legendY, '● Test Data (New)', {
+      fontSize: '11px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    legend2.setOrigin(0, 0.5);
+    objects.push(legend2);
+
+    // Title
+    const title = this.scene.add.text(x, y - height / 2 + 20, 'Prediction Quality: Training vs Reality', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+
+    return objects;
+  }
+
+  private renderNeuralTempleIntro(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Create a brain-like structure with multiple layers
+    const numLayers = 4;
+    const layerSpacing = width / (numLayers + 1);
+    const neuronsPerLayer = [3, 5, 4, 2]; // Input, Hidden1, Hidden2, Output
+    
+    // Draw brain-like outline (organic shape)
+    const brainOutline = this.scene.add.graphics();
+    brainOutline.lineStyle(4, COLORS.PRIMARY, 0.6);
+    brainOutline.beginPath();
+    
+    // Create organic brain shape
+    const brainWidth = width * 0.9;
+    const brainHeight = height * 0.7;
+    const brainX = centerX;
+    const brainY = centerY;
+    
+    // Left hemisphere curve
+    for (let i = 0; i <= 20; i++) {
+      const angle = (i / 20) * Math.PI;
+      const radiusX = brainWidth / 2 * (0.8 + 0.2 * Math.sin(angle * 2));
+      const radiusY = brainHeight / 2;
+      const px = brainX - radiusX * Math.cos(angle);
+      const py = brainY - radiusY * Math.sin(angle);
+      if (i === 0) {
+        brainOutline.moveTo(px, py);
+      } else {
+        brainOutline.lineTo(px, py);
+      }
+    }
+    
+    // Right hemisphere curve
+    for (let i = 0; i <= 20; i++) {
+      const angle = Math.PI + (i / 20) * Math.PI;
+      const radiusX = brainWidth / 2 * (0.8 + 0.2 * Math.sin(angle * 2));
+      const radiusY = brainHeight / 2;
+      const px = brainX - radiusX * Math.cos(angle);
+      const py = brainY - radiusY * Math.sin(angle);
+      brainOutline.lineTo(px, py);
+    }
+    
+    brainOutline.closePath();
+    brainOutline.strokePath();
+    brainOutline.fillStyle(COLORS.PRIMARY, 0.05);
+    brainOutline.fillPath();
+    objects.push(brainOutline);
+    
+    // Draw layers of neurons
+    const layers: { x: number; neurons: { x: number; y: number }[] }[] = [];
+    
+    for (let layerIdx = 0; layerIdx < numLayers; layerIdx++) {
+      const layerX = centerX - width / 2 + (layerIdx + 1) * layerSpacing;
+      const numNeurons = neuronsPerLayer[layerIdx];
+      const neuronSpacing = height * 0.5 / (numNeurons + 1);
+      const startY = centerY - height * 0.25 + neuronSpacing;
+      
+      const layerNeurons: { x: number; y: number }[] = [];
+      
+      for (let neuronIdx = 0; neuronIdx < numNeurons; neuronIdx++) {
+        const neuronY = startY + neuronIdx * neuronSpacing;
+        layerNeurons.push({ x: layerX, y: neuronY });
+        
+        // Draw neuron
+        const neuronSize = layerIdx === 0 ? 18 : layerIdx === numLayers - 1 ? 22 : 20;
+        const neuronColor = layerIdx === 0 ? COLORS.PRIMARY : layerIdx === numLayers - 1 ? COLORS.SUCCESS : COLORS.WARNING;
+        const neuronAlpha = 0.8;
+        
+        const neuron = this.scene.add.circle(layerX, neuronY, neuronSize, neuronColor, neuronAlpha);
+        neuron.setStrokeStyle(3, neuronColor);
+        objects.push(neuron);
+        
+        // Add glow effect
+        const glow = this.scene.add.circle(layerX, neuronY, neuronSize + 5, neuronColor, 0.2);
+        objects.push(glow);
+        
+        // Draw connections to next layer
+        if (layerIdx < numLayers - 1) {
+          const nextLayerNeurons = neuronsPerLayer[layerIdx + 1];
+          const nextNeuronSpacing = height * 0.5 / (nextLayerNeurons + 1);
+          const nextStartY = centerY - height * 0.25 + nextNeuronSpacing;
+          
+          for (let nextIdx = 0; nextIdx < nextLayerNeurons; nextIdx++) {
+            const nextY = nextStartY + nextIdx * nextNeuronSpacing;
+            const nextX = centerX - width / 2 + (layerIdx + 2) * layerSpacing;
+            
+            // Connection line with varying opacity
+            const connection = this.scene.add.graphics();
+            const lineAlpha = 0.15 + Math.random() * 0.1;
+            connection.lineStyle(1.5, COLORS.SECONDARY, lineAlpha);
+            connection.beginPath();
+            connection.moveTo(layerX + neuronSize, neuronY);
+            connection.lineTo(nextX - neuronSize, nextY);
+            connection.strokePath();
+            objects.push(connection);
+          }
+        }
+      }
+      
+      layers.push({ x: layerX, neurons: layerNeurons });
+    }
+    
+    // Add layer labels
+    const layerLabels = ['Input', 'Hidden 1', 'Hidden 2', 'Output'];
+    layers.forEach((layer, idx) => {
+      const label = this.scene.add.text(layer.x, centerY + height * 0.3, layerLabels[idx], {
+        fontSize: '12px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+    });
+    
+    // Add data flow indicators
+    const flowArrows = this.scene.add.graphics();
+    flowArrows.lineStyle(3, COLORS.SUCCESS, 0.4);
+    
+    // Input flow
+    for (let i = 0; i < 3; i++) {
+      const arrowX = centerX - width / 2 + 20;
+      const arrowY = centerY - height * 0.25 + (i + 1) * (height * 0.5 / 4);
+      flowArrows.beginPath();
+      flowArrows.moveTo(arrowX, arrowY);
+      flowArrows.lineTo(arrowX + 30, arrowY);
+      flowArrows.strokePath();
+      
+      // Arrowhead
+      flowArrows.fillStyle(COLORS.SUCCESS, 0.4);
+      flowArrows.fillTriangle(arrowX + 30, arrowY, arrowX + 25, arrowY - 5, arrowX + 25, arrowY + 5);
+    }
+    objects.push(flowArrows);
+    
+    // Output flow
+    const outputFlow = this.scene.add.graphics();
+    outputFlow.lineStyle(3, COLORS.SUCCESS, 0.4);
+    for (let i = 0; i < 2; i++) {
+      const arrowX = centerX + width / 2 - 20;
+      const arrowY = centerY - height * 0.25 + (i + 1) * (height * 0.5 / 3);
+      outputFlow.beginPath();
+      outputFlow.moveTo(arrowX, arrowY);
+      outputFlow.lineTo(arrowX + 30, arrowY);
+      outputFlow.strokePath();
+      
+      // Arrowhead
+      outputFlow.fillStyle(COLORS.SUCCESS, 0.4);
+      outputFlow.fillTriangle(arrowX + 30, arrowY, arrowX + 25, arrowY - 5, arrowX + 25, arrowY + 5);
+    }
+    objects.push(outputFlow);
+    
+    // Add input/output labels
+    const inputLabel = this.scene.add.text(centerX - width / 2 - 30, centerY, 'Raw\nData', {
+      fontSize: '11px',
+      color: '#' + COLORS.PRIMARY.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    inputLabel.setOrigin(1, 0.5);
+    objects.push(inputLabel);
+    
+    const outputLabel = this.scene.add.text(centerX + width / 2 + 30, centerY, 'Understanding', {
+      fontSize: '11px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    outputLabel.setOrigin(0, 0.5);
+    objects.push(outputLabel);
+    
+    // Add title/subtitle
+    const subtitle = this.scene.add.text(centerX, centerY - height / 2 + 15, 'Where Simple Neurons Create Powerful Intelligence', {
+      fontSize: '14px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    subtitle.setOrigin(0.5);
+    objects.push(subtitle);
+    
+    return objects;
+  }
+
+  private renderDeepLearningFields(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Three sections: ANN, CNN, RNN
+    const sectionWidth = width / 3 - 20;
+    const sectionHeight = height * 0.5;
+    const sections = [
+      { 
+        x: centerX - width / 2 + sectionWidth / 2 + 10, 
+        label: 'ANN', 
+        fullName: 'Artificial Neural Network',
+        color: COLORS.PRIMARY,
+        useCase: 'Complex Unstructured Data',
+
+      },
+      { 
+        x: centerX, 
+        label: 'CNN', 
+        fullName: 'Convolutional Neural Network',
+        color: COLORS.SUCCESS,
+        useCase: 'Computer Vision',
+
+      },
+      { 
+        x: centerX + width / 2 - sectionWidth / 2 - 10, 
+        label: 'RNN', 
+        fullName: 'Recurrent Neural Network',
+        color: COLORS.WARNING,
+        useCase: 'NLP & Time Series',
+
+      }
+    ];
+
+    sections.forEach((section, sectionIdx) => {
+      const sectionY = centerY - sectionHeight / 2 + 40;
+      
+      // Section background
+      const bg = this.scene.add.rectangle(section.x, sectionY + sectionHeight / 2, sectionWidth, sectionHeight, section.color, 0.1);
+      bg.setStrokeStyle(2, section.color);
+      objects.push(bg);
+      
+      // Label
+      const label = this.scene.add.text(section.x, sectionY + 60, section.label, {
+        fontSize: '20px',
+        color: '#' + section.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      // Full name
+      const fullName = this.scene.add.text(section.x, sectionY + 85, section.fullName, {
+        fontSize: '11px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        align: 'center',
+        wordWrap: { width: sectionWidth - 20 }
+      });
+      fullName.setOrigin(0.5);
+      objects.push(fullName);
+      
+      // Use case
+      const useCase = this.scene.add.text(section.x, sectionY + sectionHeight - 40, section.useCase, {
+        fontSize: '12px',
+        color: '#' + section.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        align: 'center',
+        wordWrap: { width: sectionWidth - 20 }
+      });
+      useCase.setOrigin(0.5);
+      objects.push(useCase);
+      
+      // Render specific diagram for each type
+      const diagramY = sectionY + 120;
+      const diagramHeight = sectionHeight - 180;
+      
+      if (sectionIdx === 0) {
+        // ANN: Multi-layer network
+        this.renderANNStructure(section.x, diagramY, sectionWidth - 20, diagramHeight, section.color, objects);
+      } else if (sectionIdx === 1) {
+        // CNN: Convolutional layers with filters
+        this.renderCNNStructure(section.x, diagramY, sectionWidth - 20, diagramHeight, section.color, objects);
+      } else {
+        // RNN: Recurrent connections
+        this.renderRNNStructure(section.x, diagramY, sectionWidth - 20, diagramHeight, section.color, objects);
+      }
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 15, 'Deep Learning Architectures', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    return objects;
+  }
+
+  private renderANNStructure(x: number, y: number, width: number, height: number, color: number, objects: Phaser.GameObjects.GameObject[]): void {
+    // Multi-layer feedforward network
+    const numLayers = 3;
+    const layerSpacing = width / (numLayers + 1);
+    const neuronsPerLayer = [4, 6, 3];
+    
+    const layers: { x: number; neurons: number[] }[] = [];
+    
+    for (let layerIdx = 0; layerIdx < numLayers; layerIdx++) {
+      const layerX = x - width / 2 + (layerIdx + 1) * layerSpacing;
+      const numNeurons = neuronsPerLayer[layerIdx];
+      const neuronSpacing = height / (numNeurons + 1);
+      const startY = y - height / 2 + neuronSpacing;
+      
+      const neuronYs: number[] = [];
+      
+      for (let neuronIdx = 0; neuronIdx < numNeurons; neuronIdx++) {
+        const neuronY = startY + neuronIdx * neuronSpacing;
+        neuronYs.push(neuronY);
+        
+        // Draw neuron
+        const neuron = this.scene.add.circle(layerX, neuronY, 8, color, 0.8);
+        neuron.setStrokeStyle(2, color);
+        objects.push(neuron);
+        
+        // Connections to next layer
+        if (layerIdx < numLayers - 1) {
+          const nextNumNeurons = neuronsPerLayer[layerIdx + 1];
+          const nextNeuronSpacing = height / (nextNumNeurons + 1);
+          const nextStartY = y - height / 2 + nextNeuronSpacing;
+          
+          for (let nextIdx = 0; nextIdx < nextNumNeurons; nextIdx++) {
+            const nextY = nextStartY + nextIdx * nextNeuronSpacing;
+            const nextX = x - width / 2 + (layerIdx + 2) * layerSpacing;
+            
+            const connection = this.scene.add.graphics();
+            connection.lineStyle(1, color, 0.2);
+            connection.beginPath();
+            connection.moveTo(layerX + 8, neuronY);
+            connection.lineTo(nextX - 8, nextY);
+            connection.strokePath();
+            objects.push(connection);
+          }
+        }
+      }
+      
+      layers.push({ x: layerX, neurons: neuronYs });
+    }
+  }
+
+  private renderCNNStructure(x: number, y: number, width: number, height: number, color: number, objects: Phaser.GameObjects.GameObject[]): void {
+    // Convolutional layers with feature maps
+    const numLayers = 3;
+    const layerSpacing = width / (numLayers + 1);
+    
+    // Input image (grid)
+    const inputX = x - width / 2 + layerSpacing;
+    const inputSize = 30;
+    const gridSize = 4;
+    const cellSize = inputSize / gridSize;
+    
+    // Draw input grid
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        const cellX = inputX - inputSize / 2 + j * cellSize + cellSize / 2;
+        const cellY = y - inputSize / 2 + i * cellSize + cellSize / 2;
+        const cell = this.scene.add.rectangle(cellX, cellY, cellSize - 1, cellSize - 1, color, 0.6);
+        cell.setStrokeStyle(1, color);
+        objects.push(cell);
+      }
+    }
+    
+    // Convolutional filter (3x3)
+    const filterX = inputX + layerSpacing * 0.6;
+    const filterSize = 20;
+    const filterGrid = 3;
+    const filterCellSize = filterSize / filterGrid;
+    
+    for (let i = 0; i < filterGrid; i++) {
+      for (let j = 0; j < filterGrid; j++) {
+        const cellX = filterX - filterSize / 2 + j * filterCellSize + filterCellSize / 2;
+        const cellY = y - filterSize / 2 + i * filterCellSize + filterCellSize / 2;
+        const cell = this.scene.add.rectangle(cellX, cellY, filterCellSize - 1, filterCellSize - 1, COLORS.WARNING, 0.8);
+        cell.setStrokeStyle(1, COLORS.WARNING);
+        objects.push(cell);
+      }
+    }
+    
+    // Arrow
+    const arrow = this.scene.add.graphics();
+    arrow.lineStyle(2, color);
+    arrow.beginPath();
+    arrow.moveTo(filterX + filterSize / 2 + 5, y);
+    arrow.lineTo(filterX + filterSize / 2 + 15, y);
+    arrow.strokePath();
+    arrow.fillStyle(color);
+    arrow.fillTriangle(filterX + filterSize / 2 + 15, y, filterX + filterSize / 2 + 10, y - 3, filterX + filterSize / 2 + 10, y + 3);
+    objects.push(arrow);
+    
+    // Feature map (output)
+    const featureX = filterX + filterSize / 2 + 25;
+    const featureSize = 25;
+    const featureGrid = 2;
+    const featureCellSize = featureSize / featureGrid;
+    
+    for (let i = 0; i < featureGrid; i++) {
+      for (let j = 0; j < featureGrid; j++) {
+        const cellX = featureX - featureSize / 2 + j * featureCellSize + featureCellSize / 2;
+        const cellY = y - featureSize / 2 + i * featureCellSize + featureCellSize / 2;
+        const cell = this.scene.add.rectangle(cellX, cellY, featureCellSize - 1, featureCellSize - 1, color, 0.7);
+        cell.setStrokeStyle(1, color);
+        objects.push(cell);
+      }
+    }
+    
+    // Labels
+    const inputLabel = this.scene.add.text(inputX, y + inputSize / 2 + 8, 'Image', {
+      fontSize: '9px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    inputLabel.setOrigin(0.5);
+    objects.push(inputLabel);
+    
+    const filterLabel = this.scene.add.text(filterX, y + filterSize / 2 + 8, 'Filter', {
+      fontSize: '9px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    filterLabel.setOrigin(0.5);
+    objects.push(filterLabel);
+    
+    const featureLabel = this.scene.add.text(featureX, y + featureSize / 2 + 8, 'Features', {
+      fontSize: '9px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    featureLabel.setOrigin(0.5);
+    objects.push(featureLabel);
+  }
+
+  private renderRNNStructure(x: number, y: number, width: number, height: number, color: number, objects: Phaser.GameObjects.GameObject[]): void {
+    // Recurrent network with time steps
+    const numSteps = 4;
+    const stepSpacing = width / (numSteps + 1);
+    
+    let prevHiddenX: number | null = null;
+    let prevHiddenY: number | null = null;
+    
+    for (let step = 0; step < numSteps; step++) {
+      const stepX = x - width / 2 + (step + 1) * stepSpacing;
+      const inputY = y - height / 3;
+      const hiddenY = y;
+      const outputY = y + height / 3;
+      
+      // Input
+      const input = this.scene.add.circle(stepX, inputY, 10, color, 0.6);
+      input.setStrokeStyle(2, color);
+      objects.push(input);
+      
+      // Hidden state (with recurrent connection)
+      const hidden = this.scene.add.circle(stepX, hiddenY, 12, color, 0.8);
+      hidden.setStrokeStyle(2, color);
+      objects.push(hidden);
+      
+      // Output
+      const output = this.scene.add.circle(stepX, outputY, 10, COLORS.SUCCESS, 0.6);
+      output.setStrokeStyle(2, COLORS.SUCCESS);
+      objects.push(output);
+      
+      // Connections
+      // Input to hidden
+      const inputToHidden = this.scene.add.graphics();
+      inputToHidden.lineStyle(2, color, 0.5);
+      inputToHidden.beginPath();
+      inputToHidden.moveTo(stepX, inputY + 10);
+      inputToHidden.lineTo(stepX, hiddenY - 12);
+      inputToHidden.strokePath();
+      objects.push(inputToHidden);
+      
+      // Hidden to output
+      const hiddenToOutput = this.scene.add.graphics();
+      hiddenToOutput.lineStyle(2, COLORS.SUCCESS, 0.5);
+      hiddenToOutput.beginPath();
+      hiddenToOutput.moveTo(stepX, hiddenY + 12);
+      hiddenToOutput.lineTo(stepX, outputY - 10);
+      hiddenToOutput.strokePath();
+      objects.push(hiddenToOutput);
+      
+      // Recurrent connection (hidden to next hidden)
+      if (prevHiddenX !== null && prevHiddenY !== null) {
+        const recurrent = this.scene.add.graphics();
+        recurrent.lineStyle(2, COLORS.WARNING, 0.4);
+        recurrent.beginPath();
+        recurrent.moveTo(prevHiddenX, prevHiddenY);
+        recurrent.lineTo(stepX - 12, hiddenY);
+        recurrent.strokePath();
+        // Arrow
+        recurrent.fillStyle(COLORS.WARNING, 0.4);
+        recurrent.fillTriangle(stepX - 12, hiddenY, stepX - 16, hiddenY - 3, stepX - 16, hiddenY + 3);
+        objects.push(recurrent);
+      }
+      
+      prevHiddenX = stepX;
+      prevHiddenY = hiddenY;
+      
+      // Time step label
+      const timeLabel = this.scene.add.text(stepX, y + height / 2 + 10, `t${step + 1}`, {
+        fontSize: '9px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      timeLabel.setOrigin(0.5);
+      objects.push(timeLabel);
+    }
+    
+    // Sequence label
+    const seqLabel = this.scene.add.text(x, y - height / 2 - 10, 'Sequence Processing', {
+      fontSize: '10px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    seqLabel.setOrigin(0.5);
+    objects.push(seqLabel);
+  }
+
+  private renderNeuronDetailed(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Three inputs with weights and values
+    const inputs = [
+      { label: 'x₁', value: 0.8, weight: 0.5, color: COLORS.PRIMARY },
+      { label: 'x₂', value: 0.6, weight: 0.3, color: COLORS.SUCCESS },
+      { label: 'x₃', value: 0.4, weight: 0.2, color: COLORS.WARNING }
+    ];
+    
+    const inputX = centerX - 250;
+    const inputSpacing = 80;
+    const startY = centerY - inputSpacing;
+    
+    inputs.forEach((input, i) => {
+      const inputY = startY + i * inputSpacing;
+      
+      // Input circle
+      const circle = this.scene.add.circle(inputX, inputY, 25, input.color, 0.7);
+      circle.setStrokeStyle(3, input.color);
+      objects.push(circle);
+      
+      // Input label and value
+      const label = this.scene.add.text(inputX, inputY - 10, input.label, {
+        fontSize: '16px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      const value = this.scene.add.text(inputX, inputY + 10, input.value.toFixed(1), {
+        fontSize: '14px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      value.setOrigin(0.5);
+      objects.push(value);
+      
+      // Connection line with weight
+      const line = this.scene.add.graphics();
+      line.lineStyle(3, input.color, 0.6);
+      line.beginPath();
+      line.moveTo(inputX + 25, inputY);
+      line.lineTo(centerX - 80, centerY);
+      line.strokePath();
+      objects.push(line);
+      
+      // Weight label on connection
+      const midX = (inputX + 25 + centerX - 80) / 2;
+      const midY = (inputY + centerY) / 2;
+      const weightLabel = this.scene.add.text(midX, midY - 10, `w=${input.weight}`, {
+        fontSize: '12px',
+        color: '#' + input.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        backgroundColor: '#000000',
+        padding: { x: 4, y: 2 }
+      });
+      weightLabel.setOrigin(0.5);
+      objects.push(weightLabel);
+    });
+    
+    // Neuron body with summation
+    const neuronBody = this.scene.add.circle(centerX, centerY, 60, COLORS.WARNING, 0.8);
+    neuronBody.setStrokeStyle(4, COLORS.WARNING);
+    objects.push(neuronBody);
+    
+    // Summation symbol
+    const sumText = this.scene.add.text(centerX, centerY - 15, 'Σ', {
+      fontSize: '32px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    sumText.setOrigin(0.5);
+    objects.push(sumText);
+    
+    // Weighted sum calculation
+    const weightedSum = inputs.reduce((sum, inp) => sum + inp.value * inp.weight, 0);
+    const sumValue = this.scene.add.text(centerX, centerY + 15, weightedSum.toFixed(2), {
+      fontSize: '16px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    sumValue.setOrigin(0.5);
+    objects.push(sumValue);
+    
+    // Activation function box
+    const activationX = centerX + 120;
+    const activationBox = this.scene.add.rectangle(activationX, centerY, 80, 50, COLORS.SECONDARY, 0.8);
+    activationBox.setStrokeStyle(3, COLORS.SECONDARY);
+    objects.push(activationBox);
+    
+    const activationText = this.scene.add.text(activationX, centerY, 'f(x)', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    activationText.setOrigin(0.5);
+    objects.push(activationText);
+    
+    // Arrow to activation
+    const arrow1 = this.scene.add.graphics();
+    arrow1.lineStyle(3, COLORS.WARNING);
+    arrow1.beginPath();
+    arrow1.moveTo(centerX + 60, centerY);
+    arrow1.lineTo(activationX - 40, centerY);
+    arrow1.strokePath();
+    arrow1.fillStyle(COLORS.WARNING);
+    arrow1.fillTriangle(activationX - 40, centerY, activationX - 45, centerY - 5, activationX - 45, centerY + 5);
+    objects.push(arrow1);
+    
+    // Output
+    const outputX = centerX + 250;
+    const outputValue = 1 / (1 + Math.exp(-weightedSum)); // Sigmoid
+    const outputCircle = this.scene.add.circle(outputX, centerY, 30, COLORS.SUCCESS, 0.8);
+    outputCircle.setStrokeStyle(3, COLORS.SUCCESS);
+    objects.push(outputCircle);
+    
+    const outputText = this.scene.add.text(outputX, centerY - 10, 'Output', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    outputText.setOrigin(0.5);
+    objects.push(outputText);
+    
+    const outputVal = this.scene.add.text(outputX, centerY + 12, outputValue.toFixed(2), {
+      fontSize: '16px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial'
+    });
+    outputVal.setOrigin(0.5);
+    objects.push(outputVal);
+    
+    // Arrow to output
+    const arrow2 = this.scene.add.graphics();
+    arrow2.lineStyle(3, COLORS.SECONDARY);
+    arrow2.beginPath();
+    arrow2.moveTo(activationX + 40, centerY);
+    arrow2.lineTo(outputX - 30, centerY);
+    arrow2.strokePath();
+    arrow2.fillStyle(COLORS.SECONDARY);
+    arrow2.fillTriangle(outputX - 30, centerY, outputX - 35, centerY - 5, outputX - 35, centerY + 5);
+    objects.push(arrow2);
+    
+    // Step labels
+    const step1 = this.scene.add.text(inputX, startY - 60, '1. Inputs × Weights', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    step1.setOrigin(0.5);
+    objects.push(step1);
+    
+    const step2 = this.scene.add.text(centerX, centerY - 90, '2. Sum', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    step2.setOrigin(0.5);
+    objects.push(step2);
+    
+    const step3 = this.scene.add.text(activationX, centerY - 50, '3. Activation', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    step3.setOrigin(0.5);
+    objects.push(step3);
+    
+    const step4 = this.scene.add.text(outputX, centerY - 50, '4. Output', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    step4.setOrigin(0.5);
+    objects.push(step4);
+    
+    return objects;
+  }
+
+  private renderNeuronLearning(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Show before and after weight adjustment
+    const sectionWidth = width / 2 - 40;
+    const sections = [
+      { x: centerX - width / 4, label: 'Before Training', weights: [0.3, 0.3, 0.3], error: 0.4 },
+      { x: centerX + width / 4, label: 'After Training', weights: [0.5, 0.3, 0.2], error: 0.1 }
+    ];
+    
+    sections.forEach((section, idx) => {
+      // Section background
+      const bg = this.scene.add.rectangle(section.x, centerY, sectionWidth, height * 0.8, 
+        idx === 0 ? COLORS.ERROR : COLORS.SUCCESS, 0.1);
+      bg.setStrokeStyle(2, idx === 0 ? COLORS.ERROR : COLORS.SUCCESS);
+      objects.push(bg);
+      
+      // Label
+      const label = this.scene.add.text(section.x, centerY - height * 0.35, section.label, {
+        fontSize: '16px',
+        color: '#' + (idx === 0 ? COLORS.ERROR : COLORS.SUCCESS).toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      // Simple neuron representation
+      const neuronY = centerY - 40;
+      
+      // Three inputs
+      for (let i = 0; i < 3; i++) {
+        const inputY = neuronY - 40 + i * 40;
+        const inputX = section.x - 80;
+        
+        // Input
+        const input = this.scene.add.circle(inputX, inputY, 12, COLORS.PRIMARY, 0.6);
+        input.setStrokeStyle(2, COLORS.PRIMARY);
+        objects.push(input);
+        
+        // Weight line
+        const weightColor = idx === 0 ? COLORS.WARNING : COLORS.SUCCESS;
+        const line = this.scene.add.graphics();
+        line.lineStyle(2 + section.weights[i] * 4, weightColor, 0.6);
+        line.beginPath();
+        line.moveTo(inputX + 12, inputY);
+        line.lineTo(section.x - 25, neuronY);
+        line.strokePath();
+        objects.push(line);
+        
+        // Weight value
+        const weight = this.scene.add.text(inputX + 40, inputY - 15, `w=${section.weights[i]}`, {
+          fontSize: '10px',
+          color: '#' + weightColor.toString(16).padStart(6, '0'),
+          fontFamily: 'Arial',
+          fontStyle: 'bold',
+          backgroundColor: '#000000',
+          padding: { x: 3, y: 1 }
+        });
+        weight.setOrigin(0.5);
+        objects.push(weight);
+      }
+      
+      // Neuron
+      const neuron = this.scene.add.circle(section.x, neuronY, 25, COLORS.WARNING, 0.8);
+      neuron.setStrokeStyle(3, COLORS.WARNING);
+      objects.push(neuron);
+      
+      // Output
+      const outputX = section.x + 80;
+      const output = this.scene.add.circle(outputX, neuronY, 15, idx === 0 ? COLORS.ERROR : COLORS.SUCCESS, 0.8);
+      output.setStrokeStyle(2, idx === 0 ? COLORS.ERROR : COLORS.SUCCESS);
+      objects.push(output);
+      
+      // Connection
+      const conn = this.scene.add.graphics();
+      conn.lineStyle(2, COLORS.WARNING);
+      conn.beginPath();
+      conn.moveTo(section.x + 25, neuronY);
+      conn.lineTo(outputX - 15, neuronY);
+      conn.strokePath();
+      objects.push(conn);
+      
+      // Error indicator
+      const errorY = centerY + 60;
+      const errorLabel = this.scene.add.text(section.x, errorY, `Error: ${section.error.toFixed(1)}`, {
+        fontSize: '14px',
+        color: '#' + (idx === 0 ? COLORS.ERROR : COLORS.SUCCESS).toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      errorLabel.setOrigin(0.5);
+      objects.push(errorLabel);
+      
+      // Status
+      const status = this.scene.add.text(section.x, errorY + 25, idx === 0 ? '❌ High Error' : '✅ Low Error', {
+        fontSize: '12px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      status.setOrigin(0.5);
+      objects.push(status);
+    });
+    
+    // Arrow between sections
+    const arrow = this.scene.add.graphics();
+    arrow.lineStyle(3, COLORS.PRIMARY);
+    arrow.beginPath();
+    arrow.moveTo(centerX - 40, centerY);
+    arrow.lineTo(centerX + 40, centerY);
+    arrow.strokePath();
+    arrow.fillStyle(COLORS.PRIMARY);
+    arrow.fillTriangle(centerX + 40, centerY, centerX + 35, centerY - 5, centerX + 35, centerY + 5);
+    objects.push(arrow);
+    
+    const arrowLabel = this.scene.add.text(centerX, centerY - 15, 'Learning', {
+      fontSize: '12px',
+      color: '#' + COLORS.PRIMARY.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      backgroundColor: '#000000',
+      padding: { x: 5, y: 2 }
+    });
+    arrowLabel.setOrigin(0.5);
+    objects.push(arrowLabel);
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 15, 'How Neurons Learn: Adjusting Weights', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    return objects;
+  }
+
+  private renderNeuronsToNetwork(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Show progression: 1 neuron → few neurons → network
+    const stages = [
+      { x: centerX - width / 3, label: 'Single Neuron', neurons: [[{x: 0, y: 0}]], desc: 'Simple pattern' },
+      { x: centerX, label: 'Few Neurons', neurons: [[{x: -30, y: -20}, {x: -30, y: 20}], [{x: 30, y: 0}]], desc: 'Basic combination' },
+      { x: centerX + width / 3, label: 'Deep Network', neurons: [[{x: -40, y: -30}, {x: -40, y: 0}, {x: -40, y: 30}], [{x: 0, y: -20}, {x: 0, y: 20}], [{x: 40, y: 0}]], desc: 'Complex patterns' }
+    ];
+    
+    stages.forEach((stage, stageIdx) => {
+      // Label
+      const label = this.scene.add.text(stage.x, centerY - height / 2 + 30, stage.label, {
+        fontSize: '14px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      // Draw neurons in layers
+      stage.neurons.forEach((layer, layerIdx) => {
+        layer.forEach((pos) => {
+          const neuronX = stage.x + pos.x;
+          const neuronY = centerY + pos.y;
+          const size = stageIdx === 0 ? 30 : stageIdx === 1 ? 18 : 12;
+          
+          const neuron = this.scene.add.circle(neuronX, neuronY, size, COLORS.WARNING, 0.8);
+          neuron.setStrokeStyle(2, COLORS.WARNING);
+          objects.push(neuron);
+          
+          // Connections to next layer
+          if (layerIdx < stage.neurons.length - 1) {
+            stage.neurons[layerIdx + 1].forEach((nextPos) => {
+              const nextX = stage.x + nextPos.x;
+              const nextY = centerY + nextPos.y;
+              
+              const conn = this.scene.add.graphics();
+              conn.lineStyle(1, COLORS.SECONDARY, 0.3);
+              conn.beginPath();
+              conn.moveTo(neuronX + size, neuronY);
+              conn.lineTo(nextX - size, nextY);
+              conn.strokePath();
+              objects.push(conn);
+            });
+          }
+        });
+      });
+      
+      // Description
+      const desc = this.scene.add.text(stage.x, centerY + height / 2 - 30, stage.desc, {
+        fontSize: '11px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        fontStyle: 'italic',
+        align: 'center'
+      });
+      desc.setOrigin(0.5);
+      objects.push(desc);
+      
+      // Capability indicator
+      const capability = this.scene.add.text(stage.x, centerY + height / 2 - 10, 
+        stageIdx === 0 ? '🔵 Basic' : stageIdx === 1 ? '🟢 Moderate' : '🟣 Advanced', {
+        fontSize: '10px',
+        color: '#ffffff',
+        fontFamily: 'Arial'
+      });
+      capability.setOrigin(0.5);
+      objects.push(capability);
+      
+      // Arrow to next stage
+      if (stageIdx < stages.length - 1) {
+        const arrow = this.scene.add.graphics();
+        arrow.lineStyle(2, COLORS.PRIMARY);
+        const arrowX = stage.x + width / 6;
+        arrow.beginPath();
+        arrow.moveTo(arrowX - 20, centerY);
+        arrow.lineTo(arrowX + 20, centerY);
+        arrow.strokePath();
+        arrow.fillStyle(COLORS.PRIMARY);
+        arrow.fillTriangle(arrowX + 20, centerY, arrowX + 15, centerY - 4, arrowX + 15, centerY + 4);
+        objects.push(arrow);
+      }
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 10, 'From Single Neuron to Deep Network', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
     return objects;
   }
 }
