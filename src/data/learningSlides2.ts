@@ -496,36 +496,38 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
     ]
   },  
   {
-    title: 'Data → Model → Prediction',
+    title: 'Prediction Errors',
     elements: [
-      { type: 'title', text: 'Data → Model → Prediction' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'The Complete ML Pipeline', align: 'center' },
-      { type: 'spacer', height: 30 },
-      { type: 'diagram', diagramType: 'pipeline', width: 700, height: 120 },
-      { type: 'spacer', height: 25 },
-      { type: 'paragraph', text: '📊 Each stage transforms data closer to actionable predictions', align: 'center' }
+      { type: 'title', text: 'Prediction Errors' },
+      { type: 'spacer', height: 0 },
+      { type: 'paragraph', text: 'Every prediction has an error. The goal is to minimize these errors.', align: 'center' },
+      { type: 'spacer', height: -10 },
+      { type: 'diagram', diagramType: 'error-visualization', width: 700, height: 400 },
+     ]
+  },
+  {
+    title: 'Error Metrics',
+    elements: [
+      { type: 'title', text: 'Error Metrics' },
+      { type: 'spacer', height: 0 },
+      { type: 'diagram', diagramType: 'error-metrics-combined', width: 700, height: 400 },
+      { type: 'spacer', height: 0 },
+      { type: 'bullet', items: [
+        '📊 R²: 0-1, variance explained',
+        '📈 MSE: Squared errors (penalizes large)',
+        '📏 MAE: Absolute errors (easier to interpret)'
+      ]}
     ]
   },
   {
-    title: 'Errors and Optimization',
+    title: 'Optimization Process',
     elements: [
-      { type: 'title', text: 'Errors and Optimization' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Every prediction has an error — the difference between what the model predicted and what actually happened. The goal is to minimize these errors.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Types of Errors:' },
-      { type: 'bullet', items: [
-        '📏 Prediction Error — difference between predicted and actual value',
-        '📊 Mean Squared Error (MSE) — average of squared errors (penalizes large errors more)',
-        '📈 Mean Absolute Error (MAE) — average of absolute errors (easier to interpret)'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Optimization Process:' },
-      { type: 'paragraph', text: 'The algorithm tries different slopes and intercepts, calculates total error for each, and chooses the combination with the smallest error. This is like finding the lowest point in a valley — you keep adjusting until you reach the bottom.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Why Squared Errors? Squaring makes large errors much more costly, so the model prioritizes avoiding big mistakes over small ones. This creates a more robust line.', align: 'center' }
-    ]
+      { type: 'title', text: 'Optimization Process' },
+       { type: 'spacer', height: -90 },
+      { type: 'diagram', diagramType: 'optimization-landscape', width: 700, height: 400 },
+      { type: 'spacer', height: 10 },
+      { type: 'paragraph', text: '🎯 Optimization: The algorithm adjusts parameters to find the minimum error (valley bottom)', align: 'center' },
+     ]
   },
 
   {

@@ -64,6 +64,21 @@ export class DiagramRenderer {
       case 'ml-types-overview':
         objects.push(...this.renderMLTypesOverview(x, y, width, height));
         break;
+      case 'error-visualization':
+        objects.push(...this.renderErrorVisualization(x, y, width, height));
+        break;
+      case 'mse-mae-comparison':
+        objects.push(...this.renderMSEMAEComparison(x, y, width, height));
+        break;
+      case 'optimization-landscape':
+        objects.push(...this.renderOptimizationLandscape(x, y, width, height));
+        break;
+      case 'r2-visualization':
+        objects.push(...this.renderR2Visualization(x, y, width, height));
+        break;
+      case 'error-metrics-combined':
+        objects.push(...this.renderErrorMetricsCombined(x, y, width, height));
+        break;
     }
 
     return objects;
@@ -1587,6 +1602,670 @@ export class DiagramRenderer {
       exText.setOrigin(0.5);
       objects.push(exText);
     });
+
+    return objects;
+  }
+
+  private renderErrorVisualization(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const padding = 50;
+    const graphX = x - width / 2 + padding;
+    const graphY = y + height / 2 - padding;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Sample data points
+    const dataPoints = [
+      { x: 1, y: 2.5 }, { x: 2, y: 4.2 }, { x: 3, y: 5.8 }, { x: 4, y: 7.5 },
+      { x: 5, y: 9.2 }, { x: 6, y: 11.1 }, { x: 7, y: 12.8 }
+    ];
+
+    // Best fit line (y = 2x + 0.5)
+    const slope = 2;
+    const intercept = 0.5;
+
+    // Find min/max for scaling
+    const xValues = dataPoints.map(p => p.x);
+    const yValues = dataPoints.map(p => p.y);
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    const minY = Math.min(...yValues);
+    const maxY = Math.max(...yValues);
+
+    // Draw axes
+    const axes = this.scene.add.graphics();
+    axes.lineStyle(2, COLORS.TEXT);
+    axes.beginPath();
+    axes.moveTo(graphX, graphY);
+    axes.lineTo(graphX, graphY - graphHeight);
+    axes.moveTo(graphX, graphY);
+    axes.lineTo(graphX + graphWidth, graphY);
+    axes.strokePath();
+    objects.push(axes);
+
+    // Draw best-fit line
+    const line = this.scene.add.graphics();
+    line.lineStyle(3, COLORS.SUCCESS);
+    line.beginPath();
+    const startX = graphX;
+    const startY = graphY - ((slope * minX + intercept - minY) / (maxY - minY)) * graphHeight;
+    const endX = graphX + graphWidth;
+    const endY = graphY - ((slope * maxX + intercept - minY) / (maxY - minY)) * graphHeight;
+    line.moveTo(startX, startY);
+    line.lineTo(endX, endY);
+    line.strokePath();
+    objects.push(line);
+
+    // Draw data points and error lines
+    dataPoints.forEach(point => {
+      const plotX = graphX + ((point.x - minX) / (maxX - minX)) * graphWidth;
+      const plotY = graphY - ((point.y - minY) / (maxY - minY)) * graphHeight;
+      
+      // Predicted y value on the line
+      const predictedY = slope * point.x + intercept;
+      const predictedPlotY = graphY - ((predictedY - minY) / (maxY - minY)) * graphHeight;
+      
+      // Draw error line (red dashed)
+      const errorLine = this.scene.add.graphics();
+      errorLine.lineStyle(2, COLORS.ERROR, 0.7);
+      errorLine.lineBetween(plotX, plotY, plotX, predictedPlotY);
+      objects.push(errorLine);
+      
+      // Draw data point
+      const pointCircle = this.scene.add.circle(plotX, plotY, 6, COLORS.PRIMARY);
+      pointCircle.setStrokeStyle(2, COLORS.TEXT);
+      objects.push(pointCircle);
+    });
+
+    // Labels
+    const xLabel = this.scene.add.text(graphX + graphWidth / 2, graphY + 25, 'X (Input)', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    xLabel.setOrigin(0.5);
+    objects.push(xLabel);
+
+    const yLabel = this.scene.add.text(graphX - 25, graphY - graphHeight / 2, 'Y (Output)', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    yLabel.setOrigin(0.5);
+    yLabel.setAngle(-90);
+    objects.push(yLabel);
+
+    // Title
+    const title = this.scene.add.text(x, y - height / 2 + 20, 'Prediction Errors', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+
+    // Legend
+    const legendY = graphY + 50;
+    const legend1 = this.scene.add.text(graphX + 20, legendY, '● Data Point', {
+      fontSize: '12px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    legend1.setOrigin(0, 0.5);
+    objects.push(legend1);
+
+    const legend2 = this.scene.add.graphics();
+    legend2.lineStyle(2, COLORS.SUCCESS);
+    legend2.lineBetween(graphX + 100, legendY, graphX + 150, legendY);
+    objects.push(legend2);
+    const legend2Text = this.scene.add.text(graphX + 160, legendY, 'Prediction Line', {
+      fontSize: '12px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    legend2Text.setOrigin(0, 0.5);
+    objects.push(legend2Text);
+
+    const legend3 = this.scene.add.graphics();
+    legend3.lineStyle(2, COLORS.ERROR, 0.7);
+    legend3.lineBetween(graphX + 250, legendY, graphX + 300, legendY);
+    objects.push(legend3);
+    const legend3Text = this.scene.add.text(graphX + 310, legendY, 'Error', {
+      fontSize: '12px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    legend3Text.setOrigin(0, 0.5);
+    objects.push(legend3Text);
+
+    return objects;
+  }
+
+  private renderMSEMAEComparison(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const padding = 50;
+    const graphX = x - width / 2 + padding;
+    const graphY = y + height / 2 - padding;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Sample errors: [1, 2, 3, 5, 8] to show how MSE penalizes large errors more
+    const errors = [1, 2, 3, 5, 8];
+    const maxError = Math.max(...errors);
+    const maxMSE = Math.max(...errors.map(e => e * e));
+
+    // Draw axes
+    const axes = this.scene.add.graphics();
+    axes.lineStyle(2, COLORS.TEXT);
+    axes.beginPath();
+    axes.moveTo(graphX, graphY);
+    axes.lineTo(graphX, graphY - graphHeight);
+    axes.moveTo(graphX, graphY);
+    axes.lineTo(graphX + graphWidth, graphY);
+    axes.strokePath();
+    objects.push(axes);
+
+    const barWidth = graphWidth / (errors.length * 2 + 1);
+    const spacing = barWidth;
+
+    // Draw MAE bars (absolute errors)
+    errors.forEach((error, index) => {
+      const barX = graphX + index * (barWidth + spacing) + spacing;
+      const barHeight = (error / maxError) * graphHeight * 0.8;
+      
+      const maeBar = this.scene.add.rectangle(barX, graphY - barHeight / 2, barWidth, barHeight, COLORS.PRIMARY, 0.7);
+      objects.push(maeBar);
+      
+      const maeLabel = this.scene.add.text(barX, graphY + 15, error.toString(), {
+        fontSize: '11px',
+        color: '#ffffff',
+        fontFamily: 'Arial'
+      });
+      maeLabel.setOrigin(0.5);
+      objects.push(maeLabel);
+    });
+
+    // Draw MSE bars (squared errors) - shifted to the right
+    errors.forEach((error, index) => {
+      const barX = graphX + (errors.length + 1) * spacing + index * (barWidth + spacing) + barWidth / 2;
+      const squaredError = error * error;
+      const barHeight = (squaredError / maxMSE) * graphHeight * 0.8;
+      
+      const mseBar = this.scene.add.rectangle(barX, graphY - barHeight / 2, barWidth, barHeight, COLORS.WARNING, 0.7);
+      objects.push(mseBar);
+      
+      const mseLabel = this.scene.add.text(barX, graphY + 15, (error * error).toString(), {
+        fontSize: '11px',
+        color: '#ffffff',
+        fontFamily: 'Arial'
+      });
+      mseLabel.setOrigin(0.5);
+      objects.push(mseLabel);
+    });
+
+    // Labels
+    const maeLabel = this.scene.add.text(graphX + graphWidth / 4, graphY - graphHeight - 10, 'MAE (Absolute)', {
+      fontSize: '14px',
+      color: '#' + COLORS.PRIMARY.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    maeLabel.setOrigin(0.5);
+    objects.push(maeLabel);
+
+    const mseLabel = this.scene.add.text(graphX + 3 * graphWidth / 4, graphY - graphHeight - 10, 'MSE (Squared)', {
+      fontSize: '14px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    mseLabel.setOrigin(0.5);
+    objects.push(mseLabel);
+
+    const yLabel = this.scene.add.text(graphX - 30, graphY - graphHeight / 2, 'Error Value', {
+      fontSize: '12px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    yLabel.setOrigin(0.5);
+    yLabel.setAngle(-90);
+    objects.push(yLabel);
+
+    // Title
+    const title = this.scene.add.text(x, y - height / 2 + 20, 'MSE vs MAE: Large Errors Penalized More', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+
+    // Explanation text
+    const explanation = this.scene.add.text(x, graphY + 50, 'Notice how MSE grows much faster for large errors!', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    explanation.setOrigin(0.5);
+    objects.push(explanation);
+
+    return objects;
+  }
+
+  private renderOptimizationLandscape(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const padding = 50;
+    const graphX = x - width / 2 + padding;
+    const graphY = y + height / 2 - padding;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Draw a 3D-like valley landscape
+    const landscape = this.scene.add.graphics();
+    
+    // Draw valley curve (parabolic shape representing error landscape)
+    landscape.lineStyle(3, COLORS.PRIMARY);
+    landscape.beginPath();
+    
+    const numPoints = 50;
+    for (let i = 0; i <= numPoints; i++) {
+      const t = i / numPoints;
+      const paramX = graphX + t * graphWidth;
+      // Parabolic valley: error = (x - center)^2 + minError
+      const centerX = 0.5;
+      const minError = 0.2;
+      const errorValue = Math.pow(t - centerX, 2) * 0.8 + minError;
+      const paramY = graphY - errorValue * graphHeight;
+      
+      if (i === 0) {
+        landscape.moveTo(paramX, paramY);
+      } else {
+        landscape.lineTo(paramX, paramY);
+      }
+    }
+    landscape.strokePath();
+    objects.push(landscape);
+
+    // Fill the valley with gradient effect
+    const valleyFill = this.scene.add.graphics();
+    for (let i = 0; i < numPoints; i++) {
+      const t1 = i / numPoints;
+      const t2 = (i + 1) / numPoints;
+      const x1 = graphX + t1 * graphWidth;
+      const x2 = graphX + t2 * graphWidth;
+      
+      const centerX = 0.5;
+      const error1 = Math.pow(t1 - centerX, 2) * 0.8 + 0.2;
+      const error2 = Math.pow(t2 - centerX, 2) * 0.8 + 0.2;
+      const y1 = graphY - error1 * graphHeight;
+      const y2 = graphY - error2 * graphHeight;
+      
+      const alpha = 0.3 - (error1 + error2) / 2 * 0.2;
+      valleyFill.fillStyle(COLORS.SUCCESS, alpha);
+      valleyFill.fillTriangle(x1, graphY, x1, y1, x2, y2);
+      valleyFill.fillTriangle(x1, graphY, x2, graphY, x2, y2);
+    }
+    objects.push(valleyFill);
+
+    // Mark the minimum point (optimal solution)
+    const optimalX = graphX + 0.5 * graphWidth;
+    const optimalY = graphY - 0.2 * graphHeight;
+    const optimalPoint = this.scene.add.circle(optimalX, optimalY, 8, COLORS.SUCCESS);
+    optimalPoint.setStrokeStyle(3, COLORS.TEXT);
+    objects.push(optimalPoint);
+
+    const optimalLabel = this.scene.add.text(optimalX, optimalY - 25, 'Optimal\nSolution', {
+      fontSize: '12px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    optimalLabel.setOrigin(0.5);
+    objects.push(optimalLabel);
+
+    // Draw arrows showing optimization path
+    const arrows = this.scene.add.graphics();
+    arrows.lineStyle(2, COLORS.WARNING, 0.6);
+    
+    // Left side - descending
+    for (let i = 0; i < 3; i++) {
+      const startX = graphX + 0.2 * graphWidth + i * 0.1 * graphWidth;
+      const startY = graphY - (0.4 + i * 0.1) * graphHeight;
+      const endX = startX + 0.05 * graphWidth;
+      const endY = graphY - (0.35 + i * 0.1) * graphHeight;
+      
+      arrows.beginPath();
+      arrows.moveTo(startX, startY);
+      arrows.lineTo(endX, endY);
+      arrows.strokePath();
+      
+      // Arrowhead
+      arrows.fillStyle(COLORS.WARNING, 0.6);
+      arrows.fillTriangle(endX, endY, endX - 3, endY - 5, endX + 3, endY - 5);
+    }
+    
+    // Right side - descending
+    for (let i = 0; i < 3; i++) {
+      const startX = graphX + 0.8 * graphWidth - i * 0.1 * graphWidth;
+      const startY = graphY - (0.4 + i * 0.1) * graphHeight;
+      const endX = startX - 0.05 * graphWidth;
+      const endY = graphY - (0.35 + i * 0.1) * graphHeight;
+      
+      arrows.beginPath();
+      arrows.moveTo(startX, startY);
+      arrows.lineTo(endX, endY);
+      arrows.strokePath();
+      
+      // Arrowhead
+      arrows.fillStyle(COLORS.WARNING, 0.6);
+      arrows.fillTriangle(endX, endY, endX - 3, endY - 5, endX + 3, endY - 5);
+    }
+    
+    objects.push(arrows);
+
+    // Labels
+    const xLabel = this.scene.add.text(graphX + graphWidth / 2, graphY + 25, 'Model Parameters (Slope & Intercept)', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    xLabel.setOrigin(0.5);
+    objects.push(xLabel);
+
+    const yLabel = this.scene.add.text(graphX - 30, graphY - graphHeight / 2, 'Total Error', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
+    });
+    yLabel.setOrigin(0.5);
+    yLabel.setAngle(-90);
+    objects.push(yLabel);
+
+    // Title
+    const title = this.scene.add.text(x, y - height / 2 + 20, 'Optimization: Finding the Valley Bottom', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+
+    // Explanation
+    const explanation = this.scene.add.text(x, graphY + 50, 'Algorithm adjusts parameters to find minimum error', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    explanation.setOrigin(0.5);
+    objects.push(explanation);
+
+    return objects;
+  }
+
+  private renderR2Visualization(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const padding = 50;
+    const graphX = x - width / 2 + padding;
+    const graphY = y + height / 2 - padding;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+
+    // Split into two side-by-side comparisons: High R² vs Low R²
+    const leftX = graphX;
+    const rightX = graphX + graphWidth / 2 + 20;
+    const centerY = graphY - graphHeight / 2;
+
+    // Left side: High R² (good fit)
+    const highR2Points = [
+      { x: 1, y: 2.1 }, { x: 2, y: 4.0 }, { x: 3, y: 5.9 }, { x: 4, y: 7.8 },
+      { x: 5, y: 9.7 }, { x: 6, y: 11.6 }, { x: 7, y: 13.5 }
+    ];
+    const highR2Slope = 2;
+    const highR2Intercept = 0.1;
+
+    // Right side: Low R² (poor fit)
+    const lowR2Points = [
+      { x: 1, y: 3.5 }, { x: 2, y: 2.8 }, { x: 3, y: 6.2 }, { x: 4, y: 4.9 },
+      { x: 5, y: 8.1 }, { x: 6, y: 7.3 }, { x: 7, y: 10.5 }
+    ];
+    const lowR2Slope = 1.2;
+    const lowR2Intercept = 2;
+
+    const plotWidth = graphWidth / 2 - 30;
+    const plotHeight = graphHeight * 0.7;
+
+    // Helper function to render one side
+    const renderSide = (points: { x: number; y: number }[], slope: number, intercept: number, 
+                       centerX: number, r2Value: number, r2Label: string) => {
+      const minX = Math.min(...points.map(p => p.x));
+      const maxX = Math.max(...points.map(p => p.x));
+      const minY = Math.min(...points.map(p => p.y));
+      const maxY = Math.max(...points.map(p => p.y));
+
+      // Axes
+      const axes = this.scene.add.graphics();
+      axes.lineStyle(2, COLORS.TEXT, 0.5);
+      axes.beginPath();
+      axes.moveTo(centerX - plotWidth / 2, centerY + plotHeight / 2);
+      axes.lineTo(centerX - plotWidth / 2, centerY - plotHeight / 2);
+      axes.moveTo(centerX - plotWidth / 2, centerY + plotHeight / 2);
+      axes.lineTo(centerX + plotWidth / 2, centerY + plotHeight / 2);
+      axes.strokePath();
+      objects.push(axes);
+
+      // Best-fit line
+      const line = this.scene.add.graphics();
+      const lineColor = r2Value > 0.8 ? COLORS.SUCCESS : COLORS.WARNING;
+      line.lineStyle(3, lineColor);
+      line.beginPath();
+      const startX = centerX - plotWidth / 2;
+      const startY = centerY + plotHeight / 2 - ((slope * minX + intercept - minY) / (maxY - minY)) * plotHeight;
+      const endX = centerX + plotWidth / 2;
+      const endY = centerY + plotHeight / 2 - ((slope * maxX + intercept - minY) / (maxY - minY)) * plotHeight;
+      line.moveTo(startX, startY);
+      line.lineTo(endX, endY);
+      line.strokePath();
+      objects.push(line);
+
+      // Data points
+      points.forEach(point => {
+        const plotX = centerX - plotWidth / 2 + ((point.x - minX) / (maxX - minX)) * plotWidth;
+        const plotY = centerY + plotHeight / 2 - ((point.y - minY) / (maxY - minY)) * plotHeight;
+        
+        const pointCircle = this.scene.add.circle(plotX, plotY, 5, COLORS.PRIMARY);
+        pointCircle.setStrokeStyle(2, COLORS.TEXT);
+        objects.push(pointCircle);
+      });
+
+      // R² label
+      const r2Text = this.scene.add.text(centerX, centerY + plotHeight / 2 + 30, `${r2Label}: ${r2Value.toFixed(2)}`, {
+        fontSize: '18px',
+        color: '#' + lineColor.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      r2Text.setOrigin(0.5);
+      objects.push(r2Text);
+    };
+
+    // Render both sides
+    renderSide(highR2Points, highR2Slope, highR2Intercept, leftX + plotWidth / 2, 0.95, 'R²');
+    renderSide(lowR2Points, lowR2Slope, lowR2Intercept, rightX + plotWidth / 2, 0.45, 'R²');
+
+    // Title
+    const title = this.scene.add.text(x, y - height / 2 + 20, 'R²: How Well Does the Model Fit?', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+
+    // Labels
+    const leftLabel = this.scene.add.text(leftX + plotWidth / 2, centerY - plotHeight / 2 - 20, 'High R² ≈ 1.0', {
+      fontSize: '14px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    leftLabel.setOrigin(0.5);
+    objects.push(leftLabel);
+
+    const rightLabel = this.scene.add.text(rightX + plotWidth / 2, centerY - plotHeight / 2 - 20, 'Low R² ≈ 0.0', {
+      fontSize: '14px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    rightLabel.setOrigin(0.5);
+    objects.push(rightLabel);
+
+    return objects;
+  }
+
+  private renderErrorMetricsCombined(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const padding = 40;
+    const sectionWidth = width / 3 - 20;
+    const sectionHeight = height * 0.7;
+    const startY = y - height / 2 + 60;
+
+    // Three sections: R², MSE, MAE
+    const sections = [
+      { x: x - width / 2 + sectionWidth / 2 + padding, label: 'R²', color: COLORS.SUCCESS, value: '0.95', desc: 'Variance explained' },
+      { x: x, label: 'MSE', color: COLORS.WARNING, value: '2.4', desc: 'Squared errors' },
+      { x: x + width / 2 - sectionWidth / 2 - padding, label: 'MAE', color: COLORS.PRIMARY, value: '1.2', desc: 'Absolute errors' }
+    ];
+
+    sections.forEach((section, index) => {
+      // Section box
+      const box = this.scene.add.rectangle(section.x, startY + sectionHeight / 2, sectionWidth, sectionHeight, section.color, 0.15);
+      box.setStrokeStyle(3, section.color);
+      objects.push(box);
+
+      // Label
+      const label = this.scene.add.text(section.x, startY + 20, section.label, {
+        fontSize: '24px',
+        color: '#' + section.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+
+      // Value
+      const value = this.scene.add.text(section.x, startY + 60, section.value, {
+        fontSize: '32px',
+        color: '#' + section.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      value.setOrigin(0.5);
+      objects.push(value);
+
+      // Description
+      const desc = this.scene.add.text(section.x, startY + 100, section.desc, {
+        fontSize: '12px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      desc.setOrigin(0.5);
+      objects.push(desc);
+
+      // Visual representation
+      if (index === 0) {
+        // R²: Show two scatter plots side by side (high vs low)
+        const plotSize = sectionWidth * 0.6;
+        const plotY = startY + sectionHeight - 80;
+        
+        // High R² (left)
+        const highX = section.x - plotSize / 3;
+        const highBox = this.scene.add.rectangle(highX, plotY, plotSize / 2, plotSize / 2, section.color, 0.1);
+        highBox.setStrokeStyle(2, section.color);
+        objects.push(highBox);
+        
+        // Points showing good fit
+        for (let i = 0; i < 5; i++) {
+          const px = highX - plotSize / 6 + (i / 4) * (plotSize / 3);
+          const py = plotY - plotSize / 6 + (i / 4) * (plotSize / 3);
+          const point = this.scene.add.circle(px, py, 3, section.color);
+          objects.push(point);
+        }
+        
+        // Low R² (right)
+        const lowX = section.x + plotSize / 3;
+        const lowBox = this.scene.add.rectangle(lowX, plotY, plotSize / 2, plotSize / 2, COLORS.WARNING, 0.1);
+        lowBox.setStrokeStyle(2, COLORS.WARNING);
+        objects.push(lowBox);
+        
+        // Points showing poor fit (scattered)
+        for (let i = 0; i < 5; i++) {
+          const px = lowX - plotSize / 6 + (i / 4) * (plotSize / 3);
+          const py = plotY - plotSize / 6 + (Math.random() - 0.5) * (plotSize / 3);
+          const point = this.scene.add.circle(px, py, 3, COLORS.WARNING);
+          objects.push(point);
+        }
+      } else if (index === 1) {
+        // MSE: Show bar chart with squared errors
+        const barWidth = sectionWidth * 0.15;
+        const errors = [1, 2, 3];
+        const maxSquared = 9;
+        const barY = startY + sectionHeight - 60;
+        
+        errors.forEach((error, i) => {
+          const barX = section.x - sectionWidth / 3 + i * (sectionWidth / 3);
+          const barHeight = (error * error / maxSquared) * (sectionHeight * 0.4);
+          const bar = this.scene.add.rectangle(barX, barY - barHeight / 2, barWidth, barHeight, section.color, 0.7);
+          objects.push(bar);
+          
+          const label = this.scene.add.text(barX, barY + 15, (error * error).toString(), {
+            fontSize: '10px',
+            color: '#ffffff',
+            fontFamily: 'Arial'
+          });
+          label.setOrigin(0.5);
+          objects.push(label);
+        });
+      } else {
+        // MAE: Show bar chart with absolute errors
+        const barWidth = sectionWidth * 0.15;
+        const errors = [1, 2, 3];
+        const maxError = 3;
+        const barY = startY + sectionHeight - 60;
+        
+        errors.forEach((error, i) => {
+          const barX = section.x - sectionWidth / 3 + i * (sectionWidth / 3);
+          const barHeight = (error / maxError) * (sectionHeight * 0.4);
+          const bar = this.scene.add.rectangle(barX, barY - barHeight / 2, barWidth, barHeight, section.color, 0.7);
+          objects.push(bar);
+          
+          const label = this.scene.add.text(barX, barY + 15, error.toString(), {
+            fontSize: '10px',
+            color: '#ffffff',
+            fontFamily: 'Arial'
+          });
+          label.setOrigin(0.5);
+          objects.push(label);
+        });
+      }
+    });
+
+    // Title
+    const title = this.scene.add.text(x, y - height / 2 + 20, 'Error Metrics: R², MSE, MAE', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
 
     return objects;
   }
