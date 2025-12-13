@@ -154,33 +154,6 @@ export class DiagramRenderer {
     labelHeader.setOrigin(0, 0.5);
     objects.push(labelHeader);
 
-    // Sample rows
-    const rows = [
-      { feature: 'Color: Red, Size: 5', label: 'Apple' },
-      { feature: 'Color: Yellow, Size: 3', label: 'Banana' },
-      { feature: 'Color: Green, Size: 4', label: 'Apple' }
-    ];
-
-    rows.forEach((row, i) => {
-      const rowY = tableY + 40 + i * 35;
-      const featureText = this.scene.add.text(tableX, rowY, row.feature, {
-        fontSize: '14px',
-        color: '#ffffff',
-        fontFamily: 'Arial'
-      });
-      featureText.setOrigin(0, 0.5);
-      objects.push(featureText);
-
-      const labelText = this.scene.add.text(tableX + 200, rowY, row.label, {
-        fontSize: '14px',
-        color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
-        fontFamily: 'Arial',
-        fontStyle: 'bold'
-      });
-      labelText.setOrigin(0, 0.5);
-      objects.push(labelText);
-    });
-
     return objects;
   }
 

@@ -300,17 +300,13 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'spacer', height: 15 },
       { type: 'paragraph', text: 'Visual Metaphor: Think of it like a study guide with practice problems and their answers. Each row is an example, and the model learns the pattern connecting questions to answers.', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'diagram', diagramType: 'dataset', width: 500, height: 300 },
-      { type: 'spacer', height: 20 },
       { type: 'bold', text: 'Features → the inputs (color, size, speed, temperature, text…)' },
       { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'Features are the measurable characteristics or attributes of each example. They\'re the "clues" the model uses to make predictions. More relevant features often lead to better predictions.', align: 'center' },
       { type: 'spacer', height: 15 },
       { type: 'bold', text: 'Label → the correct answer (cat/dog, price, category, sentiment)' },
       { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'Labels are the "ground truth" — the correct answers we want the model to learn. In supervised learning, labels guide the model; in unsupervised learning, there are no labels.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Real-World Example: A dataset for predicting house prices might have features like square footage, number of bedrooms, location, age, and nearby schools, with labels being the actual sale prices. The model learns which features most influence price.', align: 'center' }
+      { type: 'paragraph', text: 'Labels are the "ground truth" — the correct answers we want the model to learn. In supervised learning, labels guide the model; in unsupervised learning, there are no labels.', align: 'center' }
     ]
   },
   {
@@ -618,7 +614,6 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'spacer', height: 15 },
       { type: 'paragraph', text: 'This formula captures the pattern, allowing predictions for any input value, not just the training examples.', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🧮', size: 50 }
     ]
   },
   {
