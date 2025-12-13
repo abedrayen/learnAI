@@ -97,6 +97,24 @@ export class DiagramRenderer {
       case 'neurons-to-network':
         objects.push(...this.renderNeuronsToNetwork(x, y, width, height));
         break;
+      case 'weights-visualization':
+        objects.push(...this.renderWeightsVisualization(x, y, width, height));
+        break;
+      case 'activation-functions':
+        objects.push(...this.renderActivationFunctions(x, y, width, height));
+        break;
+      case 'linear-nonlinear-comparison':
+        objects.push(...this.renderLinearNonlinearComparison(x, y, width, height));
+        break;
+      case 'hierarchical-features':
+        objects.push(...this.renderHierarchicalFeatures(x, y, width, height));
+        break;
+      case 'forward-propagation':
+        objects.push(...this.renderForwardPropagation(x, y, width, height));
+        break;
+      case 'backpropagation':
+        objects.push(...this.renderBackpropagation(x, y, width, height));
+        break;
     }
 
     return objects;
@@ -3386,6 +3404,849 @@ export class DiagramRenderer {
     });
     title.setOrigin(0.5);
     objects.push(title);
+    
+    return objects;
+  }
+
+  private renderWeightsVisualization(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Show three examples: High weight, Low weight, Negative weight
+    const examples = [
+      { label: 'High Weight', weight: 0.8, input: 0.7, color: COLORS.SUCCESS, desc: 'Important feature' },
+      { label: 'Low Weight', weight: 0.2, input: 0.7, color: COLORS.WARNING, desc: 'Less important' },
+      { label: 'Negative Weight', weight: -0.5, input: 0.7, color: COLORS.ERROR, desc: 'Suppress feature' }
+    ];
+    
+    const sectionWidth = width / 3 - 20;
+    const sectionHeight = height * 0.7;
+    const spacing = 20;
+    const totalWidth = sectionWidth * 3 + spacing * 2;
+    const startX = centerX - totalWidth / 2 + sectionWidth / 2;
+    
+    examples.forEach((example, idx) => {
+      const sectionX = startX + idx * (sectionWidth + spacing);
+      const sectionY = centerY;
+      
+      // Section background
+      const bg = this.scene.add.rectangle(sectionX, sectionY, sectionWidth, sectionHeight, example.color, 0.1);
+      bg.setStrokeStyle(2, example.color);
+      objects.push(bg);
+      
+      // Label
+      const label = this.scene.add.text(sectionX, sectionY - sectionHeight / 2 + 30, example.label, {
+        fontSize: '14px',
+        color: '#' + example.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      // Input circle
+      const inputY = sectionY - 40;
+      const input = this.scene.add.circle(sectionX, inputY, 20, COLORS.PRIMARY, 0.7);
+      input.setStrokeStyle(2, COLORS.PRIMARY);
+      objects.push(input);
+      
+      const inputValue = this.scene.add.text(sectionX, inputY, example.input.toFixed(1), {
+        fontSize: '14px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      inputValue.setOrigin(0.5);
+      objects.push(inputValue);
+      
+      // Weight label
+      const weightLabel = this.scene.add.text(sectionX, inputY + 35, `Weight: ${example.weight > 0 ? '+' : ''}${example.weight}`, {
+        fontSize: '16px',
+        color: '#' + example.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      weightLabel.setOrigin(0.5);
+      objects.push(weightLabel);
+      
+      // Multiplication symbol
+      const mult = this.scene.add.text(sectionX, inputY + 55, '×', {
+        fontSize: '20px',
+        color: '#ffffff',
+        fontFamily: 'Arial'
+      });
+      mult.setOrigin(0.5);
+      objects.push(mult);
+      
+      // Connection line (thickness based on weight magnitude)
+      const lineThickness = Math.abs(example.weight) * 4 + 1;
+      const connection = this.scene.add.graphics();
+      connection.lineStyle(lineThickness, example.color, 0.7);
+      connection.beginPath();
+      connection.moveTo(sectionX, inputY + 20);
+      connection.lineTo(sectionX, sectionY + 40);
+      connection.strokePath();
+      objects.push(connection);
+      
+      // Result
+      const resultY = sectionY + 60;
+      const result = example.input * example.weight;
+      const resultCircle = this.scene.add.circle(sectionX, resultY, 18, example.color, 0.8);
+      resultCircle.setStrokeStyle(2, example.color);
+      objects.push(resultCircle);
+      
+      const resultValue = this.scene.add.text(sectionX, resultY, result.toFixed(2), {
+        fontSize: '13px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      resultValue.setOrigin(0.5);
+      objects.push(resultValue);
+      
+      // Description
+      const desc = this.scene.add.text(sectionX, sectionY + sectionHeight / 2 - 20, example.desc, {
+        fontSize: '11px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        align: 'center',
+        wordWrap: { width: sectionWidth - 10 }
+      });
+      desc.setOrigin(0.5);
+      objects.push(desc);
+      
+      // Visual indicator (bar chart)
+      const barY = sectionY + 90;
+      const barHeight = Math.abs(example.weight) * 30;
+      const bar = this.scene.add.rectangle(sectionX, barY - barHeight / 2, 30, barHeight, example.color, 0.6);
+      objects.push(bar);
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 15, 'Weights: Importance Scores', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    // Learning process visualization at bottom
+    const learningY = centerY + height / 2 - 30;
+    const learningSteps = ['Random Weights', '→', 'Make Prediction', '→', 'Calculate Error', '→', 'Update Weights'];
+    const stepWidth = width / (learningSteps.length + 1);
+    
+    learningSteps.forEach((step, i) => {
+      const stepX = centerX - width / 2 + (i + 1) * stepWidth;
+      if (step !== '→') {
+        const stepBox = this.scene.add.rectangle(stepX, learningY, stepWidth - 20, 40, COLORS.PRIMARY, 0.2);
+        stepBox.setStrokeStyle(2, COLORS.PRIMARY);
+        objects.push(stepBox);
+        
+        const stepText = this.scene.add.text(stepX, learningY, step, {
+          fontSize: '10px',
+          color: '#ffffff',
+          fontFamily: 'Arial',
+          fontStyle: 'bold',
+          align: 'center',
+          wordWrap: { width: stepWidth - 25 }
+        });
+        stepText.setOrigin(0.5);
+        objects.push(stepText);
+      } else {
+        const arrow = this.scene.add.graphics();
+        arrow.lineStyle(2, COLORS.SUCCESS);
+        arrow.beginPath();
+        arrow.moveTo(stepX - 10, learningY);
+        arrow.lineTo(stepX + 10, learningY);
+        arrow.strokePath();
+        arrow.fillStyle(COLORS.SUCCESS);
+        arrow.fillTriangle(stepX + 10, learningY, stepX + 5, learningY - 4, stepX + 5, learningY + 4);
+        objects.push(arrow);
+      }
+    });
+    
+    const learningLabel = this.scene.add.text(centerX, learningY - 30, 'Learning Process', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    learningLabel.setOrigin(0.5);
+    objects.push(learningLabel);
+    
+    return objects;
+  }
+
+  private renderActivationFunctions(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Three activation functions side by side
+    const functions = [
+      { name: 'ReLU', color: COLORS.SUCCESS, formula: 'max(0, x)' },
+      { name: 'Sigmoid', color: COLORS.PRIMARY, formula: '1/(1+e⁻ˣ)' },
+      { name: 'Tanh', color: COLORS.WARNING, formula: 'tanh(x)' }
+    ];
+    
+    const sectionWidth = width / 3 - 20;
+    const graphWidth = sectionWidth - 40;
+    const graphHeight = height * 0.5;
+    
+    functions.forEach((func, idx) => {
+      const sectionX = centerX - width / 2 + (idx + 1) * (width / 3);
+      const graphX = sectionX;
+      const graphY = centerY - 20;
+      
+      // Section background
+      const bg = this.scene.add.rectangle(sectionX, centerY, sectionWidth, height * 0.85, func.color, 0.1);
+      bg.setStrokeStyle(2, func.color);
+      objects.push(bg);
+      
+      // Function name
+      const name = this.scene.add.text(sectionX, centerY - height / 2 + 25, func.name, {
+        fontSize: '18px',
+        color: '#' + func.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      name.setOrigin(0.5);
+      objects.push(name);
+      
+      // Formula
+      const formula = this.scene.add.text(sectionX, centerY - height / 2 + 50, func.formula, {
+        fontSize: '11px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        fontStyle: 'italic'
+      });
+      formula.setOrigin(0.5);
+      objects.push(formula);
+      
+      // Draw axes
+      const axes = this.scene.add.graphics();
+      axes.lineStyle(2, COLORS.TEXT, 0.5);
+      axes.beginPath();
+      axes.moveTo(graphX - graphWidth / 2, graphY);
+      axes.lineTo(graphX + graphWidth / 2, graphY);
+      axes.moveTo(graphX, graphY - graphHeight / 2);
+      axes.lineTo(graphX, graphY + graphHeight / 2);
+      axes.strokePath();
+      objects.push(axes);
+      
+      // Draw function curve
+      const curve = this.scene.add.graphics();
+      curve.lineStyle(3, func.color);
+      curve.beginPath();
+      
+      const numPoints = 50;
+      const xRange = 4;
+      const yRange = func.name === 'ReLU' ? 2 : func.name === 'Sigmoid' ? 1 : 1;
+      
+      for (let i = 0; i <= numPoints; i++) {
+        const t = (i / numPoints) * 2 - 1; // -1 to 1
+        const inputX = t * xRange;
+        let outputY: number;
+        
+        if (func.name === 'ReLU') {
+          outputY = Math.max(0, inputX);
+        } else if (func.name === 'Sigmoid') {
+          outputY = 1 / (1 + Math.exp(-inputX));
+        } else { // Tanh
+          outputY = Math.tanh(inputX);
+        }
+        
+        const plotX = graphX - graphWidth / 2 + ((inputX + xRange) / (2 * xRange)) * graphWidth;
+        const plotY = func.name === 'Sigmoid' 
+          ? graphY + graphHeight / 2 - (outputY / yRange) * graphHeight
+          : graphY - (outputY / yRange) * (graphHeight / 2);
+        
+        if (i === 0) {
+          curve.moveTo(plotX, plotY);
+        } else {
+          curve.lineTo(plotX, plotY);
+        }
+      }
+      
+      curve.strokePath();
+      objects.push(curve);
+      
+      // Axis labels
+      const xLabel = this.scene.add.text(sectionX, graphY + graphHeight / 2 + 20, 'Input (x)', {
+        fontSize: '10px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      xLabel.setOrigin(0.5);
+      objects.push(xLabel);
+      
+      const yLabel = this.scene.add.text(sectionX - graphWidth / 2 - 15, graphY, 'Output', {
+        fontSize: '10px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      yLabel.setOrigin(0.5);
+      yLabel.setAngle(-90);
+      objects.push(yLabel);
+      
+      // Range label
+      const rangeText = func.name === 'ReLU' ? '[0, ∞)' : func.name === 'Sigmoid' ? '[0, 1]' : '[-1, 1]';
+      const range = this.scene.add.text(sectionX, centerY + height / 2 - 40, `Range: ${rangeText}`, {
+        fontSize: '11px',
+        color: '#' + func.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      range.setOrigin(0.5);
+      objects.push(range);
+      
+      // Use case
+      const useCase = func.name === 'ReLU' ? 'Most common' : func.name === 'Sigmoid' ? 'Probabilities' : 'Centered output';
+      const use = this.scene.add.text(sectionX, centerY + height / 2 - 20, useCase, {
+        fontSize: '10px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        fontStyle: 'italic'
+      });
+      use.setOrigin(0.5);
+      objects.push(use);
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 10, 'Activation Functions: Decision Makers', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    // Non-linearity explanation
+    const explanation = this.scene.add.text(centerX, centerY + height / 2 - 10, '💡 Enable non-linear patterns → Complex learning', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    explanation.setOrigin(0.5);
+    objects.push(explanation);
+    
+    return objects;
+  }
+
+  private renderLinearNonlinearComparison(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Two side-by-side plots: Linear vs Nonlinear decision boundaries
+    const plotWidth = (width - 60) / 2;
+    const plotHeight = height * 0.7;
+    const leftX = centerX - width / 2 + plotWidth / 2 + 20;
+    const rightX = centerX + width / 2 - plotWidth / 2 - 20;
+    const plotY = centerY;
+    
+    // Generate data points for two classes
+    const class1Points: { x: number; y: number }[] = [];
+    const class2Points: { x: number; y: number }[] = [];
+    
+    // Create two separable classes
+    for (let i = 0; i < 15; i++) {
+      const angle = (i / 15) * Math.PI * 2;
+      const radius = 20 + Math.random() * 10;
+      class1Points.push({
+        x: Math.cos(angle) * radius + 50,
+        y: Math.sin(angle) * radius + 50
+      });
+    }
+    
+    for (let i = 0; i < 15; i++) {
+      const angle = (i / 15) * Math.PI * 2;
+      const radius = 40 + Math.random() * 10;
+      class2Points.push({
+        x: Math.cos(angle) * radius + 50,
+        y: Math.sin(angle) * radius + 50
+      });
+    }
+    
+    const allPoints = [...class1Points, ...class2Points];
+    const minX = Math.min(...allPoints.map(p => p.x));
+    const maxX = Math.max(...allPoints.map(p => p.x));
+    const minY = Math.min(...allPoints.map(p => p.y));
+    const maxY = Math.max(...allPoints.map(p => p.y));
+    
+    // Render left plot (Linear)
+    const renderPlot = (plotCenterX: number, isLinear: boolean, title: string) => {
+      const padding = 30;
+      const graphX = plotCenterX - plotWidth / 2 + padding;
+      const graphY = plotY + plotHeight / 2 - padding;
+      const graphWidth = plotWidth - 2 * padding;
+      const graphHeight = plotHeight - 2 * padding;
+      
+      // Background
+      const bg = this.scene.add.rectangle(plotCenterX, plotY, plotWidth, plotHeight, COLORS.BG_LIGHT, 0.3);
+      bg.setStrokeStyle(2, isLinear ? COLORS.ERROR : COLORS.SUCCESS);
+      objects.push(bg);
+      
+      // Title
+      const titleText = this.scene.add.text(plotCenterX, plotY - plotHeight / 2 + 15, title, {
+        fontSize: '14px',
+        color: isLinear ? '#' + COLORS.ERROR.toString(16).padStart(6, '0') : '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      titleText.setOrigin(0.5);
+      objects.push(titleText);
+      
+      // Draw axes
+      const axes = this.scene.add.graphics();
+      axes.lineStyle(2, COLORS.TEXT, 0.5);
+      axes.beginPath();
+      axes.moveTo(graphX, graphY);
+      axes.lineTo(graphX, graphY - graphHeight);
+      axes.moveTo(graphX, graphY);
+      axes.lineTo(graphX + graphWidth, graphY);
+      axes.strokePath();
+      objects.push(axes);
+      
+      // Draw data points
+      class1Points.forEach(point => {
+        const plotX = graphX + ((point.x - minX) / (maxX - minX)) * graphWidth;
+        const plotY_scaled = graphY - ((point.y - minY) / (maxY - minY)) * graphHeight;
+        const circle = this.scene.add.circle(plotX, plotY_scaled, 4, COLORS.PRIMARY);
+        objects.push(circle);
+      });
+      
+      class2Points.forEach(point => {
+        const plotX = graphX + ((point.x - minX) / (maxX - minX)) * graphWidth;
+        const plotY_scaled = graphY - ((point.y - minY) / (maxY - minY)) * graphHeight;
+        const circle = this.scene.add.circle(plotX, plotY_scaled, 4, COLORS.WARNING);
+        objects.push(circle);
+      });
+      
+      // Draw decision boundary
+      const boundary = this.scene.add.graphics();
+      boundary.lineStyle(3, isLinear ? COLORS.ERROR : COLORS.SUCCESS);
+      boundary.beginPath();
+      
+      if (isLinear) {
+        // Straight line (linear boundary)
+        const startX = graphX;
+        const startY = graphY - graphHeight * 0.3;
+        const endX = graphX + graphWidth;
+        const endY = graphY - graphHeight * 0.7;
+        boundary.moveTo(startX, startY);
+        boundary.lineTo(endX, endY);
+      } else {
+        // Curved boundary (nonlinear)
+        const centerX_scaled = graphX + graphWidth / 2;
+        const centerY_scaled = graphY - graphHeight / 2;
+        const radius = Math.min(graphWidth, graphHeight) * 0.25;
+        
+        for (let i = 0; i <= 50; i++) {
+          const angle = (i / 50) * Math.PI * 2;
+          const x = centerX_scaled + Math.cos(angle) * radius;
+          const y = centerY_scaled + Math.sin(angle) * radius;
+          
+          if (i === 0) {
+            boundary.moveTo(x, y);
+          } else {
+            boundary.lineTo(x, y);
+          }
+        }
+      }
+      
+      boundary.strokePath();
+      objects.push(boundary);
+      
+      // Status text
+      const statusText = isLinear 
+        ? '❌ Cannot separate\n   complex patterns'
+        : '✅ Can learn curved\n   boundaries';
+      const status = this.scene.add.text(plotCenterX, plotY + plotHeight / 2 - 20, statusText, {
+        fontSize: '11px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        align: 'center'
+      });
+      status.setOrigin(0.5);
+      objects.push(status);
+    };
+    
+    renderPlot(leftX, true, 'Linear Only');
+    renderPlot(rightX, false, 'With Nonlinear');
+    
+    // Comparison label
+    const comparisonLabel = this.scene.add.text(centerX, centerY - height / 2 + 10, 'Decision Boundaries: Linear vs Nonlinear', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    comparisonLabel.setOrigin(0.5);
+    objects.push(comparisonLabel);
+    
+    return objects;
+  }
+
+  private renderHierarchicalFeatures(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Define layers with their feature complexity
+    const layers = [
+      { 
+        name: 'Input Layer', 
+        features: ['Raw Pixels', 'Color Values', 'Data Points'],
+        icon: '📥',
+        color: COLORS.PRIMARY,
+        y: centerY - height / 2 + 80
+      },
+      { 
+        name: 'Layer 1', 
+        features: ['Edges', 'Lines', 'Corners'],
+        icon: '📐',
+        color: COLORS.SECONDARY,
+        y: centerY - height / 2 + 180
+      },
+      { 
+        name: 'Layer 2', 
+        features: ['Shapes', 'Textures', 'Patterns'],
+        icon: '🔷',
+        color: COLORS.WARNING,
+        y: centerY - height / 2 + 280
+      },
+      { 
+        name: 'Layer 3', 
+        features: ['Objects', 'Faces', 'Complex Forms'],
+        icon: '🎯',
+        color: COLORS.SUCCESS,
+        y: centerY - height / 2 + 380
+      },
+      { 
+        name: 'Output Layer', 
+        features: ['Classification', 'Prediction', 'Decision'],
+        icon: '📤',
+        color: COLORS.PRIMARY,
+        y: centerY - height / 2 + 480
+      }
+    ];
+    
+    const layerWidth = width * 0.9;
+    const layerHeight = 70;
+    const leftX = centerX - layerWidth / 2;
+    
+    layers.forEach((layer, idx) => {
+      // Layer box
+      const box = this.scene.add.rectangle(centerX, layer.y, layerWidth, layerHeight, layer.color, 0.2);
+      box.setStrokeStyle(2, layer.color);
+      objects.push(box);
+      
+      // Icon
+      const icon = this.scene.add.text(leftX + 30, layer.y, layer.icon, {
+        fontSize: '24px',
+        fontFamily: 'Arial'
+      });
+      icon.setOrigin(0.5);
+      objects.push(icon);
+      
+      // Layer name
+      const name = this.scene.add.text(leftX + 100, layer.y - 15, layer.name, {
+        fontSize: '14px',
+        color: '#' + layer.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      name.setOrigin(0, 0.5);
+      objects.push(name);
+      
+      // Features
+      const featuresText = layer.features.join(' • ');
+      const features = this.scene.add.text(leftX + 100, layer.y + 15, featuresText, {
+        fontSize: '11px',
+        color: '#cccccc',
+        fontFamily: 'Arial'
+      });
+      features.setOrigin(0, 0.5);
+      objects.push(features);
+      
+      // Arrow to next layer
+      if (idx < layers.length - 1) {
+        const arrow = this.scene.add.graphics();
+        arrow.lineStyle(2, COLORS.TEXT, 0.5);
+        arrow.beginPath();
+        arrow.moveTo(centerX, layer.y + layerHeight / 2);
+        arrow.lineTo(centerX, layers[idx + 1].y - layerHeight / 2);
+        arrow.strokePath();
+        
+        // Arrowhead
+        arrow.fillStyle(COLORS.TEXT, 0.5);
+        arrow.beginPath();
+        const arrowY = layers[idx + 1].y - layerHeight / 2;
+        arrow.moveTo(centerX, arrowY);
+        arrow.lineTo(centerX - 5, arrowY - 8);
+        arrow.lineTo(centerX + 5, arrowY - 8);
+        arrow.closePath();
+        arrow.fillPath();
+        objects.push(arrow);
+      }
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 20, 'Hierarchical Feature Learning', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    // Bottom explanation
+    const explanation = this.scene.add.text(centerX, centerY + height / 2 - 20, 'Each layer builds on the previous, transforming simple features into complex understanding', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      fontStyle: 'italic',
+      align: 'center',
+      wordWrap: { width: width - 40 }
+    });
+    explanation.setOrigin(0.5);
+    objects.push(explanation);
+    
+    return objects;
+  }
+
+  private renderForwardPropagation(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Create a simple 3-layer network showing forward flow
+    const layers = [
+      { x: centerX - width / 2 + 150, nodes: 3, label: 'Input', color: COLORS.PRIMARY },
+      { x: centerX, nodes: 4, label: 'Hidden', color: COLORS.SECONDARY },
+      { x: centerX + width / 2 - 150, nodes: 2, label: 'Output', color: COLORS.SUCCESS }
+    ];
+    
+    const nodeRadius = 12;
+    const nodeSpacing = 50;
+    
+    layers.forEach((layer, layerIdx) => {
+      // Layer label
+      const label = this.scene.add.text(layer.x, centerY - height / 2 + 30, layer.label, {
+        fontSize: '14px',
+        color: '#' + layer.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      // Nodes
+      const startY = centerY - (layer.nodes - 1) * nodeSpacing / 2;
+      const nodeYs: number[] = [];
+      
+      for (let i = 0; i < layer.nodes; i++) {
+        const nodeY = startY + i * nodeSpacing;
+        nodeYs.push(nodeY);
+        
+        const node = this.scene.add.circle(layer.x, nodeY, nodeRadius, layer.color, 0.8);
+        node.setStrokeStyle(2, layer.color);
+        objects.push(node);
+        
+        // Show activation value for input layer
+        if (layerIdx === 0) {
+          const value = this.scene.add.text(layer.x, nodeY - 25, '0.8', {
+            fontSize: '10px',
+            color: '#ffffff',
+            fontFamily: 'Arial'
+          });
+          value.setOrigin(0.5);
+          objects.push(value);
+        }
+        
+        // Show prediction for output layer
+        if (layerIdx === layers.length - 1) {
+          const pred = this.scene.add.text(layer.x, nodeY + 25, i === 0 ? 'Cat: 0.9' : 'Dog: 0.1', {
+            fontSize: '10px',
+            color: '#ffffff',
+            fontFamily: 'Arial',
+            fontStyle: 'bold'
+          });
+          pred.setOrigin(0.5);
+          objects.push(pred);
+        }
+      }
+      
+      // Forward arrows to next layer
+      if (layerIdx < layers.length - 1) {
+        const nextLayer = layers[layerIdx + 1];
+        const nextStartY = centerY - (nextLayer.nodes - 1) * nodeSpacing / 2;
+        
+        nodeYs.forEach((nodeY) => {
+          for (let j = 0; j < nextLayer.nodes; j++) {
+            const nextNodeY = nextStartY + j * nodeSpacing;
+            const arrow = this.scene.add.graphics();
+            arrow.lineStyle(2, COLORS.SUCCESS, 0.6);
+            arrow.beginPath();
+            arrow.moveTo(layer.x + nodeRadius, nodeY);
+            arrow.lineTo(nextLayer.x - nodeRadius, nextNodeY);
+            arrow.strokePath();
+            
+            // Arrowhead
+            arrow.fillStyle(COLORS.SUCCESS, 0.6);
+            arrow.beginPath();
+            const dx = nextLayer.x - layer.x;
+            const dy = nextNodeY - nodeY;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            const arrowX = nextLayer.x - nodeRadius - (dx / len) * nodeRadius;
+            const arrowY = nextNodeY - (dy / len) * nodeRadius;
+            arrow.moveTo(arrowX, arrowY);
+            arrow.lineTo(arrowX - 5, arrowY - 3);
+            arrow.lineTo(arrowX - 5, arrowY + 3);
+            arrow.closePath();
+            arrow.fillPath();
+            objects.push(arrow);
+          }
+        });
+      }
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 10, 'Forward Pass: Data → Prediction', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    // Flow indicator
+    const flowText = this.scene.add.text(centerX, centerY + height / 2 - 30, 'Data flows forward through layers → Prediction', {
+      fontSize: '12px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    flowText.setOrigin(0.5);
+    objects.push(flowText);
+    
+    return objects;
+  }
+
+  private renderBackpropagation(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+    
+    // Create a simple 3-layer network showing backward error flow
+    const layers = [
+      { x: centerX - width / 2 + 150, nodes: 3, label: 'Input', color: COLORS.PRIMARY },
+      { x: centerX, nodes: 4, label: 'Hidden', color: COLORS.SECONDARY },
+      { x: centerX + width / 2 - 150, nodes: 2, label: 'Output', color: COLORS.ERROR }
+    ];
+    
+    const nodeRadius = 12;
+    const nodeSpacing = 50;
+    
+    layers.forEach((layer, layerIdx) => {
+      // Layer label
+      const label = this.scene.add.text(layer.x, centerY - height / 2 + 30, layer.label, {
+        fontSize: '14px',
+        color: '#' + layer.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      label.setOrigin(0.5);
+      objects.push(label);
+      
+      // Nodes
+      const startY = centerY - (layer.nodes - 1) * nodeSpacing / 2;
+      const nodeYs: number[] = [];
+      
+      for (let i = 0; i < layer.nodes; i++) {
+        const nodeY = startY + i * nodeSpacing;
+        nodeYs.push(nodeY);
+        
+        const node = this.scene.add.circle(layer.x, nodeY, nodeRadius, layer.color, 0.8);
+        node.setStrokeStyle(2, layer.color);
+        objects.push(node);
+        
+        // Show error for output layer
+        if (layerIdx === layers.length - 1) {
+          const error = this.scene.add.text(layer.x, nodeY + 25, i === 0 ? 'Error: 0.1' : 'Error: 0.3', {
+            fontSize: '10px',
+            color: '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+            fontFamily: 'Arial',
+            fontStyle: 'bold'
+          });
+          error.setOrigin(0.5);
+          objects.push(error);
+        }
+      }
+      
+      // Backward arrows from next layer (error flows backward)
+      if (layerIdx < layers.length - 1) {
+        const nextLayer = layers[layerIdx + 1];
+        const nextStartY = centerY - (nextLayer.nodes - 1) * nodeSpacing / 2;
+        const currentStartY = centerY - (layer.nodes - 1) * nodeSpacing / 2;
+        
+        for (let j = 0; j < nextLayer.nodes; j++) {
+          const nextNodeY = nextStartY + j * nodeSpacing;
+          for (let k = 0; k < layer.nodes; k++) {
+            const nodeY = currentStartY + k * nodeSpacing;
+            const arrow = this.scene.add.graphics();
+            arrow.lineStyle(2, COLORS.ERROR, 0.5);
+            arrow.beginPath();
+            arrow.moveTo(nextLayer.x - nodeRadius, nextNodeY);
+            arrow.lineTo(layer.x + nodeRadius, nodeY);
+            arrow.strokePath();
+            
+            // Arrowhead (pointing backward)
+            arrow.fillStyle(COLORS.ERROR, 0.5);
+            arrow.beginPath();
+            const dx = layer.x - nextLayer.x;
+            const dy = nodeY - nextNodeY;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            const arrowX = layer.x + nodeRadius + (dx / len) * nodeRadius;
+            const arrowY = nodeY + (dy / len) * nodeRadius;
+            arrow.moveTo(arrowX, arrowY);
+            arrow.lineTo(arrowX + 5, arrowY - 3);
+            arrow.lineTo(arrowX + 5, arrowY + 3);
+            arrow.closePath();
+            arrow.fillPath();
+            objects.push(arrow);
+          }
+        }
+      }
+    });
+    
+    // Title
+    const title = this.scene.add.text(centerX, centerY - height / 2 + 10, 'Backward Pass: Error → Weight Updates', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    title.setOrigin(0.5);
+    objects.push(title);
+    
+    // Update indicator
+    const updateText = this.scene.add.text(centerX, centerY + height / 2 - 30, 'Error flows backward → Weights adjust → Network learns', {
+      fontSize: '12px',
+      color: '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    updateText.setOrigin(0.5);
+    objects.push(updateText);
     
     return objects;
   }

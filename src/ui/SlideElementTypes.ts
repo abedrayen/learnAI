@@ -57,7 +57,7 @@ export interface IconElement extends BaseSlideElement {
 
 export interface DiagramElement extends BaseSlideElement {
   type: 'diagram';
-  diagramType: 'ai-hierarchy' | 'ai-subset' | 'dataset' | 'workflow' | 'neuron' | 'neural-network' | 'pipeline' | 'teachable-flow' | 'train-test-split' | 'fitting-comparison' | 'data-quality-impact' | 'data-cleaning-steps' | 'data-quality-checklist' | 'ml-types-overview' | 'error-visualization' | 'mse-mae-comparison' | 'optimization-landscape' | 'r2-visualization' | 'error-metrics-combined' | 'prediction-quality' | 'neural-temple-intro' | 'deep-learning-fields' | 'neuron-detailed' | 'neuron-learning' | 'neurons-to-network';
+  diagramType: 'ai-hierarchy' | 'ai-subset' | 'dataset' | 'workflow' | 'neuron' | 'neural-network' | 'pipeline' | 'teachable-flow' | 'train-test-split' | 'fitting-comparison' | 'data-quality-impact' | 'data-cleaning-steps' | 'data-quality-checklist' | 'ml-types-overview' | 'error-visualization' | 'mse-mae-comparison' | 'optimization-landscape' | 'r2-visualization' | 'error-metrics-combined' | 'prediction-quality' | 'neural-temple-intro' | 'deep-learning-fields' | 'neuron-detailed' | 'neuron-learning' | 'neurons-to-network' | 'weights-visualization' | 'activation-functions' | 'linear-nonlinear-comparison' | 'hierarchical-features' | 'forward-propagation' | 'backpropagation';
   x?: number;
   y?: number;
   width?: number;

@@ -629,42 +629,12 @@ export const LEVEL_4_SLIDES_ENHANCED: EnhancedSlide[] = [
     title: 'Understanding Weights',
     elements: [
       { type: 'title', text: 'Understanding Weights' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Weights are the "importance scores" that determine how much each input influences the neuron\'s decision. They\'re the key to learning.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'What Are Weights?' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Weights are numbers that multiply each input. A high weight means "this input is very important." A low (or negative) weight means "this input is less important" or "ignore this input."', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Example:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'In a face recognition neuron, inputs might be pixel values. The weight for a pixel in the "eye region" would be high (important for recognizing faces), while a pixel in the background would have a low weight.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'How Weights Are Learned:' },
-      { type: 'paragraph', text: 'During training, the network adjusts weights automatically. It starts with random weights, makes predictions, sees errors, and updates weights to reduce errors. This is the essence of learning!', align: 'center' }
+      { type: 'spacer', height: -20 },
+      { type: 'diagram', diagramType: 'weights-visualization', width: 900, height: 500 },
+      { type: 'spacer', height: 0 },
     ]
   },
-  {
-    title: 'Activation Functions',
-    elements: [
-      { type: 'title', text: 'Activation Functions' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Activation functions are the "decision-makers" in neurons. They determine whether and how strongly a neuron should fire based on its weighted inputs.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Why We Need Them:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Without activation functions, neural networks would just be linear transformations — no matter how many layers, they\'d still only learn linear patterns. Activations introduce non-linearity, enabling networks to learn complex, curved relationships.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Common Activation Functions:' },
-      { type: 'bullet', items: [
-        'ReLU (Rectified Linear Unit) — "If input > 0, pass it through; otherwise, output 0" (most common)',
-        'Sigmoid — Squashes values to 0-1 range (good for probabilities)',
-        'Tanh — Squashes values to -1 to 1 range (centered version)'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Analogy: Think of activation functions like filters on a camera. They transform the raw signal (weighted sum) into a refined output, just like artistic filters transform photos step by step.', align: 'center' }
-    ]
-  },
+
   {
     title: 'Why Nonlinear Functions Matter',
     elements: [
@@ -672,19 +642,29 @@ export const LEVEL_4_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'spacer', height: 20 },
       { type: 'paragraph', text: 'Nonlinear activation functions are what make neural networks powerful. They allow networks to learn complex, curved patterns that linear models cannot.', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Problem with Linear Only:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'If neurons only did linear transformations (just adding and multiplying), even 100 layers would still only learn straight-line relationships. Real-world data is rarely linear — it has curves, twists, and complex patterns.', align: 'center' },
+      { type: 'diagram', diagramType: 'linear-nonlinear-comparison', width: 900, height: 400 },
+     ]
+  },
+
+  {
+    title: 'How Nonlinearity Helps',
+    elements: [
+      { type: 'title', text: 'How Nonlinearity Helps' },
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'How Nonlinearity Helps:' },
+      { type: 'bold', text: 'Nonlinear activation functions enable:' },
+      { type: 'spacer', height: 15 },
       { type: 'bullet', items: [
         'Enables learning curved boundaries (e.g., separating cats from dogs in image space)',
         'Allows modeling complex relationships (e.g., price vs. features with interactions)',
         'Creates decision boundaries that aren\'t just straight lines',
         'Enables hierarchical feature learning (simple → complex patterns)'
       ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Visual Metaphor: Linear functions are like drawing only with straight lines. Nonlinear functions let you draw curves, circles, and complex shapes — essential for capturing real-world patterns.', align: 'center' }
+      { type: 'spacer', height: 20 },
+      { type: 'paragraph', text: '💡 Visual Metaphor: Linear functions are like drawing only with straight lines. Nonlinear functions let you draw curves, circles, and complex shapes — essential for capturing real-world patterns.', align: 'center' },
+      { type: 'spacer', height: 20 },
+      { type: 'bold', text: 'The Bottom Line:' },
+      { type: 'spacer', height: 10 },
+      { type: 'paragraph', text: 'Without nonlinearity, neural networks would be no more powerful than simple linear models. Activation functions are the key that unlocks the true power of deep learning.', align: 'center' }
     ]
   },
   {
@@ -692,174 +672,75 @@ export const LEVEL_4_SLIDES_ENHANCED: EnhancedSlide[] = [
     elements: [
       { type: 'title', text: 'Layers: Building Complexity' },
       { type: 'spacer', height: 20 },
-      { type: 'diagram', diagramType: 'neural-network', width: 600, height: 350 },
-      { type: 'spacer', height: 20 },
       { type: 'paragraph', text: 'Neural networks stack neurons into layers, each building on the previous one\'s understanding. Think of layers as artistic filters that transform raw data step by step.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Input Layer 📥' },
-      { type: 'paragraph', text: 'Receives raw data (pixels, words, sounds). Each neuron represents one feature.', align: 'center' },
-      { type: 'spacer', height: 10 },
-      { type: 'bold', text: 'Hidden Layers 🧩' },
-      { type: 'paragraph', text: 'Extract increasingly abstract patterns. Early layers detect simple features (edges), later layers detect complex concepts (faces, objects).', align: 'center' },
-      { type: 'spacer', height: 10 },
-      { type: 'bold', text: 'Output Layer 📤' },
-      { type: 'paragraph', text: 'Produces the final prediction or classification (e.g., "this is a cat" or "price = $250,000").', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Why Layers Matter: Each layer transforms the data into something more meaningful. This hierarchical processing is what makes deep learning so powerful for complex data.', align: 'center' }
+      { type: 'spacer', height: 20 },
+      { type: 'diagram', diagramType: 'neural-network', width: 800, height: 400 },
+  ]
+  },
+  {
+    title: 'Example of hierarchical Feature Learning',
+    elements: [
+      { type: 'title', text: 'Hierarchical Feature Learning' },
+      { type: 'spacer', height: -20 },
+      { type: 'diagram', diagramType: 'hierarchical-features', width: 900, height: 500 },
+
     ]
   },
   {
     title: 'Why Depth Matters',
     elements: [
       { type: 'title', text: 'Why Depth Matters' },
+      { type: 'spacer', height: 40 },
+      { type: 'paragraph', text: 'Deep networks (many layers) can learn more complex patterns than shallow networks.', align: 'center' },
+      { type: 'spacer', height: 30 },
+      { type: 'bold', text: 'The Power of Composition', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Deep networks (many layers) can learn more complex patterns than shallow networks. But why?', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Power of Composition:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Each layer builds on the previous one. Layer 1 finds edges. Layer 2 combines edges into shapes. Layer 3 combines shapes into object parts. Layer 4 combines parts into complete objects. This composition of simple patterns creates complex understanding.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Why More Layers Help:' },
-      { type: 'bullet', items: [
-        '🔍 Deeper abstraction — later layers understand higher-level concepts',
-        '🧩 Feature composition — simple features combine into complex ones',
-        '📊 Hierarchical learning — mirrors how humans process information',
-        '🎯 Better generalization — can capture more nuanced patterns'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'The Trade-off:' },
-      { type: 'paragraph', text: 'More layers = more complexity and computation. But for complex tasks like image recognition or language understanding, depth is essential. Modern networks often have 50-100+ layers!', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Analogy: Like reading a book — you start with letters (Layer 1), combine them into words (Layer 2), words into sentences (Layer 3), sentences into paragraphs (Layer 4), and paragraphs into meaning (Output). Each layer adds understanding.', align: 'center' }
+      { type: 'paragraph', text: 'Each layer builds on the previous: Edges → Shapes → Objects → Understanding', align: 'center' },
+      { type: 'spacer', height: 30 },
+
+      { type: 'paragraph', text: '💡 Analogy: Like reading a book — letters → words → sentences → paragraphs → meaning', align: 'center' }
     ]
   },
   {
-    title: 'Why Deep Learning Works',
+    title: 'Forward Propagation: Making Predictions',
     elements: [
-      { type: 'title', text: 'Why Deep Learning Works' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Deep Learning excels when data is complex, high-dimensional, and rich in patterns:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bullet', items: [
-        '🖼️ Images — millions of pixels with spatial relationships',
-        '🎤 Speech — audio waveforms with temporal patterns',
-        '✍️ Handwriting — stroke sequences and shapes',
-        '📝 Language — words with syntax, semantics, and context',
-        '🎥 Video — sequences of images with motion',
-        '🧬 Genomics — DNA sequences with biological patterns'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'The Hierarchical Feature Extraction:', align: 'center' },
+      { type: 'title', text: 'Forward Propagation: Making Predictions' },
       { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Layer 1: Raw pixels → edges, lines, colors' },
-      { type: 'bold', text: 'Layer 2: Edges → shapes, textures' },
-      { type: 'bold', text: 'Layer 3: Shapes → object parts (eyes, wheels)' },
-      { type: 'bold', text: 'Layer 4: Parts → complete objects (faces, cars)' }
-    ]
+      { type: 'paragraph', text: 'Forward propagation is how neural networks make predictions. Data flows from input to output, layer by layer.', align: 'center' },
+      { type: 'spacer', height: 20 },
+      { type: 'diagram', diagramType: 'forward-propagation', width: 900, height: 400 },
+      { type: 'spacer', height: 20 },
+     ]
   },
   {
-    title: 'Automatic Feature Extraction',
+    title: 'Backpropagation: The Learning Process',
     elements: [
-      { type: 'title', text: 'Automatic Feature Extraction' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Did you know?', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'This automatic feature extraction is why Deep Learning revolutionized AI. Previously, engineers had to manually design features. Now, networks learn them automatically from data.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🧠', size: 50 }
-    ]
-  },
-  {
-    title: 'Data Transformations',
-    elements: [
-      { type: 'title', text: 'Data Transformations' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'As data flows through a neural network, it undergoes a remarkable transformation — from raw, meaningless numbers to rich, meaningful understanding.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Example: Image Recognition Journey', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Input: Raw pixels (millions of numbers)' },
-      { type: 'bold', text: '→ Layer 1: Edges and basic patterns' },
-      { type: 'bold', text: '→ Layer 2: Shapes and textures' },
-      { type: 'bold', text: '→ Layer 3: Object parts (eyes, wheels, doors)' },
-      { type: 'bold', text: '→ Layer 4: Complete objects (faces, cars, buildings)' },
-      { type: 'bold', text: '→ Output: "This is a cat" or "This is a car"' }
-    ]
-  },
-  {
-    title: 'How Transformations Work',
-    elements: [
-      { type: 'title', text: 'How Transformations Work' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Visual Metaphor: Like a sculptor carving a statue, each layer removes unnecessary information and reveals the essential structure beneath. Or like artistic filters that transform raw data step by step into meaningful understanding.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Insight:', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'This transformation happens automatically during training. The network learns which features matter most for the task at hand.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🔄', size: 50 }
-    ]
-  },
-  {
-    title: 'Backpropagation: How Networks Learn',
-    elements: [
-      { type: 'title', text: 'Backpropagation: How Networks Learn' },
+      { type: 'title', text: 'Backpropagation: The Learning Process' },
       { type: 'spacer', height: 20 },
       { type: 'paragraph', text: 'Backpropagation is the algorithm that teaches neural networks. It\'s how the network learns from mistakes and improves over time.', align: 'center' },
+      { type: 'spacer', height: -10 },
+      { type: 'diagram', diagramType: 'backpropagation', width: 900, height: 400 },
+
+  ]
+  },
+  {
+    title: 'Why Backpropagation Works',
+    elements: [
+      { type: 'title', text: 'Why Backpropagation Works' },
+      { type: 'bold', text: 'The Learning Process:', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Process (Simplified):' },
-      { type: 'spacer', height: 15 },
       { type: 'bullet', items: [
-        '1️⃣ Forward Pass — data flows through the network, making a prediction',
+        '1️⃣ Forward Pass — data flows through, making a prediction',
         '2️⃣ Calculate Error — compare prediction to correct answer',
         '3️⃣ Backward Pass — error flows backward through layers',
         '4️⃣ Update Weights — adjust weights to reduce error',
-        '5️⃣ Repeat — do this thousands of times until accurate'
+        '5️⃣ Repeat — thousands of times until accurate'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Analogy:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Like learning to throw darts: you throw (forward pass), see where it lands (error), figure out what went wrong (backward pass), adjust your aim (update weights), and try again. Over time, you get better.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Why It Works:' },
-      { type: 'paragraph', text: 'Backpropagation calculates how much each weight contributed to the error, then adjusts weights proportionally. Weights that caused big errors get adjusted more. This is the mathematical foundation of learning in neural networks.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Key Insight: This happens automatically — you don\'t program the network to recognize cats. You show it cat images, and backpropagation teaches it to recognize them through thousands of adjustments.', align: 'center' }
+      { type: 'paragraph', text: '💡 This cycle repeats thousands of times, each iteration making the network slightly better at its task.', align: 'center' }
     ]
   },
-  {
-    title: 'Major Deep Learning Applications',
-    elements: [
-      { type: 'title', text: 'Major Deep Learning Applications' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Deep learning has revolutionized many fields. Here\'s why depth matters in real applications:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Computer Vision 👁️' },
-      { type: 'bullet', items: [
-        '🖼️ Image classification — recognizing objects in photos',
-        '🚗 Self-driving cars — detecting pedestrians, signs, obstacles',
-        '🏥 Medical imaging — detecting tumors, analyzing X-rays',
-        '🔒 Face recognition — security systems, photo organization'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Natural Language Processing 📝' },
-      { type: 'bullet', items: [
-        '🌐 Translation — Google Translate, language understanding',
-        '💬 Chatbots — customer service, virtual assistants',
-        '📊 Sentiment analysis — understanding emotions in text',
-        '✍️ Text generation — GPT models, creative writing'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Speech & Audio 🎤' },
-      { type: 'bullet', items: [
-        '🗣️ Speech recognition — Siri, Alexa, voice commands',
-        '🎵 Music generation — creating new compositions',
-        '🔊 Audio classification — identifying sounds, music genres'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Why Depth Matters: These tasks require understanding hierarchical patterns. Shallow networks can\'t capture the complexity needed for real-world AI applications.', align: 'center' }
-    ]
-  },
+
   {
     title: 'Activity Reminder',
     elements: [
@@ -1548,4 +1429,5 @@ export const LEVEL_6_SLIDES_ENHANCED: EnhancedSlide[] = [
     ]
   }
 ];
+
 
