@@ -818,14 +818,8 @@ export const LEVEL_6_SLIDES_ENHANCED: EnhancedSlide[] = [
     title: 'The Final Chamber',
     elements: [
       { type: 'title', text: 'The Final Chamber' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Congratulations, Explorer! You\'ve journeyed through the AI landscape and mastered fundamental concepts.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'You\'ve learned about AI types, machine learning workflows, linear regression, neural networks, and hands-on model training.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Now it\'s time to synthesize everything — to see how all these pieces fit together into a complete machine learning pipeline.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'This final challenge will test your understanding and prepare you to build real AI projects.', align: 'center' },
+      { type: 'spacer', height: 30 },
+      { type: 'paragraph', text: 'Congratulations! You\'ve mastered AI fundamentals. Now synthesize everything into the complete ML pipeline.', align: 'center' },
       { type: 'spacer', height: 30 },
       { type: 'icon', icon: '🏛️', size: 60 }
     ]
@@ -834,290 +828,135 @@ export const LEVEL_6_SLIDES_ENHANCED: EnhancedSlide[] = [
     title: 'The Complete ML Pipeline',
     elements: [
       { type: 'title', text: 'The Complete ML Pipeline' },
+      { type: 'spacer', height: 10 },
+      { type: 'diagram', diagramType: 'pipeline', width: 900, height: 200 },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Every successful AI project follows a systematic pipeline — from raw data to deployed model. Understanding this flow is essential for building reliable systems.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'diagram', diagramType: 'pipeline', width: 900, height: 150 },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'The Complete Flow:', align: 'center' },
+      { type: 'paragraph', text: '🔄 Iterative cycle: Most projects repeat this process multiple times to achieve desired performance.', align: 'center' },
       { type: 'spacer', height: 15 },
       { type: 'bullet', items: [
-        '📥 Data Collection — gather relevant examples from various sources',
-        '🧹 Data Preprocessing — clean, format, handle missing values, normalize',
-        '✂️ Data Splitting — separate into training, validation, and testing sets',
-        '🎓 Model Training — teach the algorithm patterns using training data',
-        '📊 Model Evaluation — measure performance using evaluation metrics',
-        '🔧 Model Selection — choose the best model architecture and hyperparameters',
-        '🚀 Deployment — integrate into real applications and services',
-        '📈 Monitoring — track performance in production and detect issues',
-        '🔄 Iteration — continuously improve based on real-world feedback'
+        '✅ More accurate & reliable',
+        '🛡️ Easier to debug & improve',
+        '🔄 Reproducible & maintainable'
       ]}
     ]
   },
   {
-    title: 'Real-World Workflows: Data Collection',
+    title: 'Data Collection & Preprocessing',
     elements: [
-      { type: 'title', text: 'Real-World Workflows: Data Collection' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Data collection is the foundation of every ML project. In real-world scenarios, this involves multiple sources and careful planning.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Data Sources:' },
-      { type: 'bullet', items: [
-        '📊 Databases — existing company data, user interactions',
-        '🌐 APIs — external data services, public datasets',
-        '📝 Surveys — user feedback, labeled examples',
-        '🖼️ Sensors — IoT devices, cameras, microphones',
-        '📱 User-generated — app usage, social media',
-        '🏥 Medical records — patient data (with privacy considerations)'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Challenges:' },
-      { type: 'bullet', items: [
-        '⚠️ Privacy and ethics — especially for personal data',
-        '⚠️ Data quality — ensuring accuracy and completeness',
-        '⚠️ Bias — avoiding skewed or unrepresentative data',
-        '⚠️ Volume — collecting enough examples for training',
-        '⚠️ Labeling — getting correct labels can be expensive'
-      ]},
+      { type: 'title', text: 'Data Collection & Preprocessing' },
+      { type: 'spacer', height: 10 },
+      { type: 'diagram', diagramType: 'data-cleaning-steps', width: 800, height: 400 },
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Professional Insight: Data collection often takes 50-80% of project time. Quality data is more valuable than sophisticated algorithms.', align: 'center' }
-    ]
-  },
-  {
-    title: 'Real-World Workflows: Preprocessing',
-    elements: [
-      { type: 'title', text: 'Real-World Workflows: Preprocessing' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Raw data is rarely ready for machine learning. Preprocessing transforms messy data into clean, usable formats.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Common Preprocessing Steps:' },
-      { type: 'bullet', items: [
-        '🧹 Cleaning — remove duplicates, fix errors, handle outliers',
-        '🔢 Normalization — scale features to similar ranges (0-1 or -1 to 1)',
-        '📊 Encoding — convert categorical data to numbers (e.g., "cat" → 1, "dog" → 2)',
-        '🔍 Feature engineering — create new features from existing ones',
-        '📉 Handling missing values — fill gaps or remove incomplete examples',
-        '🎯 Feature selection — choose most relevant features'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Why It Matters:' },
-      { type: 'paragraph', text: 'Poor preprocessing leads to poor models. For example, if one feature ranges from 0-1 and another from 0-1000, the model will ignore the smaller feature. Normalization ensures all features contribute equally.', align: 'center' }
-    ]
-  },
-  {
-    title: 'The Iterative Pipeline',
-    elements: [
-      { type: 'title', text: 'The Iterative Pipeline' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Key Insight:', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'This pipeline is iterative. Most projects cycle through improvement multiple times before achieving desired performance.', align: 'center' },
-      { type: 'spacer', height: 30 },
-      { type: 'icon', icon: '🔄', size: 50 }
-    ]
-  },
-  {
-    title: 'Why the Pipeline Matters',
-    elements: [
-      { type: 'title', text: 'Why the Pipeline Matters' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Following a structured pipeline isn\'t just good practice — it\'s essential for building trustworthy AI systems.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'A well-designed pipeline makes models:', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bullet', items: [
-        '✅ More accurate — proper data handling improves predictions',
-        '🛡️ More reliable — systematic testing catches errors early',
-        '🐛 Easier to debug — clear stages help identify problems',
-        '📈 Easier to improve — structured approach enables iteration',
-        '🔄 Reproducible — others can replicate your work',
-        '📚 Maintainable — easier to update and modify'
-      ]}
+      { type: 'paragraph', text: '💡 Data collection takes 50-80% of project time. Quality data > sophisticated algorithms.', align: 'center' }
     ]
   },
   {
     title: 'Evaluation Metrics',
     elements: [
       { type: 'title', text: 'Evaluation Metrics' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Evaluation metrics measure how well your model performs. Different problems require different metrics.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Classification Metrics:' },
-      { type: 'bullet', items: [
-        '✅ Accuracy — percentage of correct predictions (good for balanced classes)',
-        '📊 Precision — of predicted positives, how many were actually positive',
-        '🔍 Recall — of actual positives, how many were found',
-        '📈 F1-Score — balance between precision and recall',
-        '📉 Confusion Matrix — detailed breakdown of predictions vs. reality'
-      ]},
+      { type: 'spacer', height: 10 },
+      { type: 'diagram', diagramType: 'error-metrics-combined', width: 800, height: 400 },
       { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Regression Metrics:' },
       { type: 'bullet', items: [
-        '📏 Mean Squared Error (MSE) — average squared prediction errors',
-        '📊 Mean Absolute Error (MAE) — average absolute errors (easier to interpret)',
-        '📈 R-squared — how well model explains variance (0-1, higher is better)'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Key Insight: No single metric tells the whole story. Use multiple metrics to understand model strengths and weaknesses.', align: 'center' }
+        '📊 Classification: Accuracy, Precision, Recall, F1-Score',
+        '📈 Regression: MSE, MAE, R²',
+        '💡 Use multiple metrics for complete understanding'
+      ]}
     ]
   },
   {
-    title: 'Model Selection',
+    title: 'Model Selection & Deployment',
     elements: [
-      { type: 'title', text: 'Model Selection' },
+      { type: 'title', text: 'Model Selection & Deployment' },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Choosing the right model architecture and hyperparameters is crucial for performance. This is where the iterative nature of ML becomes clear.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Selection Process:' },
+      { type: 'bold', text: 'Selection Process:', align: 'center' },
+      { type: 'spacer', height: 10 },
       { type: 'bullet', items: [
-        '🔍 Try multiple algorithms — linear regression, decision trees, neural networks',
-        '⚙️ Tune hyperparameters — learning rate, layer sizes, regularization',
-        '📊 Compare performance — use validation set to compare models',
-        '🎯 Choose best model — balance accuracy, speed, and interpretability',
-        '🧪 Final evaluation — test on held-out test set'
+        '🔍 Try multiple algorithms',
+        '⚙️ Tune hyperparameters',
+        '📊 Compare on validation set',
+        '🎯 Balance accuracy, speed, interpretability'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Trade-offs:' },
+      { type: 'bold', text: 'Deployment Challenges:', align: 'center' },
+      { type: 'spacer', height: 10 },
       { type: 'bullet', items: [
-        'Complexity vs. Interpretability — simpler models are easier to understand',
-        'Accuracy vs. Speed — more accurate models may be slower',
-        'Training time vs. Performance — deep networks take longer but may perform better'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Professional Practice: Start simple (linear models), then increase complexity only if needed. Often, simple models perform well and are easier to deploy.', align: 'center' }
+        '⚡ Performance & Scalability',
+        '🔄 Model updates & Reliability',
+        '🔒 Security & Cost'
+      ]}
     ]
   },
   {
-    title: 'Deployment Challenges',
+    title: 'Monitoring & Iteration Cycle',
     elements: [
-      { type: 'title', text: 'Deployment Challenges' },
+      { type: 'title', text: 'Monitoring & Iteration Cycle' },
+      { type: 'spacer', height: 10 },
+      { type: 'diagram', diagramType: 'workflow', width: 800, height: 200 },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Deploying models to production involves challenges beyond just training. Real-world deployment is where many projects fail.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Key Challenges:' },
+      { type: 'bold', text: 'Monitor:', align: 'center' },
+      { type: 'spacer', height: 10 },
       { type: 'bullet', items: [
-        '⚡ Performance — models must make predictions fast enough for real-time use',
-        '📦 Scalability — handle thousands or millions of requests',
-        '🔄 Model updates — how to update models without disrupting service',
-        '🛡️ Reliability — models must work consistently, handle edge cases',
-        '🔒 Security — protect models from attacks, ensure data privacy',
-        '💰 Cost — compute resources, storage, maintenance'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Deployment Strategies:' },
-      { type: 'bullet', items: [
-        '☁️ Cloud deployment — AWS, Google Cloud, Azure ML services',
-        '📱 Edge deployment — run models on devices (phones, IoT)',
-        '🔄 Batch processing — process data in batches (not real-time)',
-        '⚡ Real-time APIs — serve predictions via web APIs'
+        '📊 Prediction accuracy & data drift',
+        '⚡ System performance',
+        '⚠️ Edge cases & failures'
       ]},
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Reality Check: Many models that work well in testing fail in production due to data drift, performance issues, or deployment complexity. Always plan for production from the start.', align: 'center' }
+      { type: 'paragraph', text: '💡 Models degrade over time. Continuous monitoring and retraining are essential.', align: 'center' }
     ]
   },
   {
-    title: 'Monitoring and Iteration',
+    title: 'Real-World Applications',
     elements: [
-      { type: 'title', text: 'Monitoring and Iteration' },
+      { type: 'title', text: 'Real-World Applications' },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Deployment isn\'t the end — it\'s the beginning of continuous improvement. Models need monitoring and updates to stay effective.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'What to Monitor:' },
+      { type: 'bold', text: 'Recommendation Systems:', align: 'center' },
       { type: 'bullet', items: [
-        '📊 Prediction accuracy — is performance degrading over time?',
-        '📈 Data drift — is incoming data different from training data?',
-        '⚡ System performance — latency, throughput, error rates',
-        '🔍 Prediction distribution — are outputs changing unexpectedly?',
-        '⚠️ Edge cases — unusual inputs causing failures'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Iteration Cycle:' },
-      { type: 'bullet', items: [
-        '1️⃣ Monitor production performance',
-        '2️⃣ Identify issues (accuracy drop, new patterns)',
-        '3️⃣ Collect new data addressing issues',
-        '4️⃣ Retrain model with updated data',
-        '5️⃣ Test and validate improvements',
-        '6️⃣ Deploy updated model',
-        '7️⃣ Repeat — continuous improvement loop'
+        '📥 User history → 🧹 Normalize → 🎓 Train → 📊 A/B test → 🚀 Deploy → 📈 Monitor'
       ]},
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Professional Insight: Models degrade over time as the world changes. A recommendation system trained in 2020 may perform poorly in 2024. Continuous monitoring and retraining are essential.', align: 'center' }
-    ]
-  },
-  {
-    title: 'Pipeline: Real-World Impact',
-    elements: [
-      { type: 'title', text: 'Pipeline: Real-World Impact' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Real-World Impact:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Recommendation Systems (Netflix, Amazon):' },
+      { type: 'bold', text: 'Fraud Detection:', align: 'center' },
       { type: 'bullet', items: [
-        '📥 Data Collection — user viewing history, ratings, interactions',
-        '🧹 Preprocessing — normalize ratings, handle missing data',
-        '🎓 Training — collaborative filtering, deep learning models',
-        '📊 Evaluation — A/B testing, click-through rates',
-        '🚀 Deployment — serve recommendations in real-time',
-        '📈 Monitoring — track engagement, update based on feedback'
+        '📥 Transactions → 🧹 Feature engineering → 🎓 Classify → 📊 Precision/Recall → 🚀 Real-time → 📈 Adapt'
       ]},
       { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Fraud Detection (Banks, Credit Cards):' },
+      { type: 'bold', text: 'Medical Imaging:', align: 'center' },
       { type: 'bullet', items: [
-        '📥 Data Collection — transaction history, user behavior patterns',
-        '🧹 Preprocessing — feature engineering, anomaly detection',
-        '🎓 Training — classification models, anomaly detection',
-        '📊 Evaluation — precision/recall (false positives cost money)',
-        '🚀 Deployment — real-time transaction monitoring',
-        '📈 Monitoring — track fraud rates, adapt to new schemes'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Medical Imaging Workflows:' },
-      { type: 'bullet', items: [
-        '📥 Data Collection — X-rays, MRIs, CT scans with expert labels',
-        '🧹 Preprocessing — image normalization, augmentation',
-        '🎓 Training — deep learning models (CNNs) for image classification',
-        '📊 Evaluation — sensitivity, specificity (patient safety critical)',
-        '🚀 Deployment — integrate into hospital systems',
-        '📈 Monitoring — track diagnostic accuracy, regulatory compliance'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Professional Insight: Data scientists and ML engineers use this pipeline every day. It\'s the foundation of production AI systems that impact millions of users.', align: 'center' }
+        '📥 Scans → 🧹 Normalize → 🎓 CNN → 📊 Sensitivity → 🚀 Hospital systems → 📈 Track accuracy'
+      ]}
     ]
   },
   {
     title: 'Your Final Mission',
     elements: [
       { type: 'title', text: 'Your Final Mission' },
+      { type: 'spacer', height: 30 },
+      { type: 'paragraph', text: 'Complete the full ML pipeline:', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Your final challenge combines everything you\'ve learned. You\'ll demonstrate mastery by completing the full ML pipeline.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Activate the three chambers:', align: 'center' },
-      { type: 'spacer', height: 15 },
       { type: 'bullet', items: [
-        '📊 Data Chamber — prepare and split your dataset correctly',
-        '🔨 Model Forge — train and configure your model',
-        '🔍 Evaluation Lens — assess performance and interpret results'
-      ]}
+        '📊 Data Chamber — prepare and split dataset',
+        '🔨 Model Forge — train and configure model',
+        '🔍 Evaluation Lens — assess performance'
+      ]},
+      { type: 'spacer', height: 20 },
+      { type: 'paragraph', text: 'Then demonstrate mastery in the final assessment!', align: 'center' }
     ]
   },
   {
     title: 'Final Assessment',
     elements: [
       { type: 'title', text: 'Final Assessment' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Then answer comprehensive questions that test your understanding of:', align: 'center' },
+      { type: 'spacer', height: 30 },
+      { type: 'paragraph', text: 'Test your understanding of:', align: 'center' },
       { type: 'spacer', height: 20 },
       { type: 'bullet', items: [
-        'AI types and their applications',
-        'Machine learning fundamentals',
-        'Model training and evaluation',
-        'Neural networks and deep learning',
+        'AI types & applications',
+        'ML fundamentals',
+        'Model training & evaluation',
+        'Neural networks',
         'Complete ML workflows'
       ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'This final assessment proves you\'re ready to build real AI projects!', align: 'center' },
-      { type: 'spacer', height: 20 },
+      { type: 'spacer', height: 30 },
       { type: 'icon', icon: '🎯', size: 50 }
     ]
   },
@@ -1126,92 +965,43 @@ export const LEVEL_6_SLIDES_ENHANCED: EnhancedSlide[] = [
     elements: [
       { type: 'title', text: 'Graduation' },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '🎉 Congratulations on completing your AI learning journey! 🎉', align: 'center' },
+      { type: 'paragraph', text: '🎉 Congratulations! 🎉', align: 'center' },
       { type: 'spacer', height: 20 },
       { type: 'graph', graphType: 'accuracy', width: 500, height: 300 },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'You\'ve mastered the fundamentals of Artificial Intelligence and Machine Learning. Your journey doesn\'t end here — it\'s just beginning!', align: 'center' },
+      { type: 'paragraph', text: 'You\'ve mastered AI & ML fundamentals. Your journey continues!', align: 'center' },
       { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'What You\'ve Learned:' },
-      { type: 'spacer', height: 15 },
+      { type: 'bold', text: 'What You\'ve Learned:', align: 'center' },
+      { type: 'spacer', height: 10 },
       { type: 'bullet', items: [
-        '🤖 AI Types — Rule-based, Machine Learning, and Deep Learning',
-        '📊 ML Fundamentals — datasets, features, labels, training, testing',
-        '📈 Linear Models — regression, coefficients, optimization',
-        '🧠 Neural Networks — neurons, layers, backpropagation, depth',
-        '🎓 Hands-on Training — Teachable Machine, model creation',
-        '🔄 Complete Pipeline — from data to deployment, monitoring, iteration'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Next steps for your AI journey:', align: 'center' },
-      { type: 'bullet', items: [
-        '📚 Practice with Colab notebooks — hands-on coding exercises',
-        '🔗 Build with Teachable Machine — create your own models',
-        '💪 Continue learning — explore advanced AI topics',
-        '🚀 Start real projects — apply what you\'ve learned'
+        '🤖 AI Types — Rule-based, ML, Deep Learning',
+        '📊 ML Fundamentals — data, training, evaluation',
+        '📈 Linear Models & Neural Networks',
+        '🔄 Complete Pipeline — data to deployment'
       ]}
-    ]
-  },
-  {
-    title: 'Applying Your Knowledge',
-    elements: [
-      { type: 'title', text: 'Applying Your Knowledge' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Now that you understand AI fundamentals, here\'s how your knowledge applies to real AI scenarios:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'In Your Daily Life:' },
-      { type: 'bullet', items: [
-        '🔍 Recognize AI systems — understand how recommendation engines, voice assistants, and image recognition work',
-        '💼 Career opportunities — data science, ML engineering, AI research',
-        '🧠 Critical thinking — evaluate AI claims, understand limitations',
-        '🎯 Problem-solving — identify when AI can solve problems effectively'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'In Real Projects:' },
-      { type: 'bullet', items: [
-        '📊 Choose the right approach — know when to use rule-based vs. ML vs. DL',
-        '📈 Build models — use Teachable Machine or coding frameworks',
-        '🔍 Evaluate systems — understand metrics, identify issues',
-        '🚀 Deploy solutions — follow the complete pipeline you learned'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'In Further Learning:' },
-      { type: 'bullet', items: [
-        '📚 Advanced ML — deep learning, reinforcement learning, NLP',
-        '💻 Programming — Python, TensorFlow, PyTorch',
-        '🔬 Research — stay current with AI developments',
-        '🌐 Specialization — computer vision, NLP, robotics, etc.'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Remember: Every expert was once a beginner. You now have the foundation to build real AI applications, understand AI news, and continue learning. The AI field evolves rapidly — keep exploring!', align: 'center' }
     ]
   },
   {
     title: 'Your Next Steps',
     elements: [
       { type: 'title', text: 'Your Next Steps' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Next Steps:', align: 'center' },
+      { type: 'spacer', height: 30 },
+      { type: 'bold', text: 'Immediate Actions:', align: 'center' },
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Use your knowledge to build something amazing. Whether it\'s a personal project, a startup idea, or further study, you now have the foundation to succeed in the AI world.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Immediate Actions:' },
       { type: 'bullet', items: [
-        '🎯 Build a Teachable Machine project — apply what you learned',
-        '📚 Complete the Colab exercises — hands-on coding practice',
-        '🔍 Explore real AI systems — analyze how they work',
-        '💡 Start a project — solve a problem using ML'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Long-term Goals:' },
-      { type: 'bullet', items: [
-        '📖 Continue learning — advanced courses, research papers',
-        '💻 Learn programming — Python, ML libraries',
-        '🌐 Join communities — AI forums, meetups, competitions',
-        '🚀 Build a portfolio — showcase your AI projects'
+        '🎯 Build Teachable Machine projects',
+        '📚 Complete Colab exercises',
+        '💡 Start your own ML project'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Remember: Every expert was once a beginner. Keep learning, keep building, and keep exploring! The AI revolution is just beginning, and you\'re now part of it.', align: 'center' },
+      { type: 'bold', text: 'Long-term Goals:', align: 'center' },
+      { type: 'spacer', height: 15 },
+      { type: 'bullet', items: [
+        '📖 Advanced ML & Deep Learning',
+        '💻 Learn Python & ML libraries',
+        '🌐 Join AI communities',
+        '🚀 Build your portfolio'
+      ]},
       { type: 'spacer', height: 30 },
       { type: 'icon', icon: '🚀', size: 60 }
     ]
