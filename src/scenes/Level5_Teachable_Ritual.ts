@@ -14,11 +14,6 @@ interface Sample {
   y: number;
 }
 
-interface TestExample {
-  container: Phaser.GameObjects.Container;
-  class: 'happy' | 'sad' | 'neutral';
-  isDragging: boolean;
-}
 
 export default class Level5_Teachable_Ritual extends Phaser.Scene {
   private dialogBox?: DialogBox;
@@ -42,16 +37,9 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
   private trainingProgress: number = 0;
   private isTraining: boolean = false;
   
-  // Activity 3: Live Classification Test
-  private classificationContainer?: Phaser.GameObjects.Container;
-  private testExamples: TestExample[] = [];
-  private classificationZone?: Phaser.GameObjects.Rectangle;
-  private confidenceBars: Array<{ bar: Phaser.GameObjects.Rectangle; label: Phaser.GameObjects.Text }> = [];
-  
-  private activityCompleted: { collection: boolean; training: boolean; classification: boolean } = {
+  private activityCompleted: { collection: boolean; training: boolean } = {
     collection: false,
-    training: false,
-    classification: false
+    training: false
   };
 
   constructor() {
@@ -71,10 +59,10 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
     this.slideOverlay.show(LEVEL_5_SLIDES_ENHANCED, () => {
       this.time.delayedCall(500, () => {
         this.dialogBox!.show(
-          'Welcome to the Teachable Ritual! Complete three activities:\n\n' +
+          'Welcome to the Teachable Ritual! Complete two activities:\n\n' +
           '1. Collect Examples - Use the camera beam to capture samples\n' +
-          '2. Training Dashboard - Watch your model train\n' +
-          '3. Live Classification - Test your model with new examples',
+          '2. Training Dashboard - Watch your model train\n\n' +
+          'Then try it yourself with Google Teachable Machine!',
           () => {
             this.startCollectionActivity();
           }
@@ -88,10 +76,10 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
     this.exitButton.setInteractive({ useHandCursor: true });
     this.exitButton.setDepth(3000);
     this.exitButton.on('pointerdown', () => {
-      if (this.activityCompleted.collection && this.activityCompleted.training && this.activityCompleted.classification) {
+      if (this.activityCompleted.collection && this.activityCompleted.training) {
         this.completeLevel();
       } else {
-        this.dialogBox!.show('Complete all three activities first!', () => {});
+        this.dialogBox!.show('Complete all activities first!', () => {});
       }
     });
 
@@ -463,9 +451,7 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
     closeBtn.on('pointerdown', () => {
       if (this.activityCompleted.training) {
         this.trainingContainer!.destroy();
-        this.dialogBox!.show('Great! Model trained! Now test it!', () => {
-          this.startClassificationActivity();
-        });
+        this.showTeachableMachineLink();
       } else {
         this.dialogBox!.show('Train the model first!', () => {});
       }
@@ -540,56 +526,62 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
     });
   }
 
-  // ========== ACTIVITY 3: LIVE CLASSIFICATION TEST ==========
-  private startClassificationActivity(): void {
-    this.testExamples = [];
-    
-    this.classificationContainer = this.add.container(640, 360);
-    this.classificationContainer.setDepth(500);
+  // ========== TEACHABLE MACHINE LINK ==========
+  private showTeachableMachineLink(): void {
+    const linkContainer = this.add.container(640, 360);
+    linkContainer.setDepth(500);
     
     // Background
     const bg = this.add.rectangle(0, 0, 1280, 720, 0x000000, 0.85);
-    this.classificationContainer.add(bg);
+    linkContainer.add(bg);
     
     // Title
-    const title = this.add.text(0, -320, 'Live Classification Test', {
-      fontSize: '36px',
+    const title = this.add.text(0, -200, 'Try It Yourself!', {
+      fontSize: '48px',
       color: '#ffffff',
       fontFamily: 'Arial',
       fontStyle: 'bold'
     });
     title.setOrigin(0.5);
-    this.classificationContainer.add(title);
+    linkContainer.add(title);
     
-    // Instructions
-    const instructions = this.add.text(0, -270, 'Drag test examples to the classification zone', {
-      fontSize: '20px',
-      color: '#aaaaaa',
-      fontFamily: 'Arial'
-    });
-    instructions.setOrigin(0.5);
-    this.classificationContainer.add(instructions);
-    
-    // Create test examples
-    this.createTestExamples();
-    
-    // Classification zone
-    this.classificationZone = this.add.rectangle(0, 150, 400, 300, COLORS.PRIMARY, 0.3);
-    this.classificationZone.setStrokeStyle(4, COLORS.PRIMARY);
-    this.classificationZone.setInteractive({ useHandCursor: false });
-    this.classificationContainer.add(this.classificationZone);
-    
-    const zoneLabel = this.add.text(0, 50, 'Classification Zone', {
+    // Description
+    const description = this.add.text(0, -100, 'You\'ve learned how to collect data and train a model.\nNow try creating your own model with Google Teachable Machine!', {
       fontSize: '24px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      align: 'center',
+      wordWrap: { width: 900 }
+    });
+    description.setOrigin(0.5);
+    linkContainer.add(description);
+    
+    // Link button
+    const linkBtn = this.add.rectangle(0, 100, 400, 80, COLORS.PRIMARY);
+    linkBtn.setInteractive({ useHandCursor: true });
+    linkBtn.setStrokeStyle(4, COLORS.SUCCESS);
+    
+    const linkText = this.add.text(0, 100, 'Open Teachable Machine', {
+      fontSize: '28px',
       color: '#ffffff',
       fontFamily: 'Arial',
       fontStyle: 'bold'
     });
-    zoneLabel.setOrigin(0.5);
-    this.classificationContainer.add(zoneLabel);
+    linkText.setOrigin(0.5);
     
-    // Confidence bars
-    this.createConfidenceBars();
+    linkBtn.on('pointerdown', () => {
+      window.open('https://teachablemachine.withgoogle.com/', '_blank');
+    });
+    
+    linkBtn.on('pointerover', () => {
+      linkBtn.setScale(1.05);
+    });
+    
+    linkBtn.on('pointerout', () => {
+      linkBtn.setScale(1);
+    });
+    
+    linkContainer.add([linkBtn, linkText]);
     
     // Close button
     const closeBtn = this.add.rectangle(600, -320, 120, 40, COLORS.ERROR);
@@ -601,205 +593,10 @@ export default class Level5_Teachable_Ritual extends Phaser.Scene {
     });
     closeText.setOrigin(0.5);
     closeBtn.on('pointerdown', () => {
-      if (this.activityCompleted.classification) {
-        this.classificationContainer!.destroy();
-        this.dialogBox!.show('Perfect! All activities complete!', () => {});
-      } else {
-        this.dialogBox!.show('Test at least one example to complete this activity!', () => {});
-      }
+      linkContainer.destroy();
+      this.dialogBox!.show('Perfect! You can now try Teachable Machine yourself!', () => {});
     });
-    this.classificationContainer.add([closeBtn, closeText]);
-  }
-
-  private createTestExamples(): void {
-    const examples = [
-      { x: -500, y: -100, class: 'happy' as const, emoji: '😊' },
-      { x: -300, y: -100, class: 'sad' as const, emoji: '😢' },
-      { x: -100, y: -100, class: 'neutral' as const, emoji: '😐' },
-      { x: 100, y: -100, class: 'happy' as const, emoji: '😄' },
-      { x: 300, y: -100, class: 'sad' as const, emoji: '😭' }
-    ];
-    
-    examples.forEach(example => {
-      const container = this.add.container(example.x, example.y);
-      
-      const bg = this.add.circle(0, 0, 40, COLORS.WARNING, 0.8);
-      bg.setStrokeStyle(3, COLORS.WARNING);
-      container.add(bg);
-      
-      const emoji = this.add.text(0, 0, example.emoji, { fontSize: '40px' });
-      emoji.setOrigin(0.5);
-      container.add(emoji);
-      
-      container.setInteractive(new Phaser.Geom.Circle(0, 0, 40), Phaser.Geom.Circle.Contains);
-      this.input.setDraggable(container);
-      
-      const testExample: TestExample = {
-        container,
-        class: example.class,
-        isDragging: false
-      };
-      
-      this.testExamples.push(testExample);
-      this.classificationContainer!.add(container);
-      
-      // Drag events
-      this.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) => {
-        if (gameObject === container) {
-          testExample.isDragging = true;
-          container.setScale(1.2);
-          container.setDepth(1000);
-        }
-      });
-      
-      this.input.on('drag', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dragX: number, dragY: number) => {
-        if (gameObject === container && testExample.isDragging) {
-          container.x = dragX;
-          container.y = dragY;
-        }
-      });
-      
-      this.input.on('dragend', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) => {
-        if (gameObject === container && testExample.isDragging) {
-          testExample.isDragging = false;
-          container.setScale(1);
-          
-          // Check if dropped in classification zone
-          if (this.classificationZone && 
-              Math.abs(container.x) < 200 && 
-              container.y > 0 && container.y < 300) {
-            this.classifyExample(testExample);
-          } else {
-            // Return to original position
-            container.x = example.x;
-            container.y = example.y;
-          }
-        }
-      });
-    });
-  }
-
-  private createConfidenceBars(): void {
-    const classes = ['happy', 'sad', 'neutral'];
-    const emojis = ['😊', '😢', '😐'];
-    const colors = [COLORS.SUCCESS, COLORS.ERROR, COLORS.WARNING];
-    
-    classes.forEach((classType, index) => {
-      const x = -400 + index * 400;
-      const y = 250;
-      
-      const label = this.add.text(x, y - 30, `${emojis[index]} ${classType}`, {
-        fontSize: '18px',
-        color: '#ffffff',
-        fontFamily: 'Arial',
-        fontStyle: 'bold'
-      });
-      label.setOrigin(0.5);
-      this.classificationContainer!.add(label);
-      
-      const barBg = this.add.rectangle(x, y + 20, 200, 20, COLORS.BG_LIGHT, 0.5);
-      barBg.setStrokeStyle(2, COLORS.TEXT);
-      this.classificationContainer!.add(barBg);
-      
-      const bar = this.add.rectangle(x - 100, y + 20, 0, 20, colors[index]);
-      bar.setOrigin(0, 0.5);
-      this.classificationContainer!.add(bar);
-      
-      const percentText = this.add.text(x, y + 50, '0%', {
-        fontSize: '16px',
-        color: '#ffffff',
-        fontFamily: 'Arial'
-      });
-      percentText.setOrigin(0.5);
-      this.classificationContainer!.add(percentText);
-      
-      this.confidenceBars.push({ bar, label: percentText });
-    });
-  }
-
-  private classifyExample(example: TestExample): void {
-    // Simulate classification with confidence scores
-    const confidences = {
-      happy: example.class === 'happy' ? 0.85 : example.class === 'sad' ? 0.10 : 0.20,
-      sad: example.class === 'sad' ? 0.80 : example.class === 'happy' ? 0.15 : 0.25,
-      neutral: example.class === 'neutral' ? 0.75 : example.class === 'happy' ? 0.30 : 0.35
-    };
-    
-    // Normalize
-    const total = confidences.happy + confidences.sad + confidences.neutral;
-    confidences.happy /= total;
-    confidences.sad /= total;
-    confidences.neutral /= total;
-    
-    // Update confidence bars
-    const classes = ['happy', 'sad', 'neutral'];
-    classes.forEach((classType, index) => {
-      const confidence = confidences[classType as keyof typeof confidences];
-      const bar = this.confidenceBars[index].bar;
-      const percentText = this.confidenceBars[index].label;
-      
-      this.tweens.add({
-        targets: bar,
-        width: confidence * 200,
-        duration: 500
-      });
-      
-      percentText.setText(`${Math.round(confidence * 100)}%`);
-    });
-    
-    // Check if correct
-    const predicted = Object.keys(confidences).reduce((a, b) => 
-      confidences[a as keyof typeof confidences] > confidences[b as keyof typeof confidences] ? a : b);
-    
-    const isCorrect = predicted === example.class;
-    
-    // Visual feedback
-    if (isCorrect) {
-      // Confetti effect
-      for (let i = 0; i < 10; i++) {
-        const particle = this.add.circle(example.container.x, example.container.y, 5, COLORS.SUCCESS);
-        this.classificationContainer!.add(particle);
-        this.tweens.add({
-          targets: particle,
-          x: particle.x + (Math.random() - 0.5) * 200,
-          y: particle.y + (Math.random() - 0.5) * 200,
-          alpha: 0,
-          scale: 0,
-          duration: 1000
-        });
-      }
-    } else {
-      const feedback = this.add.text(example.container.x, example.container.y - 60, 
-        'Oops. I\'m still learning. More data please.', {
-        fontSize: '16px',
-        color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
-        fontFamily: 'Arial',
-        fontStyle: 'italic',
-        wordWrap: { width: 200 },
-        align: 'center'
-      });
-      feedback.setOrigin(0.5);
-      this.classificationContainer!.add(feedback);
-      this.tweens.add({
-        targets: feedback,
-        alpha: 0,
-        duration: 2000,
-        onComplete: () => feedback.destroy()
-      });
-    }
-    
-    // Return example to original position
-    const originalExample = this.testExamples.find(e => e.container === example.container);
-    if (originalExample) {
-      this.tweens.add({
-        targets: example.container,
-        x: originalExample.container.x,
-        y: originalExample.container.y,
-        duration: 500
-      });
-    }
-    
-    this.activityCompleted.classification = true;
+    linkContainer.add([closeBtn, closeText]);
   }
 
   private completeLevel(): void {

@@ -149,15 +149,15 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     instructions.setOrigin(0.5);
     this.ecosystemContainer.add(instructions);
     
-    // Left side label for icons
-    const iconsLabel = this.add.text(-600, -150, 'AI Examples\n(Drag to zones)', {
-      fontSize: '16px',
+    // Label for icons (centered above the icons)
+    const iconsLabel = this.add.text(0, -240, '', {
+      fontSize: '20px',
       color: '#ffffff',
       fontFamily: 'Arial',
       fontStyle: 'bold',
       align: 'center'
     });
-    iconsLabel.setOrigin(0.5);
+    iconsLabel.setOrigin(0.7);
     this.ecosystemContainer.add(iconsLabel);
     
     // Create zones
@@ -246,17 +246,16 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
       { name: 'Calculator', icon: '🔢', correctZone: 'rule-based' }
     ];
     
-    // Arrange icons in a grid on the left side, well separated from zones
-    const startX = -600;
-    const startY = -150;
-    const colSpacing = 110;
-    const rowSpacing = 130;
+    // Arrange icons horizontally in a single row, centered above the zones
+    const totalIcons = icons.length;
+    const iconSpacing = 160; // Space between icons (reduced to fit better)
+    const totalWidth = (totalIcons - 1) * iconSpacing;
+    const startX = -totalWidth / 2; // Center the row
+    const startY = -220; // Position well above the zones (zones are at y: 50, with labels at y: -90)
     
     icons.forEach((iconData, index) => {
-      const row = Math.floor(index / 2);
-      const col = index % 2;
-      const x = startX + col * colSpacing;
-      const y = startY + row * rowSpacing;
+      const x = startX + index * iconSpacing;
+      const y = startY;
       
       const container = this.add.container(x, y);
       
