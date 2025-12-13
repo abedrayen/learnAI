@@ -25,6 +25,9 @@ export class DiagramRenderer {
       case 'ai-hierarchy':
         objects.push(...this.renderAIHierarchy(x, y, width, height));
         break;
+      case 'ai-subset':
+        objects.push(...this.renderAISubset(x, y, width, height));
+        break;
       case 'dataset':
         objects.push(...this.renderDataset(x, y, width, height));
         break;
@@ -42,6 +45,24 @@ export class DiagramRenderer {
         break;
       case 'teachable-flow':
         objects.push(...this.renderTeachableFlow(x, y, width, height));
+        break;
+      case 'train-test-split':
+        objects.push(...this.renderTrainTestSplit(x, y, width, height));
+        break;
+      case 'fitting-comparison':
+        objects.push(...this.renderFittingComparison(x, y, width, height));
+        break;
+      case 'data-quality-impact':
+        objects.push(...this.renderDataQualityImpact(x, y, width, height));
+        break;
+      case 'data-cleaning-steps':
+        objects.push(...this.renderDataCleaningSteps(x, y, width, height));
+        break;
+      case 'data-quality-checklist':
+        objects.push(...this.renderDataQualityChecklist(x, y, width, height));
+        break;
+      case 'ml-types-overview':
+        objects.push(...this.renderMLTypesOverview(x, y, width, height));
         break;
     }
 
@@ -121,6 +142,262 @@ export class DiagramRenderer {
       sublabelText.setOrigin(0.5);
       objects.push(sublabelText);
     });
+
+    return objects;
+  }
+
+  private renderAISubset(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // Draw three nested circles showing AI ⊃ ML ⊃ DL
+    // Outer circle: AI (largest)
+    const aiRadius = Math.min(width, height) * 0.45;
+    const aiCircle = this.scene.add.circle(centerX, centerY, aiRadius);
+    aiCircle.setStrokeStyle(4, COLORS.PRIMARY, 0.8);
+    aiCircle.setFillStyle(COLORS.PRIMARY, 0.1);
+    objects.push(aiCircle);
+
+    const aiLabel = this.scene.add.text(centerX, centerY - aiRadius + 30, 'AI', {
+      fontSize: '22px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    aiLabel.setOrigin(0.5);
+    objects.push(aiLabel);
+
+    const aiSubtext = this.scene.add.text(centerX, centerY - aiRadius + 60, 'All intelligent systems', {
+      fontSize: '14px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    aiSubtext.setOrigin(0.5);
+    objects.push(aiSubtext);
+
+    // Middle circle: ML (subset of AI)
+    const mlRadius = aiRadius * 0.65;
+    const mlCircle = this.scene.add.circle(centerX, centerY + 20, mlRadius);
+    mlCircle.setStrokeStyle(4, COLORS.SECONDARY, 0.9);
+    mlCircle.setFillStyle(COLORS.SECONDARY, 0.15);
+    objects.push(mlCircle);
+
+    const mlLabel = this.scene.add.text(centerX, centerY - mlRadius + 50, 'ML', {
+      fontSize: '20px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    mlLabel.setOrigin(0.5);
+    objects.push(mlLabel);
+
+    const mlSubtext = this.scene.add.text(centerX, centerY - mlRadius + 75, 'Learns from data', {
+      fontSize: '13px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    mlSubtext.setOrigin(0.5);
+    objects.push(mlSubtext);
+
+    // Inner circle: DL (subset of ML)
+    const dlRadius = mlRadius * 0.55;
+    const dlCircle = this.scene.add.circle(centerX, centerY + 40, dlRadius);
+    dlCircle.setStrokeStyle(4, COLORS.WARNING, 1);
+    dlCircle.setFillStyle(COLORS.WARNING, 0.2);
+    objects.push(dlCircle);
+
+    const dlLabel = this.scene.add.text(centerX, centerY + 10, 'DL', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    dlLabel.setOrigin(0.5);
+    objects.push(dlLabel);
+
+    const dlSubtext = this.scene.add.text(centerX, centerY + 35, 'Neural networks', {
+      fontSize: '12px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    dlSubtext.setOrigin(0.5);
+    objects.push(dlSubtext);
+
+    // Add relationship indicators
+    // Arrow/text showing subset relationship
+    const relationText1 = this.scene.add.text(centerX + aiRadius - 80, centerY - aiRadius / 2, 'ML ⊂ AI', {
+      fontSize: '16px',
+      color: '#' + COLORS.SECONDARY.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    relationText1.setOrigin(0.5);
+    objects.push(relationText1);
+
+    const relationText2 = this.scene.add.text(centerX + mlRadius - 60, centerY + mlRadius / 2, 'DL ⊂ ML', {
+      fontSize: '16px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    relationText2.setOrigin(0.5);
+    objects.push(relationText2);
+
+    return objects;
+  }
+
+  private renderTrainTestSplit(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // Original dataset box (left side)
+    const datasetX = centerX - width / 3;
+    const datasetY = centerY;
+    const datasetBox = this.scene.add.rectangle(datasetX, datasetY, 180, 250, COLORS.PRIMARY, 0.3);
+    datasetBox.setStrokeStyle(3, COLORS.PRIMARY);
+    objects.push(datasetBox);
+
+    const datasetLabel = this.scene.add.text(datasetX, datasetY - 100, 'Full Dataset', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    datasetLabel.setOrigin(0.5);
+    objects.push(datasetLabel);
+
+    const datasetIcon = this.scene.add.text(datasetX, datasetY - 40, '📊', {
+      fontSize: '50px'
+    });
+    datasetIcon.setOrigin(0.5);
+    objects.push(datasetIcon);
+
+    const datasetInfo = this.scene.add.text(datasetX, datasetY + 30, '100%\nAll Data', {
+      fontSize: '16px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    datasetInfo.setOrigin(0.5);
+    objects.push(datasetInfo);
+
+    // Split arrow
+    const arrowX = centerX - width / 6;
+    const arrow = this.scene.add.graphics();
+    arrow.lineStyle(4, COLORS.WARNING);
+    arrow.beginPath();
+    arrow.moveTo(datasetX + 90, datasetY);
+    arrow.lineTo(arrowX, datasetY);
+    arrow.strokePath();
+    // Arrowhead
+    arrow.fillStyle(COLORS.WARNING);
+    arrow.fillTriangle(arrowX, datasetY, arrowX - 12, datasetY - 8, arrowX - 12, datasetY + 8);
+    objects.push(arrow);
+
+    const splitLabel = this.scene.add.text(datasetX + 90 + (arrowX - datasetX - 90) / 2, datasetY - 25, 'SPLIT', {
+      fontSize: '14px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    splitLabel.setOrigin(0.5);
+    objects.push(splitLabel);
+
+    // Training set (top right)
+    const trainX = centerX + width / 4;
+    const trainY = centerY - 80;
+    const trainBox = this.scene.add.rectangle(trainX, trainY, 200, 160, COLORS.SUCCESS, 0.3);
+    trainBox.setStrokeStyle(3, COLORS.SUCCESS);
+    objects.push(trainBox);
+
+    const trainLabel = this.scene.add.text(trainX, trainY - 60, 'Training Set', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    trainLabel.setOrigin(0.5);
+    objects.push(trainLabel);
+
+    const trainIcon = this.scene.add.text(trainX, trainY - 10, '🎓', {
+      fontSize: '40px'
+    });
+    trainIcon.setOrigin(0.5);
+    objects.push(trainIcon);
+
+    const trainInfo = this.scene.add.text(trainX, trainY + 40, '80-90%\nLearn patterns', {
+      fontSize: '15px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    trainInfo.setOrigin(0.5);
+    objects.push(trainInfo);
+
+    // Testing set (bottom right)
+    const testX = centerX + width / 4;
+    const testY = centerY + 80;
+    const testBox = this.scene.add.rectangle(testX, testY, 200, 160, COLORS.SECONDARY, 0.3);
+    testBox.setStrokeStyle(3, COLORS.SECONDARY);
+    objects.push(testBox);
+
+    const testLabel = this.scene.add.text(testX, testY - 60, 'Testing Set', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    testLabel.setOrigin(0.5);
+    objects.push(testLabel);
+
+    const testIcon = this.scene.add.text(testX, testY - 10, '📝', {
+      fontSize: '40px'
+    });
+    testIcon.setOrigin(0.5);
+    objects.push(testIcon);
+
+    const testInfo = this.scene.add.text(testX, testY + 40, '10-20%\nEvaluate model', {
+      fontSize: '15px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    testInfo.setOrigin(0.5);
+    objects.push(testInfo);
+
+    // Connecting lines from split to train/test
+    const splitConnector = this.scene.add.graphics();
+    splitConnector.lineStyle(3, COLORS.BG_LIGHT);
+    splitConnector.beginPath();
+    splitConnector.moveTo(arrowX, datasetY);
+    splitConnector.lineTo(trainX - 100, trainY);
+    splitConnector.strokePath();
+    splitConnector.beginPath();
+    splitConnector.moveTo(arrowX, datasetY);
+    splitConnector.lineTo(testX - 100, testY);
+    splitConnector.strokePath();
+    objects.push(splitConnector);
+
+    // Warning note
+    const warningNote = this.scene.add.text(testX, testY + 90, '⚠️ Never train on test data!', {
+      fontSize: '14px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'italic'
+    });
+    warningNote.setOrigin(0.5);
+    objects.push(warningNote);
 
     return objects;
   }
@@ -424,6 +701,891 @@ export class DiagramRenderer {
         arrow.fillPath();
         objects.push(arrow);
       }
+    });
+
+    return objects;
+  }
+
+  private renderFittingComparison(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // Three plots side by side
+    const plotWidth = 220;
+    const plotHeight = 180;
+    const spacing = 250;
+    const startX = centerX - spacing;
+
+    const plots = [
+      { 
+        title: 'Underfitting', 
+        subtitle: 'Too Simple',
+        x: startX, 
+        color: COLORS.ERROR,
+        icon: '📉',
+        type: 'underfit' as const
+      },
+      { 
+        title: 'Good Fit', 
+        subtitle: 'Just Right',
+        x: centerX, 
+        color: COLORS.SUCCESS,
+        icon: '✅',
+        type: 'goodfit' as const
+      },
+      { 
+        title: 'Overfitting', 
+        subtitle: 'Too Complex',
+        x: startX + spacing * 2, 
+        color: COLORS.WARNING,
+        icon: '📈',
+        type: 'overfit' as const
+      }
+    ];
+
+    plots.forEach(plot => {
+      // Plot background
+      const plotBg = this.scene.add.rectangle(plot.x, centerY, plotWidth, plotHeight, 0x1a1a2e, 0.6);
+      plotBg.setStrokeStyle(2, plot.color);
+      objects.push(plotBg);
+
+      // Title
+      const titleText = this.scene.add.text(plot.x, centerY - plotHeight/2 - 30, plot.title, {
+        fontSize: '18px',
+        color: '#' + plot.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      titleText.setOrigin(0.5);
+      objects.push(titleText);
+
+      // Subtitle
+      const subtitleText = this.scene.add.text(plot.x, centerY - plotHeight/2 - 10, plot.subtitle, {
+        fontSize: '13px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        align: 'center'
+      });
+      subtitleText.setOrigin(0.5);
+      objects.push(subtitleText);
+
+      // Icon
+      const iconText = this.scene.add.text(plot.x, centerY + plotHeight/2 + 25, plot.icon, {
+        fontSize: '24px'
+      });
+      iconText.setOrigin(0.5);
+      objects.push(iconText);
+
+      // Draw axes
+      const graphics = this.scene.add.graphics();
+      graphics.lineStyle(2, 0x666666);
+      
+      // X-axis
+      graphics.beginPath();
+      graphics.moveTo(plot.x - plotWidth/2 + 20, centerY + plotHeight/2 - 20);
+      graphics.lineTo(plot.x + plotWidth/2 - 20, centerY + plotHeight/2 - 20);
+      graphics.strokePath();
+      
+      // Y-axis
+      graphics.beginPath();
+      graphics.moveTo(plot.x - plotWidth/2 + 20, centerY + plotHeight/2 - 20);
+      graphics.lineTo(plot.x - plotWidth/2 + 20, centerY - plotHeight/2 + 20);
+      graphics.strokePath();
+      
+      objects.push(graphics);
+
+      // Generate sample data points (same for all three)
+      const dataPoints: Array<{x: number, y: number}> = [];
+      const numPoints = 8;
+      for (let i = 0; i < numPoints; i++) {
+        const xPos = plot.x - plotWidth/2 + 30 + (i * (plotWidth - 50) / (numPoints - 1));
+        // Create a curved pattern with some noise
+        const normalizedX = i / (numPoints - 1);
+        const baseY = Math.sin(normalizedX * Math.PI * 1.5) * 50 + Math.random() * 15 - 7.5;
+        const yPos = centerY + plotHeight/2 - 30 - baseY;
+        dataPoints.push({ x: xPos, y: yPos });
+      }
+
+      // Draw data points
+      dataPoints.forEach(point => {
+        const circle = this.scene.add.circle(point.x, point.y, 4, 0xffffff);
+        objects.push(circle);
+      });
+
+      // Draw fitting curves
+      const curveGraphics = this.scene.add.graphics();
+      curveGraphics.lineStyle(3, plot.color);
+      
+      if (plot.type === 'underfit') {
+        // Simple straight line (doesn't follow the curve)
+        curveGraphics.beginPath();
+        curveGraphics.moveTo(dataPoints[0].x, dataPoints[0].y + 20);
+        curveGraphics.lineTo(dataPoints[dataPoints.length - 1].x, dataPoints[dataPoints.length - 1].y - 10);
+        curveGraphics.strokePath();
+      } else if (plot.type === 'goodfit') {
+        // Smooth curve that captures general trend
+        curveGraphics.beginPath();
+        
+        // Create a smooth approximation of the data trend
+        const smoothPoints: Array<{x: number, y: number}> = [];
+        for (let i = 0; i < dataPoints.length; i++) {
+          // Apply simple moving average for smoothing
+          let sumY = 0;
+          let count = 0;
+          for (let j = Math.max(0, i - 1); j <= Math.min(dataPoints.length - 1, i + 1); j++) {
+            sumY += dataPoints[j].y;
+            count++;
+          }
+          smoothPoints.push({ x: dataPoints[i].x, y: sumY / count });
+        }
+        
+        curveGraphics.moveTo(smoothPoints[0].x, smoothPoints[0].y);
+        for (let i = 1; i < smoothPoints.length; i++) {
+          curveGraphics.lineTo(smoothPoints[i].x, smoothPoints[i].y);
+        }
+        curveGraphics.strokePath();
+      } else if (plot.type === 'overfit') {
+        // Wiggly curve that goes through every point
+        curveGraphics.beginPath();
+        curveGraphics.moveTo(dataPoints[0].x, dataPoints[0].y);
+        
+        for (let i = 1; i < dataPoints.length; i++) {
+          const currPoint = dataPoints[i];
+          curveGraphics.lineTo(currPoint.x, currPoint.y);
+        }
+        curveGraphics.strokePath();
+      }
+      
+      objects.push(curveGraphics);
+    });
+
+    // Performance indicators below
+    const perfY = centerY + plotHeight/2 + 55;
+    
+    // Underfitting performance
+    const underPerf = this.scene.add.text(startX, perfY, 'Training: 60%\nTesting: 58%', {
+      fontSize: '12px',
+      color: '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    underPerf.setOrigin(0.5);
+    objects.push(underPerf);
+
+    // Good fit performance
+    const goodPerf = this.scene.add.text(centerX, perfY, 'Training: 92%\nTesting: 90%', {
+      fontSize: '12px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    goodPerf.setOrigin(0.5);
+    objects.push(goodPerf);
+
+    // Overfitting performance
+    const overPerf = this.scene.add.text(startX + spacing * 2, perfY, 'Training: 99%\nTesting: 65%', {
+      fontSize: '12px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    overPerf.setOrigin(0.5);
+    objects.push(overPerf);
+
+    return objects;
+  }
+
+  private renderDataQualityImpact(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // Two parallel flows: Good data path (top) and Bad data path (bottom)
+    const pathSpacing = 110;
+    const goodY = centerY - pathSpacing;
+    const badY = centerY + pathSpacing;
+
+    // === GOOD DATA PATH (TOP) ===
+    const goodStartX = centerX - 280;
+
+    // Good data input
+    const goodDataBox = this.scene.add.rectangle(goodStartX, goodY, 140, 80, COLORS.SUCCESS, 0.3);
+    goodDataBox.setStrokeStyle(3, COLORS.SUCCESS);
+    objects.push(goodDataBox);
+
+    const goodDataIcon = this.scene.add.text(goodStartX, goodY - 20, '✓ 📊', {
+      fontSize: '30px'
+    });
+    goodDataIcon.setOrigin(0.5);
+    objects.push(goodDataIcon);
+
+    const goodDataLabel = this.scene.add.text(goodStartX, goodY + 15, 'Quality Data', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    goodDataLabel.setOrigin(0.5);
+    objects.push(goodDataLabel);
+
+    // Arrow 1
+    const arrow1Good = this.scene.add.graphics();
+    arrow1Good.lineStyle(3, COLORS.SUCCESS);
+    arrow1Good.beginPath();
+    arrow1Good.moveTo(goodStartX + 70, goodY);
+    arrow1Good.lineTo(centerX - 90, goodY);
+    arrow1Good.strokePath();
+    arrow1Good.fillStyle(COLORS.SUCCESS);
+    arrow1Good.fillTriangle(centerX - 90, goodY, centerX - 100, goodY - 6, centerX - 100, goodY + 6);
+    objects.push(arrow1Good);
+
+    // ML Training (middle)
+    const goodMLBox = this.scene.add.rectangle(centerX, goodY, 140, 80, COLORS.PRIMARY, 0.3);
+    goodMLBox.setStrokeStyle(3, COLORS.PRIMARY);
+    objects.push(goodMLBox);
+
+    const goodMLIcon = this.scene.add.text(centerX, goodY - 20, '🧠', {
+      fontSize: '30px'
+    });
+    goodMLIcon.setOrigin(0.5);
+    objects.push(goodMLIcon);
+
+    const goodMLLabel = this.scene.add.text(centerX, goodY + 15, 'ML Training', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    goodMLLabel.setOrigin(0.5);
+    objects.push(goodMLLabel);
+
+    // Arrow 2
+    const arrow2Good = this.scene.add.graphics();
+    arrow2Good.lineStyle(3, COLORS.SUCCESS);
+    arrow2Good.beginPath();
+    arrow2Good.moveTo(centerX + 70, goodY);
+    arrow2Good.lineTo(centerX + 210, goodY);
+    arrow2Good.strokePath();
+    arrow2Good.fillStyle(COLORS.SUCCESS);
+    arrow2Good.fillTriangle(centerX + 210, goodY, centerX + 200, goodY - 6, centerX + 200, goodY + 6);
+    objects.push(arrow2Good);
+
+    // Good model output
+    const goodEndX = centerX + 280;
+    const goodModelBox = this.scene.add.rectangle(goodEndX, goodY, 140, 80, COLORS.SUCCESS, 0.3);
+    goodModelBox.setStrokeStyle(3, COLORS.SUCCESS);
+    objects.push(goodModelBox);
+
+    const goodModelIcon = this.scene.add.text(goodEndX, goodY - 20, '⭐', {
+      fontSize: '30px'
+    });
+    goodModelIcon.setOrigin(0.5);
+    objects.push(goodModelIcon);
+
+    const goodModelLabel = this.scene.add.text(goodEndX, goodY + 15, 'Quality Model', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    goodModelLabel.setOrigin(0.5);
+    objects.push(goodModelLabel);
+
+    // === BAD DATA PATH (BOTTOM) ===
+    const badStartX = centerX - 280;
+
+    // Bad data input
+    const badDataBox = this.scene.add.rectangle(badStartX, badY, 140, 80, COLORS.ERROR, 0.3);
+    badDataBox.setStrokeStyle(3, COLORS.ERROR);
+    objects.push(badDataBox);
+
+    const badDataIcon = this.scene.add.text(badStartX, badY - 20, '🗑️ ', {
+      fontSize: '28px'
+    });
+    badDataIcon.setOrigin(0.5);
+    objects.push(badDataIcon);
+
+    const badDataLabel = this.scene.add.text(badStartX, badY + 15, 'Garbage Data', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    badDataLabel.setOrigin(0.5);
+    objects.push(badDataLabel);
+
+    // Arrow 1
+    const arrow1Bad = this.scene.add.graphics();
+    arrow1Bad.lineStyle(3, COLORS.ERROR);
+    arrow1Bad.beginPath();
+    arrow1Bad.moveTo(badStartX + 70, badY);
+    arrow1Bad.lineTo(centerX - 90, badY);
+    arrow1Bad.strokePath();
+    arrow1Bad.fillStyle(COLORS.ERROR);
+    arrow1Bad.fillTriangle(centerX - 90, badY, centerX - 100, badY - 6, centerX - 100, badY + 6);
+    objects.push(arrow1Bad);
+
+    // ML Training (middle)
+    const badMLBox = this.scene.add.rectangle(centerX, badY, 140, 80, COLORS.PRIMARY, 0.3);
+    badMLBox.setStrokeStyle(3, COLORS.PRIMARY);
+    objects.push(badMLBox);
+
+    const badMLIcon = this.scene.add.text(centerX, badY - 20, '🧠', {
+      fontSize: '30px'
+    });
+    badMLIcon.setOrigin(0.5);
+    objects.push(badMLIcon);
+
+    const badMLLabel = this.scene.add.text(centerX, badY + 15, 'ML Training', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    badMLLabel.setOrigin(0.5);
+    objects.push(badMLLabel);
+
+    // Arrow 2
+    const arrow2Bad = this.scene.add.graphics();
+    arrow2Bad.lineStyle(3, COLORS.ERROR);
+    arrow2Bad.beginPath();
+    arrow2Bad.moveTo(centerX + 70, badY);
+    arrow2Bad.lineTo(centerX + 210, badY);
+    arrow2Bad.strokePath();
+    arrow2Bad.fillStyle(COLORS.ERROR);
+    arrow2Bad.fillTriangle(centerX + 210, badY, centerX + 200, badY - 6, centerX + 200, badY + 6);
+    objects.push(arrow2Bad);
+
+    // Bad model output
+    const badEndX = centerX + 280;
+    const badModelBox = this.scene.add.rectangle(badEndX, badY, 140, 80, COLORS.ERROR, 0.3);
+    badModelBox.setStrokeStyle(3, COLORS.ERROR);
+    objects.push(badModelBox);
+
+    const badModelIcon = this.scene.add.text(badEndX, badY - 20, '❌', {
+      fontSize: '30px'
+    });
+    badModelIcon.setOrigin(0.5);
+    objects.push(badModelIcon);
+
+    const badModelLabel = this.scene.add.text(badEndX, badY + 15, 'Poor Model', {
+      fontSize: '16px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    badModelLabel.setOrigin(0.5);
+    objects.push(badModelLabel);
+
+    // Title at top
+    const titleText = this.scene.add.text(centerX, centerY - 180, 'Garbage In, Garbage Out (GIGO)', {
+      fontSize: '20px',
+      color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    titleText.setOrigin(0.5);
+    objects.push(titleText);
+
+    // Data quality examples
+    const goodExamples = this.scene.add.text(goodStartX, goodY - 60, 'Clean, accurate,\nrepresentative', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    goodExamples.setOrigin(0.5);
+    objects.push(goodExamples);
+
+    const badExamples = this.scene.add.text(badStartX, badY + 60, 'Biased, incomplete,\ninaccurate', {
+      fontSize: '12px',
+      color: '#aaaaaa',
+      fontFamily: 'Arial',
+      align: 'center'
+    });
+    badExamples.setOrigin(0.5);
+    objects.push(badExamples);
+
+    return objects;
+  }
+
+  private renderDataCleaningSteps(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // Vertical pipeline showing data cleaning steps
+    const steps = [
+      { 
+        title: '1. Raw Data', 
+        icon: '📁', 
+        description: 'Messy, unprocessed',
+        color: COLORS.ERROR,
+        y: centerY - 150
+      },
+      { 
+        title: '2. Remove Duplicates', 
+        icon: '🗑️', 
+        description: 'Delete repeated entries',
+        color: COLORS.WARNING,
+        y: centerY - 90
+      },
+      { 
+        title: '3. Handle Missing Values', 
+        icon: '🔧', 
+        description: 'Fill gaps or remove',
+        color: COLORS.WARNING,
+        y: centerY - 30
+      },
+      { 
+        title: '4. Fix Errors & Outliers', 
+        icon: '🎯', 
+        description: 'Correct inconsistencies',
+        color: COLORS.SECONDARY,
+        y: centerY + 30
+      },
+      { 
+        title: '5. Standardize Format', 
+        icon: '⚙️', 
+        description: 'Normalize & encode',
+        color: COLORS.SECONDARY,
+        y: centerY + 90
+      },
+      { 
+        title: '6. Clean Data Ready!', 
+        icon: '✅', 
+        description: 'Ready for ML',
+        color: COLORS.SUCCESS,
+        y: centerY + 150
+      }
+    ];
+
+    steps.forEach((step, index) => {
+      // Step box
+      const box = this.scene.add.rectangle(centerX, step.y, 400, 50, step.color, 0.2);
+      box.setStrokeStyle(3, step.color);
+      objects.push(box);
+
+      // Icon
+      const iconText = this.scene.add.text(centerX - 170, step.y, step.icon, {
+        fontSize: '28px'
+      });
+      iconText.setOrigin(0.5);
+      objects.push(iconText);
+
+      // Title
+      const titleText = this.scene.add.text(centerX - 120, step.y - 10, step.title, {
+        fontSize: '16px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold'
+      });
+      titleText.setOrigin(0, 0.5);
+      objects.push(titleText);
+
+      // Description
+      const descText = this.scene.add.text(centerX - 120, step.y + 10, step.description, {
+        fontSize: '13px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial'
+      });
+      descText.setOrigin(0, 0.5);
+      objects.push(descText);
+
+      // Arrow to next step (except for last step)
+      if (index < steps.length - 1) {
+        const arrow = this.scene.add.graphics();
+        arrow.lineStyle(3, 0x888888);
+        arrow.beginPath();
+        arrow.moveTo(centerX, step.y + 25);
+        arrow.lineTo(centerX, steps[index + 1].y - 25);
+        arrow.strokePath();
+        
+        // Arrowhead
+        arrow.fillStyle(0x888888);
+        const nextY = steps[index + 1].y - 25;
+        arrow.fillTriangle(centerX, nextY, centerX - 6, nextY - 10, centerX + 6, nextY - 10);
+        objects.push(arrow);
+      }
+    });
+
+    // Add side annotations showing before/after quality
+    const beforeLabel = this.scene.add.text(centerX - 250, centerY - 150, 'Dirty ', {
+      fontSize: '14px',
+      color: '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    beforeLabel.setOrigin(0.5);
+    objects.push(beforeLabel);
+
+    const afterLabel = this.scene.add.text(centerX + 250, centerY + 150, 'Clean ✨', {
+      fontSize: '14px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    afterLabel.setOrigin(0.5);
+    objects.push(afterLabel);
+
+    // Examples of issues (left side)
+    const issuesBox = this.scene.add.rectangle(centerX - 280, centerY - 20, 140, 160, 0x1a1a2e, 0.5);
+    issuesBox.setStrokeStyle(2, COLORS.ERROR, 0.5);
+    objects.push(issuesBox);
+
+    const issuesTitle = this.scene.add.text(centerX - 280, centerY - 80, 'Common Issues:', {
+      fontSize: '13px',
+      color: '#' + COLORS.ERROR.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    issuesTitle.setOrigin(0.5);
+    objects.push(issuesTitle);
+
+    const issuesList = this.scene.add.text(centerX - 280, centerY - 10, '• Duplicates\n• Missing: ???\n• Typos\n• Outliers\n• Wrong format', {
+      fontSize: '11px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'left',
+      lineSpacing: 6
+    });
+    issuesList.setOrigin(0.5);
+    objects.push(issuesList);
+
+    // Result quality indicators (right side)
+    const resultBox = this.scene.add.rectangle(centerX + 280, centerY + 20, 140, 160, 0x1a1a2e, 0.5);
+    resultBox.setStrokeStyle(2, COLORS.SUCCESS, 0.5);
+    objects.push(resultBox);
+
+    const resultTitle = this.scene.add.text(centerX + 280, centerY - 40, 'Result Quality:', {
+      fontSize: '13px',
+      color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    resultTitle.setOrigin(0.5);
+    objects.push(resultTitle);
+
+    const resultList = this.scene.add.text(centerX + 280, centerY + 30, '✓ Complete\n✓ Consistent\n✓ Accurate\n✓ Structured\n✓ ML-Ready', {
+      fontSize: '11px',
+      color: '#cccccc',
+      fontFamily: 'Arial',
+      align: 'left',
+      lineSpacing: 6
+    });
+    resultList.setOrigin(0.5);
+    objects.push(resultList);
+
+    return objects;
+  }
+
+  private renderDataQualityChecklist(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // 6 characteristics in a 2x3 grid
+    const characteristics = [
+      { 
+        icon: '✅', 
+        title: 'Accurate', 
+        desc: 'Labels correct\nFeatures reliable',
+        color: COLORS.SUCCESS,
+        x: centerX - 200,
+        y: centerY - 120
+      },
+      { 
+        icon: '📊', 
+        title: 'Representative', 
+        desc: 'Real-world diversity\nAll scenarios',
+        color: COLORS.PRIMARY,
+        x: centerX + 200,
+        y: centerY - 120
+      },
+      { 
+        icon: '🧹', 
+        title: 'Clean', 
+        desc: 'No missing values\nNo errors',
+        color: COLORS.SECONDARY,
+        x: centerX - 200,
+        y: centerY
+      },
+      { 
+        icon: '⚖️', 
+        title: 'Balanced', 
+        desc: 'Sufficient examples\nPer category',
+        color: COLORS.WARNING,
+        x: centerX + 200,
+        y: centerY
+      },
+      { 
+        icon: '🎯', 
+        title: 'Relevant', 
+        desc: 'Features relate\nto problem',
+        color: COLORS.PRIMARY,
+        x: centerX - 200,
+        y: centerY + 120
+      },
+      { 
+        icon: '📈', 
+        title: 'Sufficient', 
+        desc: '100s-1000s+\nexamples',
+        color: COLORS.SUCCESS,
+        x: centerX + 200,
+        y: centerY + 120
+      }
+    ];
+
+    characteristics.forEach(char => {
+      // Card background
+      const card = this.scene.add.rectangle(char.x, char.y, 180, 100, char.color, 0.15);
+      card.setStrokeStyle(2, char.color);
+      objects.push(card);
+
+      // Icon
+      const iconText = this.scene.add.text(char.x, char.y - 30, char.icon, {
+        fontSize: '32px'
+      });
+      iconText.setOrigin(0.5);
+      objects.push(iconText);
+
+      // Title
+      const titleText = this.scene.add.text(char.x, char.y + 5, char.title, {
+        fontSize: '16px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      titleText.setOrigin(0.5);
+      objects.push(titleText);
+
+      // Description
+      const descText = this.scene.add.text(char.x, char.y + 30, char.desc, {
+        fontSize: '12px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        align: 'center',
+        lineSpacing: 4
+      });
+      descText.setOrigin(0.5);
+      objects.push(descText);
+    });
+
+    // Central title/header
+    const headerText = this.scene.add.text(centerX, centerY - 200, 'Quality Data Checklist', {
+      fontSize: '22px',
+      color: '#' + COLORS.PRIMARY.toString(16).padStart(6, '0'),
+      fontFamily: 'Arial',
+      fontStyle: 'bold',
+      align: 'center'
+    });
+    headerText.setOrigin(0.5);
+    objects.push(headerText);
+
+    // Bottom note
+    const noteText = this.scene.add.text(centerX, centerY + 200, '💡 Data scientists spend 60-80% of time on data quality!', {
+      fontSize: '14px',
+      color: '#888888',
+      fontFamily: 'Arial',
+      fontStyle: 'italic',
+      align: 'center'
+    });
+    noteText.setOrigin(0.5);
+    objects.push(noteText);
+
+    return objects;
+  }
+
+  private renderMLTypesOverview(x: number, y: number, width: number, height: number): Phaser.GameObjects.GameObject[] {
+    const objects: Phaser.GameObjects.GameObject[] = [];
+    const centerX = x;
+    const centerY = y;
+
+    // Three main ML types arranged horizontally
+    const mainTypes = [
+      {
+        title: 'Supervised Learning',
+        icon: '📚',
+        color: COLORS.SUCCESS,
+        x: centerX - 300,
+        y: centerY - 100,
+        description: 'With labels',
+        subtypes: [
+          { name: 'Classification', icon: '🏷️', desc: 'Categorize data' },
+          { name: 'Regression', icon: '📈', desc: 'Predict numbers' }
+        ]
+      },
+      {
+        title: 'Unsupervised Learning',
+        icon: '🔍',
+        color: COLORS.PRIMARY,
+        x: centerX,
+        y: centerY - 100,
+        description: 'No labels',
+        subtypes: [
+          { name: 'Clustering', icon: '👥', desc: 'Find groups' },
+          { name: 'Association Rules', icon: '🔗', desc: 'Find patterns' }
+        ]
+      },
+      {
+        title: 'Reinforcement Learning',
+        icon: '🎮',
+        color: COLORS.WARNING,
+        x: centerX + 300,
+        y: centerY - 100,
+        description: 'Trial & reward',
+        subtypes: []
+      }
+    ];
+
+    mainTypes.forEach((mainType) => {
+      // Main type box
+      const mainBox = this.scene.add.rectangle(mainType.x, mainType.y, 200, 120, mainType.color, 0.2);
+      mainBox.setStrokeStyle(3, mainType.color);
+      objects.push(mainBox);
+
+      // Icon
+      const iconText = this.scene.add.text(mainType.x, mainType.y - 35, mainType.icon, {
+        fontSize: '40px'
+      });
+      iconText.setOrigin(0.5);
+      objects.push(iconText);
+
+      // Title
+      const titleText = this.scene.add.text(mainType.x, mainType.y + 10, mainType.title, {
+        fontSize: '16px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        align: 'center',
+        wordWrap: { width: 180 }
+      });
+      titleText.setOrigin(0.5);
+      objects.push(titleText);
+
+      // Description
+      const descText = this.scene.add.text(mainType.x, mainType.y + 35, mainType.description, {
+        fontSize: '13px',
+        color: '#aaaaaa',
+        fontFamily: 'Arial',
+        align: 'center'
+      });
+      descText.setOrigin(0.5);
+      objects.push(descText);
+
+      // Subtypes (for Supervised and Unsupervised)
+      if (mainType.subtypes.length > 0) {
+        const subtypeY = centerY + 60;
+        const subtypeSpacing = 330 / (mainType.subtypes.length + 1);
+        const startX = mainType.x - (mainType.subtypes.length - 1) * subtypeSpacing / 2;
+
+        mainType.subtypes.forEach((subtype, subIndex) => {
+          const subX = startX + subIndex * subtypeSpacing;
+
+          // Arrow from main to subtype
+          const arrow = this.scene.add.graphics();
+          arrow.lineStyle(2, mainType.color, 0.6);
+          arrow.beginPath();
+          arrow.moveTo(mainType.x, mainType.y + 60);
+          arrow.lineTo(subX, subtypeY - 20);
+          arrow.strokePath();
+          arrow.fillStyle(mainType.color, 0.6);
+          arrow.fillTriangle(subX, subtypeY - 20, subX - 5, subtypeY - 28, subX + 5, subtypeY - 28);
+          objects.push(arrow);
+
+          // Subtype box
+          const subBox = this.scene.add.rectangle(subX, subtypeY, 140, 70, mainType.color, 0.15);
+          subBox.setStrokeStyle(2, mainType.color);
+          objects.push(subBox);
+
+          // Subtype icon
+          const subIcon = this.scene.add.text(subX, subtypeY - 20, subtype.icon, {
+            fontSize: '24px'
+          });
+          subIcon.setOrigin(0.5);
+          objects.push(subIcon);
+
+          // Subtype name
+          const subName = this.scene.add.text(subX, subtypeY + 5, subtype.name, {
+            fontSize: '12px',
+            color: '#ffffff',
+            fontFamily: 'Arial',
+            fontStyle: 'bold',
+            align: 'center',
+            wordWrap: { width: 130 }
+          });
+          subName.setOrigin(0.5);
+          objects.push(subName);
+
+          // Subtype description
+          const subDesc = this.scene.add.text(subX, subtypeY + 25, subtype.desc, {
+            fontSize: '11px',
+            color: '#aaaaaa',
+            fontFamily: 'Arial',
+            align: 'center'
+          });
+          subDesc.setOrigin(0.5);
+          objects.push(subDesc);
+        });
+      } else {
+        // For Reinforcement Learning, show key concept
+        const rlDesc = this.scene.add.text(mainType.x, centerY + 60, 'Agent learns through\nrewards & penalties', {
+          fontSize: '13px',
+          color: '#aaaaaa',
+          fontFamily: 'Arial',
+          align: 'center',
+          lineSpacing: 4
+        });
+        rlDesc.setOrigin(0.5);
+        objects.push(rlDesc);
+      }
+    });
+
+    // Examples section at bottom
+    const examplesY = centerY + 180;
+    const examples = [
+      { type: 'Supervised', examples: 'Spam detection, Price prediction', color: COLORS.SUCCESS },
+      { type: 'Unsupervised', examples: 'Customer segments, Anomaly detection', color: COLORS.PRIMARY },
+      { type: 'Reinforcement', examples: 'Game AI, Robot control', color: COLORS.WARNING }
+    ];
+
+    examples.forEach((example, index) => {
+      const exX = centerX - 300 + index * 300;
+      const exBox = this.scene.add.rectangle(exX, examplesY, 250, 50, 0x1a1a2e, 0.5);
+      exBox.setStrokeStyle(2, example.color);
+      objects.push(exBox);
+
+      const exType = this.scene.add.text(exX, examplesY - 12, example.type + ':', {
+        fontSize: '13px',
+        color: '#' + example.color.toString(16).padStart(6, '0'),
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      exType.setOrigin(0.5);
+      objects.push(exType);
+
+      const exText = this.scene.add.text(exX, examplesY + 12, example.examples, {
+        fontSize: '11px',
+        color: '#cccccc',
+        fontFamily: 'Arial',
+        align: 'center',
+        wordWrap: { width: 230 }
+      });
+      exText.setOrigin(0.5);
+      objects.push(exText);
     });
 
     return objects;

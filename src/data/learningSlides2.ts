@@ -31,6 +31,7 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'icon', icon: '🤖', size: 50 }
     ]
   },
+
   {
     title: 'Where Do You Meet AI Daily?',
     elements: [
@@ -64,6 +65,17 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'diagram', diagramType: 'ai-hierarchy', width: 600, height: 400 },
       { type: 'spacer', height: 20 },
       { type: 'paragraph', text: 'These three main types form a hierarchy of complexity and capability. Let\'s explore each one in detail.', align: 'center' }
+    ]
+  },
+  {
+    title: 'Understanding the AI Family',
+    elements: [
+      { type: 'title', text: 'Understanding the AI Family' },
+      { type: 'spacer', height: 10 },
+      { type: 'paragraph', text: 'Not all AI is the same! Let\'s visualize how different types of AI relate to each other:', align: 'center' },
+      { type: 'spacer', height: 5 },
+      { type: 'diagram', diagramType: 'ai-subset', width: 600, height: 450 },
+      { type: 'spacer', height: 25 },
     ]
   },
   {
@@ -217,45 +229,6 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
     ]
   },
   {
-    title: 'Why It Matters',
-    elements: [
-      { type: 'title', text: 'Why It Matters' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Understanding AI types empowers you to:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bullet', items: [
-        '🎯 Choose the right tool for each problem',
-        '💼 Make informed decisions in tech careers',
-        '🔍 Recognize AI in everyday products',
-        '🧠 Understand how modern systems work',
-        '🚀 Build better AI solutions yourself'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'As AI becomes more integrated into society, this knowledge helps you navigate the digital world with confidence and make informed choices about technology.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '💡', size: 60 }
-    ]
-  },
-  {
-    title: 'Prepare Your Mind',
-    elements: [
-      { type: 'title', text: 'Prepare Your Mind' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Your mission in this jungle:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bullet', items: [
-        '🔍 Spot real-world AI examples',
-        '🧠 Classify them into Rule-based, ML, or DL',
-        '🎯 Understand why each uses its specific approach',
-        '💪 Train your AI recognition skills!'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Remember: There\'s no "best" AI type — only the right tool for the right job. Your goal is to develop intuition for matching problems to solutions.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🎯', size: 50 }
-    ]
-  },
-  {
     title: 'Activity Reminder',
     elements: [
       { type: 'title', text: 'Activity Reminder' },
@@ -313,18 +286,10 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
     title: 'Training vs Testing',
     elements: [
       { type: 'title', text: 'Training vs Testing' },
-      { type: 'spacer', height: 20 },
+      { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'To teach a machine properly, we must separate learning from evaluation — just like students study with practice tests, then take a final exam.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Training Data (80-90%): examples used to learn patterns' },
-      { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'The model sees these examples repeatedly, adjusting its understanding until it can predict correctly.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Testing Data (10-20%): fresh examples used to measure real performance' },
-      { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'The model has never seen these examples. This tests whether it truly learned the pattern or just memorized the training data.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '⚠️', size: 40 }
+      { type: 'spacer', height: 5 },
+      { type: 'diagram', diagramType: 'train-test-split', width: 700, height: 400 },
     ]
   },
   {
@@ -343,160 +308,61 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
         '🎯 Tests real learning — ensures the model generalizes to new data',
         '🛡️ Prevents overfitting — catches models that memorized instead of learned',
         '📊 Measures true performance — shows how well it will work in production',
-        '🔍 Identifies problems early — reveals issues before deployment'
       ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Professional Insight: Data scientists typically use 70-80% for training, 10-15% for validation (tuning), and 10-15% for testing (final evaluation).', align: 'center' }
     ]
   },
   {
-    title: 'Understanding Overfitting',
+    title: 'Underfitting vs Overfitting',
     elements: [
-      { type: 'title', text: 'Understanding Overfitting' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'What Is Overfitting? (In Simple Terms)' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Overfitting happens when a model memorizes the training examples instead of learning the underlying pattern. It\'s like a student who memorizes answers to specific questions but can\'t solve similar problems.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Signs:' },
-      { type: 'bullet', items: [
-        '✅ Model performs perfectly on training data (99% accuracy)',
-        '❌ Model performs poorly on new, unseen data (60% accuracy)',
-        '⚠️ Large gap between training and testing performance'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Real-World Example:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'A spam filter trained only on emails from 2020 might memorize specific senders and keywords from that year. When 2024 emails arrive with new patterns, it fails because it never learned the general concept of "spam."', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'How to Prevent It:' },
-      { type: 'bullet', items: [
-        '📊 Use more diverse training data',
-        '✂️ Always test on separate, unseen data',
-        '🎯 Simplify the model if it\'s too complex',
-        '🔄 Regularize — add constraints to prevent memorization'
-      ]}
+      { type: 'title', text: 'Underfitting vs Overfitting' },
+      { type: 'spacer', height: 10 },
+      { type: 'paragraph', text: 'Finding the right model complexity is like Goldilocks finding the perfect porridge — not too simple, not too complex, but just right!', align: 'center' },
+      { type: 'spacer', height: 5 },
+      { type: 'diagram', diagramType: 'fitting-comparison', width: 800, height: 350 },
+      { type: 'spacer', height: 10 },
+      { type: 'paragraph', text: '🎯 Goal: Find the sweet spot where your model generalizes well to new, unseen data.', align: 'center' }
     ]
   },
   {
     title: 'How Data Quality Influences Models',
     elements: [
       { type: 'title', text: 'How Data Quality Influences Models' },
-      { type: 'spacer', height: 20 },
+      { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'The quality of your data directly determines the quality of your model. This is one of the most important principles in machine learning.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Garbage In, Garbage Out (GIGO)' },
       { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'If you feed a model bad data, it will learn bad patterns. No amount of sophisticated algorithms can fix fundamentally flawed data.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'What Makes Good Data?' },
-      { type: 'bullet', items: [
-        '✅ Accurate — labels are correct and features are reliable',
-        '📊 Representative — reflects real-world diversity and scenarios',
-        '🧹 Clean — no missing values, errors, or inconsistencies',
-        '⚖️ Balanced — sufficient examples for each class or category',
-        '🎯 Relevant — features actually relate to the problem',
-        '📈 Sufficient — enough examples to learn patterns (typically 100s-1000s+)'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Real-World Impact:' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'A medical diagnosis model trained on biased data (e.g., only male patients) will perform poorly on female patients. A recommendation system trained on incomplete data will miss important patterns. Data quality isn\'t just technical — it\'s ethical and practical.', align: 'center' }
+      { type: 'diagram', diagramType: 'data-quality-impact', width: 700, height: 400 },
     ]
+  },
+
+  {
+    title: 'What Makes Good Data?',
+    elements: [
+      { type: 'title', text: 'What Makes Good Data?' },
+      { type: 'spacer', height: -10 },
+      { type: 'paragraph', text: 'Quality data has six essential characteristics. Check all boxes for ML success!', align: 'center' },
+      { type: 'spacer', height: -30},
+      { type: 'diagram', diagramType: 'data-quality-checklist', width: 600, height: 500 }
+    ]
+  },
+  {
+    title: 'Data Cleaning Pipeline',
+    elements: [
+      { type: 'title', text: 'Data Cleaning Pipeline' },
+      { type: 'spacer', height: 10 },
+      { type: 'paragraph', text: 'Before training any model, raw data must go through a systematic cleaning process:', align: 'center' },
+      { type: 'spacer', height: -20 },
+      { type: 'diagram', diagramType: 'data-cleaning-steps', width: 700, height: 450 },
+      { type: 'spacer', height: 15 },
+      ]
   },
   {
     title: 'Types of Machine Learning',
     elements: [
       { type: 'title', text: 'Types of Machine Learning' },
-      { type: 'spacer', height: 20 },
+      { type: 'spacer', height: 10 },
       { type: 'paragraph', text: 'Machine learning has three main paradigms, each suited for different problems. Understanding when to use each is crucial for building effective AI systems.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Supervised Learning 📚' },
-      { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'The model gets both inputs and correct outputs (labeled data). Like a student with an answer key who learns by comparing their answers to the correct ones.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'How It Works:', align: 'center' },
-      { type: 'bullet', items: [
-        'You provide examples with known correct answers',
-        'The model learns the relationship between inputs and outputs',
-        'It can then predict outputs for new, unseen inputs'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
-        title: 'Supervised Learning Applications',
-        items: [
-          '🏥 Medical diagnosis — predicting diseases from symptoms and test results',
-          '📧 Email spam detection — learning which emails are spam vs. legitimate',
-          '💰 Price prediction — estimating house prices from features',
-          '🖼️ Image classification — recognizing objects in photos',
-          '📊 Sentiment analysis — determining if text is positive or negative'
-        ]
-      }},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Use when: You have examples with known correct answers and want to predict or classify new examples.', align: 'center' }
-    ]
-  },
-  {
-    title: 'Unsupervised Learning Deep Dive',
-    elements: [
-      { type: 'title', text: 'Unsupervised Learning Deep Dive' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Unsupervised Learning 🔍' },
-      { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'No labels — the model finds patterns and groups things on its own. Like discovering hidden structures in data without a teacher.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'How It Works:', align: 'center' },
-      { type: 'bullet', items: [
-        'You provide data without labels or correct answers',
-        'The model discovers hidden patterns, clusters, or relationships',
-        'It reveals insights you might not have known existed'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
-        title: 'Unsupervised Learning Applications',
-        items: [
-          '👥 Customer segmentation — grouping customers by behavior patterns (e.g., "frequent buyers," "bargain hunters," "luxury shoppers")',
-          '🔍 Anomaly detection — finding unusual patterns (fraud, system failures)',
-          '📚 Topic modeling — discovering themes in large text collections',
-          '🛒 Market basket analysis — finding products frequently bought together',
-          '🧬 Gene clustering — grouping similar genes in biology research'
-        ]
-      }},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Use when: You want to discover unknown patterns, group similar items, or explore data without predefined categories.', align: 'center' }
-    ]
-  },
-  {
-    title: 'Reinforcement Learning',
-    elements: [
-      { type: 'title', text: 'Reinforcement Learning' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Reinforcement Learning 🎮' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'The model learns by trial, error, and rewards. Like training a pet with treats for good behavior — it tries different actions, receives feedback, and learns which actions lead to rewards.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'How It Works:', align: 'center' },
-      { type: 'bullet', items: [
-        'Agent takes actions in an environment',
-        'Receives rewards (positive) or penalties (negative)',
-        'Learns to maximize rewards over time',
-        'Develops strategies through repeated interactions'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'tooltip', triggerText: 'Real-World Applications (hover to see)', align: 'center', tooltipContent: {
-        title: 'Reinforcement Learning Applications',
-        items: [
-          '🤖 Robot learning — robots learn to walk, grasp objects, or navigate by trying actions and receiving feedback',
-          '🎮 Game-playing AI — AlphaGo, chess engines learn optimal strategies through millions of games',
-          '🚗 Autonomous vehicles — learn to drive safely by experiencing different traffic scenarios',
-          '📊 Recommendation systems — learn to suggest content that keeps users engaged',
-          '🏭 Industrial control — optimizing energy usage, manufacturing processes'
-        ]
-      }},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'Use when: The model can interact with an environment, receive feedback, and learn through exploration. Perfect for sequential decision-making problems.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🎮', size: 50 }
+      { type: 'spacer', height: -70 },
+      { type: 'diagram', diagramType: 'ml-types-overview', width: 900, height: 550 },
     ]
   },
   {
@@ -508,56 +374,8 @@ export const LEVEL_2_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'spacer', height: 20 },
       { type: 'diagram', diagramType: 'workflow', width: 800, height: 150 },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'The Cycle:', align: 'center' },
-      { type: 'bullet', items: [
-        '📥 Collect Data — gather examples relevant to your problem',
-        '✂️ Split Data — separate into training and testing sets',
-        '🎓 Train Model — let the algorithm learn patterns',
-        '📊 Evaluate Model — measure performance on test data',
-        '🔄 Improve and Repeat — refine data, adjust model, iterate'
-      ]}
-    ]
-  },
-  {
-    title: 'The ML Workflow: Iterative Process',
-    elements: [
-      { type: 'title', text: 'The ML Workflow: Iterative Process' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Insight: This cycle is iterative. Rarely does the first model work perfectly. Data scientists often go through this cycle dozens of times, improving each iteration.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Intuitive Ways to Think About ML Tasks:' },
-      { type: 'spacer', height: 15 },
-      { type: 'bullet', items: [
-        '🔍 Classification — "Is this a cat or dog?" (choosing categories)',
-        '📊 Regression — "What will the price be?" (predicting numbers)',
-        '👥 Clustering — "Which customers are similar?" (finding groups)',
-        '🎯 Recommendation — "What would this user like?" (suggesting items)',
-        '🔮 Forecasting — "What will happen next?" (predicting sequences)'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'This workflow powers almost every ML system today, from recommendation engines to medical diagnosis tools. Each step builds on the previous, creating a systematic approach to building intelligent systems.', align: 'center' },
-      { type: 'spacer', height: 30 },
-      { type: 'icon', icon: '🔄', size: 50 }
-    ]
-  },
-  {
-    title: 'Why It Matters',
-    elements: [
-      { type: 'title', text: 'Why It Matters' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Understanding these fundamentals empowers you to:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bullet', items: [
-        '🎯 Choose the right ML approach for your problem',
-        '📊 Evaluate whether a model is trustworthy',
-        '🔍 Understand why models succeed or fail',
-        '💼 Communicate effectively with data scientists',
-        '🚀 Build your own ML projects with confidence'
-      ]},
-      { type: 'spacer', height: 20 },
       { type: 'paragraph', text: 'ML lets machines improve by themselves instead of following fixed rules. This makes them flexible, adaptable, and smarter over time — but only when built correctly with quality data and proper evaluation.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🌟', size: 60 }
+  
     ]
   },
   {
@@ -1101,7 +919,7 @@ export const LEVEL_5_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'paragraph', text: 'What You Can Build:', align: 'center' },
       { type: 'spacer', height: 20 },
       { type: 'bullet', items: [
-        '🎮 Game controllers using hand gestures',
+        ' Game controllers using hand gestures',
         '🎵 Music instruments triggered by body poses',
         '🏠 Smart home devices activated by voice',
         '🎨 Interactive art installations',

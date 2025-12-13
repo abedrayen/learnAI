@@ -57,7 +57,7 @@ export interface IconElement extends BaseSlideElement {
 
 export interface DiagramElement extends BaseSlideElement {
   type: 'diagram';
-  diagramType: 'ai-hierarchy' | 'dataset' | 'workflow' | 'neuron' | 'neural-network' | 'pipeline' | 'teachable-flow';
+  diagramType: 'ai-hierarchy' | 'ai-subset' | 'dataset' | 'workflow' | 'neuron' | 'neural-network' | 'pipeline' | 'teachable-flow' | 'train-test-split' | 'fitting-comparison' | 'data-quality-impact' | 'data-cleaning-steps' | 'data-quality-checklist' | 'ml-types-overview';
   x?: number;
   y?: number;
   width?: number;
