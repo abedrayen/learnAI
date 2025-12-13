@@ -11,6 +11,7 @@ export type SlideElementType =
   | 'icon'
   | 'diagram'
   | 'graph'
+  | 'image'
   | 'spacer'
   | 'tooltip'
   | 'table';
@@ -74,6 +75,16 @@ export interface GraphElement extends BaseSlideElement {
   data?: any; // Graph-specific data
 }
 
+export interface ImageElement extends BaseSlideElement {
+  type: 'image';
+  src: string; // Path to image file
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  scale?: number;
+}
+
 export interface SpacerElement extends BaseSlideElement {
   type: 'spacer';
   height: number;
@@ -106,6 +117,7 @@ export type SlideElement =
   | IconElement
   | DiagramElement
   | GraphElement
+  | ImageElement
   | SpacerElement
   | TooltipElement
   | TableElement;

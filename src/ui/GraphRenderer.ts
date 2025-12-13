@@ -123,11 +123,19 @@ export class GraphRenderer {
       { x: 4, y: 0.8 }, { x: 5, y: 0.82 }, { x: 6, y: 0.85 }
     ];
 
-    const padding = 40;
+    const padding = 60;
     const graphX = x - width / 2 + padding;
     const graphY = y + height / 2 - padding;
     const graphWidth = width - 2 * padding;
     const graphHeight = height - 2 * padding;
+
+    // Find min/max for proper scaling
+    const xValues = dataPoints.map(p => p.x);
+    const yValues = dataPoints.map(p => p.y);
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    const minY = Math.min(0, ...yValues); // Start from 0 or lower
+    const maxY = Math.max(...yValues);
 
     // Axes
     const axes = this.scene.add.graphics();
@@ -146,8 +154,8 @@ export class GraphRenderer {
     line.beginPath();
     
     dataPoints.forEach((point, i) => {
-      const plotX = graphX + (point.x / dataPoints[dataPoints.length - 1].x) * graphWidth;
-      const plotY = graphY - point.y * graphHeight;
+      const plotX = graphX + ((point.x - minX) / (maxX - minX)) * graphWidth;
+      const plotY = graphY - ((point.y - minY) / (maxY - minY)) * graphHeight;
       
       if (i === 0) {
         line.moveTo(plotX, plotY);
@@ -158,13 +166,34 @@ export class GraphRenderer {
     line.strokePath();
     objects.push(line);
 
-    // Draw points
-    dataPoints.forEach(point => {
-      const plotX = graphX + (point.x / dataPoints[dataPoints.length - 1].x) * graphWidth;
-      const plotY = graphY - point.y * graphHeight;
-      const pointCircle = this.scene.add.circle(plotX, plotY, 4, COLORS.PRIMARY);
-      objects.push(pointCircle);
+    // Draw points if requested
+    if (data?.showPoints) {
+      dataPoints.forEach(point => {
+        const plotX = graphX + ((point.x - minX) / (maxX - minX)) * graphWidth;
+        const plotY = graphY - ((point.y - minY) / (maxY - minY)) * graphHeight;
+        const pointCircle = this.scene.add.circle(plotX, plotY, 5, COLORS.SUCCESS);
+        pointCircle.setStrokeStyle(2, COLORS.SUCCESS);
+        objects.push(pointCircle);
+      });
+    }
+
+    // Labels
+    const xLabel = this.scene.add.text(graphX + graphWidth / 2, graphY + 30, data?.xLabel || 'X', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial'
     });
+    xLabel.setOrigin(0.5);
+    objects.push(xLabel);
+
+    const yLabel = this.scene.add.text(graphX - 35, graphY - graphHeight / 2, data?.yLabel || 'Y', {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      angle: -90
+    });
+    yLabel.setOrigin(0.5);
+    objects.push(yLabel);
 
     return objects;
   }

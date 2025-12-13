@@ -602,18 +602,29 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
     elements: [
       { type: 'title', text: 'Models Learn Patterns' },
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Key Insight: A model doesn\'t memorize values — it learns the underlying pattern or relationship behind them.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Visual Metaphor: Imagine teaching someone to recognize the pattern "double the number." After seeing examples (2→4, 3→6, 5→10), they learn the rule, not just the specific pairs. They can then predict 7→14 without ever seeing that example.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Example Pattern:', align: 'center' },
-      { type: 'paragraph', text: 'If the relationship is "double the number",', align: 'center' },
-      { type: 'paragraph', text: 'the model learns the mathematical formula:', align: 'center' },
+      { type: 'paragraph', text: '💡 A model learns the underlying pattern, not memorized values', align: 'center' },
+      { type: 'spacer', height: 30 },
+      { 
+        type: 'graph', 
+        graphType: 'line',
+        width: 500,
+        height: 300,
+        data: {
+          points: [
+            { x: 1, y: 2 },
+            { x: 2, y: 4 },
+            { x: 3, y: 6 },
+            { x: 4, y: 8 },
+            { x: 5, y: 10 }
+          ],
+          xLabel: 'Input (x)',
+          yLabel: 'Output (y)',
+          showPoints: true
+        }
+      },
       { type: 'spacer', height: 10 },
-      { type: 'bold', text: 'y = 2 × x', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: 'This formula captures the pattern, allowing predictions for any input value, not just the training examples.', align: 'center' },
-      { type: 'spacer', height: 20 },
+      { type: 'bold', text: 'Pattern: y = 2 × x + 1', align: 'center' },
+
     ]
   },
   {
@@ -647,34 +658,6 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
     ]
   },
   {
-    title: 'Why Linear Models Matter',
-    elements: [
-      { type: 'title', text: 'Why Linear Models Matter' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Linear regression is the foundation of machine learning for good reasons:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Strengths 💪' },
-      { type: 'bullet', items: [
-        '✅ Simple and interpretable — you can understand exactly what it learned',
-        '⚡ Fast — trains in milliseconds, even with large datasets',
-        '🎯 Reliable — works well when relationships are roughly linear',
-        '📊 Transparent — coefficients tell you how each feature affects predictions',
-        '🔧 Versatile — foundation for more complex models',
-        '📈 Excellent baseline — always start here before trying complex models'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Limitations ⚠️' },
-      { type: 'bullet', items: [
-        '📉 Assumes linear relationships — fails when patterns are curved or complex',
-        '🔗 Can\'t capture interactions — doesn\'t model how features combine',
-        '📊 Sensitive to outliers — extreme values can skew the line',
-        '🎯 Limited complexity — can\'t learn non-linear patterns'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'paragraph', text: '💡 Professional Insight: Most data scientists start with linear regression as a baseline. If it works well, great! If not, they move to more complex models. Simple models often outperform complex ones when data is limited.', align: 'center' }
-    ]
-  },
-  {
     title: 'Fitting a Model: The Learning Process',
     elements: [
       { type: 'title', text: 'Fitting a Model: The Learning Process' },
@@ -690,50 +673,20 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
         '5️⃣ The final line is your trained model'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Visual Metaphor: Like adjusting a telescope lens — you twist it slightly, check if the image is clearer, and keep adjusting until it\'s perfectly focused. The algorithm does this mathematically, finding the "focus" that makes predictions most accurate.', align: 'center' },
-      { type: 'spacer', height: 15 },
+
       { type: 'paragraph', text: '💡 This process is called "optimization" — finding the best possible values for slope and intercept that minimize prediction errors.', align: 'center' }
     ]
-  },
-  {
-    title: 'Interpreting Coefficients',
-    elements: [
-      { type: 'title', text: 'Interpreting Coefficients' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'One of linear regression\'s greatest strengths is interpretability — you can understand exactly what the model learned.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'The Formula: y = slope × x + intercept' },
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Slope (Rate of Change):' },
-      { type: 'paragraph', text: 'Tells you how much y changes when x increases by 1 unit.', align: 'center' },
-      { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'Example: If slope = 50 for house prices (price = 50 × square_feet + 10000), then each additional square foot adds $50 to the price.', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Intercept (Starting Point):' },
-      { type: 'paragraph', text: 'The predicted value when x = 0 (the baseline).', align: 'center' },
-      { type: 'spacer', height: 10 },
-      { type: 'paragraph', text: 'Example: If intercept = 10000, a house with 0 square feet (theoretical) would cost $10,000 — this represents the base value before size is considered.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Real-World Interpretation:' },
-      { type: 'paragraph', text: 'In medical diagnosis: "For each year of age, risk increases by 2% (slope), with a baseline risk of 5% (intercept)." This makes the model\'s reasoning transparent and trustworthy.', align: 'center' }
-    ]
-  },
+  },  
   {
     title: 'Data → Model → Prediction',
     elements: [
       { type: 'title', text: 'Data → Model → Prediction' },
       { type: 'spacer', height: 20 },
-      { type: 'graph', graphType: 'scatter', width: 500, height: 350 },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'The Complete Pipeline:', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bullet', items: [
-        '📥 Give the model data (X, y) — input features and target values',
-        '🎓 Let it find the pattern — algorithm adjusts line to fit data',
-        '✅ Validate the model — test on unseen data to check accuracy',
-        '🔮 Ask it to predict — input new X, get predicted y',
-        '📊 Evaluate performance — compare predictions to reality'
-      ]}
+      { type: 'paragraph', text: 'The Complete ML Pipeline', align: 'center' },
+      { type: 'spacer', height: 30 },
+      { type: 'diagram', diagramType: 'pipeline', width: 700, height: 120 },
+      { type: 'spacer', height: 25 },
+      { type: 'paragraph', text: '📊 Each stage transforms data closer to actionable predictions', align: 'center' }
     ]
   },
   {
@@ -756,32 +709,7 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'paragraph', text: '💡 Why Squared Errors? Squaring makes large errors much more costly, so the model prioritizes avoiding big mistakes over small ones. This creates a more robust line.', align: 'center' }
     ]
   },
-  {
-    title: 'Prediction Reliability',
-    elements: [
-      { type: 'title', text: 'Prediction Reliability' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Not all predictions are equally reliable. Understanding when to trust your model is crucial.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'When Predictions Are Reliable:' },
-      { type: 'bullet', items: [
-        '✅ New data is similar to training data',
-        '✅ The relationship is actually linear',
-        '✅ You have enough training examples',
-        '✅ Data quality is good (no errors, outliers handled)'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'When to Be Cautious:' },
-      { type: 'bullet', items: [
-        '⚠️ Predicting far outside the training range (extrapolation)',
-        '⚠️ Data has changed significantly since training',
-        '⚠️ Relationship is clearly non-linear (curved patterns)',
-        '⚠️ High error on test data indicates poor fit'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Example: A model trained on house prices from 2020 might predict poorly for 2024 if the market changed dramatically. Always validate predictions with domain knowledge.', align: 'center' }
-    ]
-  },
+
   {
     title: 'Making Good Predictions',
     elements: [
@@ -794,34 +722,6 @@ export const LEVEL_3_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'paragraph', text: 'This pipeline — from data to prediction — is the foundation of all supervised machine learning. Linear regression teaches you the core principles that apply to all ML models.', align: 'center' },
       { type: 'spacer', height: 20 },
       { type: 'icon', icon: '🔮', size: 50 }
-    ]
-  },
-  {
-    title: 'Human vs Machine',
-    elements: [
-      { type: 'title', text: 'Human vs Machine' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'When it comes to pattern recognition, both humans and machines have strengths:', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'bold', text: 'Human Advantages 🧠' },
-      { type: 'bullet', items: [
-        'Intuition for complex, non-linear patterns',
-        'Context understanding and common sense',
-        'Ability to spot outliers and anomalies',
-        'Creative problem-solving'
-      ]},
-      { type: 'spacer', height: 15 },
-      { type: 'bold', text: 'Machine Advantages 🤖' },
-      { type: 'bullet', items: [
-        'Processes massive datasets (millions of points)',
-        'Consistent, unbiased pattern detection',
-        'Finds subtle correlations humans miss',
-        'Works 24/7 without fatigue'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: '💡 Insight: The best approach often combines both — humans define problems and interpret results, machines find patterns in large-scale data.', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🤖', size: 50 }
     ]
   },
   {
@@ -1398,28 +1298,6 @@ export const LEVEL_5_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'spacer', height: 20 },
       { type: 'icon', icon: '🌐', size: 50 }
     ]
-  },
-  {
-    title: 'Activity Reminder',
-    elements: [
-      { type: 'title', text: 'Activity Reminder' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Time to practice training your own model!', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'Inside the game:', align: 'center' },
-      { type: 'spacer', height: 15 },
-      { type: 'bullet', items: [
-        '🏛️ Choose your shrine — select a classification task',
-        '📦 Collect example icons — gather training data',
-        '🎓 Train your simulated model — watch it learn patterns',
-        '🧪 Test its predictions — see how well it performs',
-        '📊 Evaluate accuracy — understand model performance'
-      ]},
-      { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'This simulation mirrors the real Teachable Machine experience, preparing you to build actual models!', align: 'center' },
-      { type: 'spacer', height: 20 },
-      { type: 'icon', icon: '🎯', size: 50 }
-    ]
   }
 ];
 
@@ -1753,13 +1631,12 @@ export const LEVEL_6_SLIDES_ENHANCED: EnhancedSlide[] = [
         '🔄 Complete Pipeline — from data to deployment, monitoring, iteration'
       ]},
       { type: 'spacer', height: 20 },
-      { type: 'paragraph', text: 'You will receive:', align: 'center' },
+      { type: 'paragraph', text: 'Next steps for your AI journey:', align: 'center' },
       { type: 'bullet', items: [
-        '🎓 Your AI Explorer Certificate — proof of your achievement',
-        '📚 Complete list of Colab links — hands-on coding exercises',
-        '🔗 Link to Teachable Machine — build your own models',
-        '💪 Resources and encouragement — continue your AI journey',
-        '🚀 Project ideas — start building real applications'
+        '📚 Practice with Colab notebooks — hands-on coding exercises',
+        '🔗 Build with Teachable Machine — create your own models',
+        '💪 Continue learning — explore advanced AI topics',
+        '🚀 Start real projects — apply what you\'ve learned'
       ]}
     ]
   },

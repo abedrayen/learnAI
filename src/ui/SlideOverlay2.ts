@@ -358,6 +358,22 @@ export class SlideOverlay2 {
         objects.push(...diagramObjects);
         break;
 
+      case 'image':
+        const imageEl = element as any;
+        const imageX = (imageEl.x !== undefined ? x + imageEl.x : x + width / 2);
+        const imageY = (imageEl.y !== undefined ? y + imageEl.y : y);
+        const image = this.scene.add.image(imageX, imageY, imageEl.src);
+        image.setOrigin(0.5, 0);
+        if (imageEl.scale) {
+          image.setScale(imageEl.scale);
+        } else if (imageEl.width || imageEl.height) {
+          const imgWidth = imageEl.width || image.width;
+          const imgHeight = imageEl.height || image.height;
+          image.setDisplaySize(imgWidth, imgHeight);
+        }
+        objects.push(image);
+        break;
+
       case 'graph':
         const graphEl = element as any;
         let graphWidth = graphEl.width || 500;

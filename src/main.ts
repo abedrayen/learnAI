@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GameConfig } from './GameConfig';
 import BootScene from './scenes/BootScene';
+import BuzzwordsIntroScene from './scenes/BuzzwordsIntroScene';
 import MenuScene from './scenes/MenuScene';
 import Level1_AI_Jungle from './scenes/Level1_AI_Jungle';
 import Level2_ML_Basics from './scenes/Level2_ML_Basics';
@@ -14,6 +15,7 @@ const config: Phaser.Types.Core.GameConfig = {
   ...GameConfig,
   scene: [
     BootScene,
+    BuzzwordsIntroScene,
     MenuScene,
     Level1_AI_Jungle,
     Level2_ML_Basics,

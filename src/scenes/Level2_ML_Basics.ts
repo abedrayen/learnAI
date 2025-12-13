@@ -59,6 +59,11 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     super({ key: 'Level2_ML_Basics' });
   }
 
+  preload(): void {
+    // Load images for slides
+    this.load.image('simple-regression-model', 'src/images/simple-regression-model.png');
+  }
+
   create(): void {
     this.dialogBox = new DialogBox(this);
     this.labLinkOverlay = new LabLinkOverlay(this);
