@@ -61,7 +61,7 @@ Or set up automatic deployment with GitHub Actions (see `.github/workflows/deplo
 - Rule-based AI vs Machine Learning vs Deep Learning
 
 **Activities:**
-- Collect AI example icons (search, recommendations, face recognition, chatbot, self-driving)
+- Collect AI example icons (search, recommendations, face recognition, chatbot, self-driving, tax systems)
 - Categorize examples into Rule-based, ML, or DL platforms
 
 **Colab Link:** `https://colab.research.google.com/ai_intro_examples`
@@ -174,10 +174,13 @@ learnAI/
 │   │   ├── DialogBox.ts
 │   │   ├── QuizOverlay.ts
 │   │   ├── LabLinkOverlay.ts
-│   │   └── RecapScreen.ts
+│   │   ├── RecapScreen.ts
+│   │   └── AchievementOverlay.ts  # Achievements display
 │   └── systems/                # Game systems
 │       ├── ProgressManager.ts   # Progress tracking (localStorage)
-│       └── InputManager.ts     # Input handling
+│       ├── InputManager.ts     # Input handling
+│       ├── SoundManager.ts     # Sound effects management
+│       └── AchievementManager.ts  # Achievements/badges system
 ├── index.html
 ├── package.json
 ├── tsconfig.json
@@ -222,13 +225,44 @@ All UI components are in `src/ui/`. They use Phaser's graphics API and can be st
 
 Progress is saved in `localStorage` using the key `ai_explorer_progress`. To reset progress, call `ProgressManager.resetProgress()` or clear browser localStorage.
 
+## 🎵 Sound Effects
+
+The game includes procedural sound effects generated using the Web Audio API:
+- **Success sounds**: Play when completing activities correctly
+- **Error sounds**: Play when making mistakes
+- **Click sounds**: Play on button interactions
+- **Level complete**: Fanfare when finishing a level
+- **Achievement unlock**: Special sound when earning achievements
+- **Collect sounds**: Play when collecting items
+
+Sound can be toggled via the `SoundManager` class.
+
+## 🏆 Achievements System
+
+The game features a comprehensive achievements/badges system with 10 achievements:
+
+### Level Completion Achievements
+- 🌴 **Jungle Explorer**: Complete Level 1
+- 🤖 **Machine Whisperer**: Complete Level 2
+- 📊 **Model Creator**: Complete Level 3
+- 🧠 **Neural Architect**: Complete Level 4
+- 🎓 **Teachable Master**: Complete Level 5
+- 🏆 **AI Explorer Champion**: Complete Level 6
+
+### Special Achievements
+- ⭐ **Ecosystem Master**: Place all AI examples correctly on first try
+- 🧩 **Brain Expert**: Answer all AI Guess-the-Brain questions correctly
+- ⚡ **Speed Learner**: Complete a level in under 5 minutes
+- 👑 **AI Master**: Complete all 6 levels
+
+Achievements are saved in localStorage and can be viewed from the main menu. Unlocking an achievement plays a special sound effect and shows a notification.
+
 ## 📝 TODO / Future Enhancements
 
 - [ ] Complete implementation of activities in Levels 2-6
-- [ ] Add sound effects and background music
+- [ ] Add background music
 - [ ] Create actual Colab notebooks and update URLs
 - [ ] Add more interactive puzzles and activities
-- [ ] Implement achievements/badges system
 - [ ] Add sprite graphics instead of colored rectangles
 - [ ] Add particle effects and animations
 - [ ] Implement save/load functionality for mid-level progress

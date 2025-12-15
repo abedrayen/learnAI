@@ -1,13 +1,20 @@
 import Phaser from 'phaser';
 import { COLORS, LEVELS } from '../GameConfig';
 import { ProgressManager } from '../systems/ProgressManager';
+import { AchievementOverlay } from '../ui/AchievementOverlay';
+import { AchievementManager } from '../systems/AchievementManager';
+import { soundManager } from '../systems/SoundManager';
 
 export default class MenuScene extends Phaser.Scene {
+  private achievementOverlay?: AchievementOverlay;
+
   constructor() {
     super({ key: 'MenuScene' });
   }
 
   create(): void {
+    this.achievementOverlay = new AchievementOverlay(this);
+    
     // Background
     this.add.rectangle(640, 360, 1280, 720, COLORS.BG_DARK);
 
@@ -32,6 +39,7 @@ export default class MenuScene extends Phaser.Scene {
     startBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 80), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     startBtn.setDepth(10); // Ensure button is on top
     startBtn.on('pointerdown', () => {
+      soundManager.playClick();
       console.log('Start Game clicked');
       try {
         this.scene.start('Level1_AI_Jungle');
@@ -52,6 +60,7 @@ export default class MenuScene extends Phaser.Scene {
     const levelSelectBtn = this.add.rectangle(640, 400, 300, 80, COLORS.SECONDARY);
     levelSelectBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 80), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     levelSelectBtn.on('pointerdown', () => {
+      soundManager.playClick();
       this.showLevelSelect();
     });
     const levelSelectText = this.add.text(640, 400, 'Level Select', {
@@ -61,6 +70,21 @@ export default class MenuScene extends Phaser.Scene {
       fontStyle: 'bold'
     });
     levelSelectText.setOrigin(0.5);
+
+    // Achievements button
+    const achievementsBtn = this.add.rectangle(640, 500, 300, 80, COLORS.WARNING);
+    achievementsBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 80), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
+    achievementsBtn.on('pointerdown', () => {
+      soundManager.playClick();
+      this.achievementOverlay!.showAll();
+    });
+    const achievementsText = this.add.text(640, 500, `Achievements (${AchievementManager.getUnlockedCount()}/${AchievementManager.getTotalCount()})`, {
+      fontSize: '28px',
+      color: '#ffffff',
+      fontFamily: 'Arial',
+      fontStyle: 'bold'
+    });
+    achievementsText.setOrigin(0.5);
 
     // Footer credit
     const creditText = this.add.text(640, 680, 'Created by Abed Rayen', {
@@ -119,6 +143,7 @@ export default class MenuScene extends Phaser.Scene {
       if (isUnlocked) {
         btn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 600, 60), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
         btn.on('pointerdown', () => {
+          soundManager.playClick();
           this.scene.start(level.key);
         });
       }
@@ -128,6 +153,7 @@ export default class MenuScene extends Phaser.Scene {
     const backBtn = this.add.rectangle(640, 650, 200, 50, COLORS.BG_MEDIUM);
     backBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 200, 50), Phaser.Geom.Rectangle.Contains, { useHandCursor: true });
     backBtn.on('pointerdown', () => {
+      soundManager.playClick();
       this.scene.restart();
     });
     const backText = this.add.text(640, 650, 'Back to Menu', {

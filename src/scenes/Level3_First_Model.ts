@@ -41,7 +41,6 @@ export default class Level3_First_Model extends Phaser.Scene {
   private plotBounds: { x: number; y: number; width: number; height: number } = { x: 0, y: 0, width: 0, height: 0 };
   private errorText?: Phaser.GameObjects.Text;
   private r2Text?: Phaser.GameObjects.Text;
-  private showMachineFit: boolean = false;
   private progressText?: Phaser.GameObjects.Text;
   private hintText?: Phaser.GameObjects.Text;
   private attempts: number = 0;
@@ -112,7 +111,6 @@ export default class Level3_First_Model extends Phaser.Scene {
 
   // ========== ACTIVITY 1: INTERACTIVE REGRESSION PLOT ==========
   private startRegressionActivity(): void {
-    this.showMachineFit = false;
     this.attempts = 0;
     this.bestError = Infinity;
     
@@ -269,25 +267,6 @@ export default class Level3_First_Model extends Phaser.Scene {
     });
     this.r2Text.setOrigin(0, 0);
     this.regressionContainer.add(this.r2Text);
-    
-    // Toggle button for machine fit
-    const toggleBtn = this.add.rectangle(plotX + plotWidth / 2 - 100, plotY + plotHeight / 2 - 30, 200, 40, COLORS.SECONDARY);
-    toggleBtn.setInteractive({ useHandCursor: true });
-    const toggleText = this.add.text(plotX + plotWidth / 2 - 100, plotY + plotHeight / 2 - 30, 'Show Machine Fit', {
-      fontSize: '16px',
-      color: '#ffffff',
-      fontFamily: 'Arial',
-      fontStyle: 'bold'
-    });
-    toggleText.setOrigin(0.5);
-    toggleBtn.on('pointerdown', () => {
-      this.showMachineFit = !this.showMachineFit;
-      if (this.machineLine) {
-        this.machineLine.setVisible(this.showMachineFit);
-      }
-      toggleText.setText(this.showMachineFit ? 'Hide Machine Fit' : 'Show Machine Fit');
-    });
-    this.regressionContainer.add([toggleBtn, toggleText]);
     
     // Mouse interaction
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {

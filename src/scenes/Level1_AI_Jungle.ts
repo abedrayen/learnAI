@@ -6,6 +6,9 @@ import { LabLinkOverlay, LabLinkInfo } from '../ui/LabLinkOverlay';
 import { RecapScreen, RecapData } from '../ui/RecapScreen';
 import { SlideOverlay2 } from '../ui/SlideOverlay2';
 import { LEVEL_1_SLIDES_ENHANCED } from '../data/learningSlides2';
+import { soundManager } from '../systems/SoundManager';
+import { AchievementManager } from '../systems/AchievementManager';
+import { AchievementOverlay } from '../ui/AchievementOverlay';
 
 interface DraggableIcon {
   sprite: Phaser.GameObjects.Container;
@@ -42,6 +45,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
   private labLinkOverlay?: LabLinkOverlay;
   private recapScreen?: RecapScreen;
   private slideOverlay?: SlideOverlay2;
+  private achievementOverlay?: AchievementOverlay;
   
   // Activity 1: AI Ecosystem Drag & Drop
   private ecosystemContainer?: Phaser.GameObjects.Container;
@@ -68,6 +72,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.labLinkOverlay = new LabLinkOverlay(this);
     this.recapScreen = new RecapScreen(this);
     this.slideOverlay = new SlideOverlay2(this);
+    this.achievementOverlay = new AchievementOverlay(this);
 
     // Background
     this.add.rectangle(640, 360, 1280, 720, 0x0a1929);
@@ -98,6 +103,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.exitButton = this.add.rectangle(1200, 650, 120, 60, COLORS.SUCCESS);
     this.exitButton.setInteractive({ useHandCursor: true });
     this.exitButton.on('pointerdown', () => {
+      soundManager.playClick();
       if (this.activityCompleted.ecosystem && this.activityCompleted.brainGame) {
         this.completeLevel();
       } else {
@@ -105,6 +111,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
           'Complete both activities first!',
           () => {}
         );
+        soundManager.playError();
       }
     });
 
@@ -176,14 +183,17 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     });
     closeText.setOrigin(0.5);
     closeBtn.on('pointerdown', () => {
+      soundManager.playClick();
       if (this.placedCount >= this.draggableIcons.length) {
         this.activityCompleted.ecosystem = true;
         this.ecosystemContainer!.destroy();
+        soundManager.playSuccess();
         this.dialogBox!.show('Great! Now try the AI Guess-the-Brain game!', () => {
           this.startBrainGame();
         });
       } else {
         this.dialogBox!.show('Place all icons first!', () => {});
+        soundManager.playError();
       }
     });
     this.ecosystemContainer.add([closeBtn, closeText]);
@@ -243,7 +253,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
       { name: 'Google Lens', icon: '🔍', correctZone: 'dl' },
       { name: 'Spam Filter', icon: '📧', correctZone: 'ml' },
       { name: 'Anti-cheat Bot', icon: '🛡️', correctZone: 'ml' },
-      { name: 'Calculator', icon: '🔢', correctZone: 'rule-based' }
+      { name: 'Tax System', icon: '💰', correctZone: 'rule-based' }
     ];
     
     // Arrange icons horizontally in a single row, centered above the zones
@@ -377,6 +387,9 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
                 container.setAlpha(0.8);
                 this.placedCount++;
                 
+                // Play success sound
+                soundManager.playSuccess();
+                
                 // Particle effect
                 this.createParticleBurst(zoneX, zoneY, zone.color);
                 
@@ -404,6 +417,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
                 }
               } else {
                 // Incorrect - shake and hint
+                soundManager.playError();
                 this.tweens.add({
                   targets: container,
                   x: container.x - 10,
@@ -587,6 +601,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
       
       // Click handler
       box.on('pointerdown', () => {
+        soundManager.playClick();
         this.selectBrain(choiceData.type, choiceData.reaction);
       });
       
@@ -627,6 +642,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
     this.brainGameContainer!.add(reactionText);
     
     if (isCorrect) {
+      soundManager.playSuccess();
       const correctText = this.add.text(0, 320, '✓ Correct!', {
         fontSize: '28px',
         color: '#' + COLORS.SUCCESS.toString(16).padStart(6, '0'),
@@ -641,6 +657,7 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
         this.showNextScenario();
       });
     } else {
+      soundManager.playError();
       const tryAgain = this.add.text(0, 320, 'Try again!', {
         fontSize: '24px',
         color: '#' + COLORS.WARNING.toString(16).padStart(6, '0'),
@@ -657,6 +674,11 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
   }
 
   private completeLevel(): void {
+    soundManager.playLevelComplete();
+    
+    // Check for achievements
+    const newAchievement = AchievementManager.checkLevelComplete('Level1_AI_Jungle');
+    
     const recapData: RecapData = {
       levelName: 'AI Jungle',
       concepts: [
@@ -666,13 +688,23 @@ export default class Level1_AI_Jungle extends Phaser.Scene {
       ]
     };
 
-    this.recapScreen!.show(recapData, () => {
-      ProgressManager.completeLevel('Level1_AI_Jungle');
-      this.scene.start('MenuScene');
-    }, undefined, (levelKey: string) => {
-      ProgressManager.completeLevel('Level1_AI_Jungle');
-      this.scene.start(levelKey);
-    });
+    const showRecap = () => {
+      this.recapScreen!.show(recapData, () => {
+        ProgressManager.completeLevel('Level1_AI_Jungle');
+        this.scene.start('MenuScene');
+      }, undefined, (levelKey: string) => {
+        ProgressManager.completeLevel('Level1_AI_Jungle');
+        this.scene.start(levelKey);
+      });
+    };
+
+    if (newAchievement) {
+      this.achievementOverlay!.showUnlock(newAchievement, () => {
+        showRecap();
+      });
+    } else {
+      showRecap();
+    }
   }
 
 }

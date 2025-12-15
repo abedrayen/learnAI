@@ -75,16 +75,10 @@ export default class Level4_Neural_Temple extends Phaser.Scene {
     this.slideOverlay.show(LEVEL_4_SLIDES_ENHANCED, () => {
       this.time.delayedCall(500, () => {
         this.dialogBox!.show(
-          '🏛️ Welcome to the Neural Temple! 🏛️\n\n' +
-          'Time for some REAL neural network action!\n\n' +
-          '🎯 Activity 1: Pattern Recognition Challenge\n' +
-          'Train a network to solve the XOR problem! Watch it learn in real-time! 🧠\n\n' +
-          '⚡ Activity 2: Activation Function Arena\n' +
-          'Battle test different activation functions! See which one rules! 👑',
-          () => {
-            this.startPatternRecognition();
-          }
+          ' Welcome to the Neural Temple! 🏛️\n\n' +
+          'Time for some REAL neural network action!\n\n' ,
         );
+        this.startPatternRecognition();
       });
     });
   }
@@ -556,13 +550,7 @@ export default class Level4_Neural_Temple extends Phaser.Scene {
         this.activationContainer!.destroy();
         this.dialogBox!.show(
           '🏆 ARENA CHAMPION! 🏆\n\n' +
-          'You\'ve mastered activation functions!\n\n' +
-          '🎓 What you learned:\n' +
-          '• ReLU: Simple, fast, most common\n' +
-          '• Sigmoid: Smooth, for probabilities\n' +
-          '• Tanh: Centered, stronger gradients\n' +
-          '• Leaky ReLU: Fixes "dead neurons"\n\n' +
-          'All activities complete! Hit EXIT to finish! 🚀',
+          'You\'ve mastered activation functions!\n\n',
           () => {}
         );
       } else {

@@ -252,7 +252,7 @@ export class RecapScreen {
     if (data.nextLevel && this.onNextLevel) {
       const nextLevelBtn = this.scene.add.rectangle(0, buttonY, 300, 60, COLORS.SUCCESS);
       nextLevelBtn.setOrigin(0.5, 0.5);
-      const nextLevelText = this.scene.add.text(0, buttonY, `Continue to ${data.nextLevel.name}`, {
+      const nextLevelText = this.scene.add.text(0, buttonY, `To ${data.nextLevel.name}`, {
         fontSize: '20px',
         color: '#ffffff',
         fontFamily: 'Arial',

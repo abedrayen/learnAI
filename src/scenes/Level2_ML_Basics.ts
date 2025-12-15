@@ -55,11 +55,7 @@ export default class Level2_ML_Basics extends Phaser.Scene {
     this.slideOverlay.show(LEVEL_2_SLIDES_ENHANCED, () => {
       this.time.delayedCall(500, () => {
         this.dialogBox!.show(
-          'Welcome to Machine Whisperer! Complete the ML Detective activity:\n\n' +
-          'Answer questions about:\n' +
-          '• ML Types (Supervised, Unsupervised, Reinforcement)\n' +
-          '• Supervised Subtypes (Classification, Regression)\n' +
-          '• Data Quality Issues',
+          'Welcome to Machine Whisperer! Complete the ML Detective activity',
           () => {
             this.startDetectiveMode();
           }

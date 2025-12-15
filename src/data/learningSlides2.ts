@@ -98,7 +98,7 @@ export const LEVEL_1_SLIDES_ENHANCED: EnhancedSlide[] = [
       { type: 'tooltip', triggerText: 'Real-World Examples (hover to see)', align: 'center', tooltipContent: {
         title: 'Rule-Based AI Examples',
         items: [
-          '🔢 Calculators — mathematical operations follow strict rules',
+          '💰 Tax calculation systems — income brackets and rates follow predefined rules',
           '🚦 Traffic lights — timed sequences based on fixed logic',
           '🏦 ATM machines — predefined transaction rules',
         ]
